@@ -1,3 +1,6 @@
+#' This script reads data/final_index.csv and plots
+#' Figure 3 in the paper.
+
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
 version                           
@@ -25,10 +28,13 @@ packageVersion("tidyverse")
 
 source("aux_functions.R")
 
+##### 2. READ DATA #####
 
 # Read the data
 
 final_index <- read_csv("data/final_index.csv")
+
+##### 3. PLOT ######
 
 # Columns to plot and their x label
 
