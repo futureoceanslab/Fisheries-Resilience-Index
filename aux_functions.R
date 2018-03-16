@@ -1,3 +1,5 @@
+#' Contains auxiliary functions used in other scripts
+
 if(!require(gridExtra)){
   install.packages("gridExtra",dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
