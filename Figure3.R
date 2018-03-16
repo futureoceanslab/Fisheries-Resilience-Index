@@ -71,14 +71,14 @@ graphs <- 1:length(x_labels) %>% lapply(function(i){
   
   # subset data for trend lines.
   
-  not.cod.data <- to.plot %>% filter(SPECIE!="Cod")
-  not.hake.data <- to.plot %>% filter(SPECIE!="Hake")
+  cod.data <- to.plot %>% filter(SPECIE=="Cod")
+  hake.data <- to.plot %>% filter(SPECIE=="Hake")
   
   # Plot
-  g <- ggplot (to.plot, aes_string(column_name, "Resilience_Index", col = "SPECIE", linetype = "SPECIE")) +
+  g <- ggplot(to.plot, aes_string(column_name, "Resilience_Index", col = "SPECIE", linetype = "SPECIE")) +
     geom_point(aes(shape=SPECIE)) +
-    geom_smooth(data = not.cod.data,method = lm, se = TRUE, linetype = "dotted")+
-    geom_smooth(data = not.hake.data,method = lm, se = TRUE)+
+    geom_smooth(data = hake.data,method = lm, se = TRUE, linetype = "dotted")+
+    geom_smooth(data = cod.data,method = lm, se = TRUE)+
     scale_shape_manual(values=point_shapes)+
     scale_color_manual(values=c("steelblue","steelblue"))+
     ylab("R.I")+
