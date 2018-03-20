@@ -19,6 +19,20 @@ version
 # version.string R version 3.3.0 (2016-05-03)
 # nickname       Supposedly Educational          
 
+if(!require(magrittr)){
+  install.packages('magrittr',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(magrittr)
+packageVersion("magrittr")
+# [1] ‘1.5’
+
+if(!require(ReporteRs)){
+  install.packages('ReporteRs',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(ReporteRs)
+packageVersion("ReporteRs")
+# [1] ‘0.8.8’
+
 if(!require(tidyverse)){
   install.packages("tidyverse",dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
@@ -58,7 +72,7 @@ x_labels <- c(GDP.2016="GDP 2016",
 
 species_to_plot <- c(COD="Cod",HAKE="Hake")
 
-# Note: We are modifying the x-axis for some graphs, but trend lines are computed using all the data available.
+
 
 graphs <- names(species_to_plot) %>% lapply(function(species_name){
   # species_name <- "HAKE"
@@ -112,15 +126,9 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
             legend.title = element_text(size=14,color="black"))
     
     
-    # p-values
+    # plot p-values
     
-    extract_p_value <- function(model) {
-      
-      fstat <- summary(model)$fstatistic
-      
-      pf(fstat[1],fstat[2],fstat[3],lower.tail = FALSE)
-      
-    }
+    
     
     model_formula <- as.formula(paste("Resilience_Index ~",column_name))
     
@@ -148,7 +156,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
     
     
     if(nrow(p) >0){
-    g<- g + geom_text(data=p,aes(x=x,y=y,label=p,col=DIMENSION,hjust=hjust),show.legend = FALSE,vjust=-0.1) +
+      g<- g + geom_text(data=p,aes(x=x,y=y,label=p,col=DIMENSION,hjust=hjust),show.legend = FALSE,vjust=-0.1) +
       geom_text(label="p-value",col="black",x=x_center,y=y_center,vjust=-0.1,hjust=2)
     }
     # Remove y label on the right side column of graphs
@@ -158,19 +166,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
       
     }
     
-    # Limiting x-axis range for three cases
-    
-    # if(species_name=="HAKE"){
-    #   g <-switch (column_name,
-    #               GDP.2016 = g + coord_cartesian(xlim=c(28,50)),   
-    #               Readiness = g + coord_cartesian(xlim=c(0.58,0.74)),
-    #               Vulnerability = g + coord_cartesian(xlim=c(0.300,0.351)),
-    #               OHI.eco = g + coord_cartesian(xlim = c(70,100)),
-    #               Inclusion.of.Requirements.2010= g + coord_cartesian(xlim = c(17,24)),
-    #               g
-    #               ) 
-    #    
-    # }
+  
     
     
     g
@@ -188,3 +184,116 @@ png("Figures/Figure 8.png",width=10,height=20,units="in",res=300)
 do.call(grid.arrange,c(graphs, list(ncol = 1)))
 
 dev.off()
+
+
+##### 4. TABLES #####
+
+doc <- docx()
+
+for(species_name in names(species_to_plot)){
+  # species_name <- "HAKE"
+  # Species
+  
+  species <- species_to_plot[species_name]
+  
+  
+  # Filter species data
+  
+  final_index_species <- final_index %>% filter(SPECIE==species)
+  
+  # Plot the graphs and save each graph in a list for later
+  
+  table_for_specie <- 1:length(x_labels) %>% lapply(function(i){
+    # i <-6
+    # Get the column name to plot
+    column_name <- names(x_labels)[i]
+    
+    # Get the x label
+    x_label <- x_labels[column_name]
+    
+    # A letter for the subtitle
+    subtitle_letter <- LETTERS[i]
+    
+    # data to plot
+    
+    to.plot <- final_index_species %>% 
+      filter_at(vars(one_of(c(column_name,"Resilience_Index"))),all_vars(!is.na(.))) # remove NAs
+    
+    
+    
+    
+    
+    
+  
+    # compute p-values
+    
+    
+    
+    model_formula <- as.formula(paste("Resilience_Index ~",column_name))
+    
+    dimension_names <- to.plot$DIMENSION %>% unique %>% sort
+    
+    
+    
+    p <-   dimension_names %>% lapply(function(x){
+      
+      # x <- "institutional"
+      d <- to.plot %>% filter(DIMENSION==x)
+      
+      model <-  lm(formula=model_formula,data=d) 
+      
+      p<- extract_p_value(model)
+      
+      
+      data.frame(Var=x_labels[column_name],DIMENSION=x,p=p)
+      
+    }) %>% bind_rows() %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% spread(DIMENSION,p)
+    
+    
+    
+    
+    
+    
+    p
+    
+  }) %>% bind_rows() %>% data.frame
+  
+  
+  
+  doc %<>% addParagraph("")
+  
+  title <-  paste0(species,": p-values for trend lines in Fig 8")
+  
+  doc %<>% addParagraph(title,stylename = "En-tte")
+  
+  
+  Ft <- FlexTable(table_for_specie,add.rownames = FALSE)
+  
+  Ft[to="header"] <- textProperties(font.size = 12,font.weight = "bold")
+  Ft[to="header"] <- parProperties(text.align = "center")
+  
+  
+  Ft[] <- textProperties(font.size = 12)
+  
+  Ft[,1] <- textProperties(font.size = 12,font.weight = "bold")
+  
+  Ft[] <- parProperties(text.align = "center")
+  
+  Ft[,1] <- parProperties(text.align = "left")
+  
+  
+  doc %<>% addFlexTable(Ft,offx=-1)
+  
+  #footer <- paste0("Notes: All models include year fixed effects.  Reported results are the predicted change in the probability of reporting poor health for a ",units," change in the state ",measure," [the sum of β(",measure,") + β(",measure," * income quintile)].  In the baseline model, for example, a ",units," increase in the state ",measure," predicts an increase of ",export.tbl[[i]][1,2] %>% strsplit("\\n") %>% `[[`(1) %>% `[`(1) %>% as.numeric()*100," percentage points in the probability of reporting poor health among people in the poorest income quintile in their state.  Robust 95% confidence intervals. N = ",export.tbl[[i]][6,2],". ")
+  
+  
+  
+  #doc %<>% addParagraph(pot(footer,format = textProperties(font.size=10)),stylename = "Pieddepage")
+  
+  
+  
+  
+  
+}
+
+writeDoc(doc,file=paste0("Tables/Fig8_p_values.docx"))
