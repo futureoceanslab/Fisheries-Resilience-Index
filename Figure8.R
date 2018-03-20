@@ -26,6 +26,14 @@ require(tidyverse)
 packageVersion("tidyverse")
 # [1] ‘1.2.1’
 
+if(!require(gridExtra)){
+  install.packages("gridExtra",dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(gridExtra)
+packageVersion("gridExtra")
+# [1] ‘2.2.1’
+
+
 source("aux_functions.R")
 
 ##### 2. READ DATA #####
@@ -80,16 +88,18 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
     
     to.plot <- final_index_species %>% 
       filter_at(vars(one_of(c(column_name,"Resilience_Index"))),all_vars(!is.na(.))) # remove NAs
+
     
-    # subset data for trend lines.
+    
+    
     
     
     # Plot
-    g <-  ggplot(to.plot, aes_string(column_name, "Resilience_Index", col = "DIMENSION")) +
+    g <- ggplot(to.plot, aes_string(column_name, "Resilience_Index", col = "DIMENSION")) +
       geom_point(aes(shape=DIMENSION)) +
-      geom_smooth(se = TRUE, method = "lm", fill= "gray77", size= 1)+
+      geom_smooth(se = TRUE, method = "lm", fill= "gray77", size= 1,alpha=0.25)+
       scale_shape_manual(values=c(1,5,6))+
-      scale_color_manual(values=c("green4","navy","purple"))+
+      scale_color_manual(values=c("yellow3","seagreen4","cornsilk3"))+
       ylab("R.I")+
       scale_fill_discrete(name=species_name)+
       xlab(x_label)+
@@ -101,6 +111,46 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
             legend.text = element_text(size=12,color = "black"),
             legend.title = element_text(size=14,color="black"))
     
+    
+    # p-values
+    
+    extract_p_value <- function(model) {
+      
+      fstat <- summary(model)$fstatistic
+      
+      pf(fstat[1],fstat[2],fstat[3],lower.tail = FALSE)
+      
+    }
+    
+    model_formula <- as.formula(paste("Resilience_Index ~",column_name))
+    
+    dimension_names <- to.plot$DIMENSION %>% unique %>% sort
+    
+    x_center <- to.plot[,column_name] %>% range %>% mean
+    y_center <- ggplot_build(g)[["layout"]][["panel_ranges"]][[1]][["y.range"]] %>% min
+    
+    
+    p <-   dimension_names %>% lapply(function(x){
+      
+      # x <- "institutional"
+      d <- to.plot %>% filter(DIMENSION==x)
+      
+      model <-  lm(formula=model_formula,data=d) 
+      
+      p<- extract_p_value(model)
+      
+      
+      data.frame(DIMENSION=x,p=p)
+      
+    }) %>% bind_rows()   %>% filter(p<0.05) %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% mutate(x=x_center,y=y_center,hjust=c(1.2,0,-1.2)[1:nrow(.)])
+    
+    
+    
+    
+    if(nrow(p) >0){
+    g<- g + geom_text(data=p,aes(x=x,y=y,label=p,col=DIMENSION,hjust=hjust),show.legend = FALSE,vjust=-0.1) +
+      geom_text(label="p-value",col="black",x=x_center,y=y_center,vjust=-0.1,hjust=2)
+    }
     # Remove y label on the right side column of graphs
     
     if(i %% 2==0){
