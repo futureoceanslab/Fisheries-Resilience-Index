@@ -82,7 +82,7 @@ graphs <- 1:nrow(graph_defs) %>% lapply(function(i){
 
 # Arrange in grid with shared legend and save to file.
 
-png("Figures/Fig dimensions.png",width=9.38,height=7.99,units="in",res=300)
+png("Figures/Fig dimensions.png",width=9.5,height=8,units="in",res=300)
 
 do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 2, ncol = 2)))
 
