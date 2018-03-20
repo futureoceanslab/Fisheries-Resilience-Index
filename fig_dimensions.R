@@ -34,51 +34,57 @@ source("aux_functions.R")
 
 sp <- read_csv("data/sp.csv")
 
-matrix(c("Resilience_Index_E","Resilience_Index_S","RESILIENCE INDEX ecological-socioeconomic","Resilience Index S",
-        "Resilience_Index_E","Resilience_Index_S","RESILIENCE INDEX ecological-socioeconomic","Resilience Index S",
-        "Resilience_Index_E","Resilience_Index_S","RESILIENCE INDEX ecological-socioeconomic","Resilience Index S"),ncol=4) %>% data.frame()
 
-data.frame(x=c(),
-           y=c(),
-           title=c())
+##### 3. PLOT #####
 
-p1 <- ggplot (sp, aes(Resilience_Index_E, Resilience_Index_S , col = SPECIE, linetype = SPECIE)) +
-  geom_point(aes(shape=SPECIE)) +
-  geom_smooth(se = TRUE, method = lm)+
-  #scale_x_continuous(limits = c(0,1),
-  #                   expand = c(0,0))+
-  scale_shape_manual(values=c(16,1))+
-  scale_color_manual(values=c("steelblue","steelblue"))+
-  ggtitle("RESILIENCE INDEX ecological-socioeconomic") +
-  xlab("Resilience_Index_E")+
-  theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
-p1
+# Define the grahps: xvar, y var, title, x-axis label, y-axis label for each graph
 
-####**Ecolgical Resilience vs Institutional Resilience**
+graph_defs <- matrix(c(
+  "Resilience_Index_S","Resilience_Index_I","RESILIENCE INDEX socioeconomic-institutional","Resilience Index S","Resilence Index I",
+  "Resilience_Index_E","Resilience_Index_I","RESILIENCE INDEX ecological-institutional","Resilience Index E","Resilence Index I",
+  "Resilience_Index_E","Resilience_Index_S","RESILIENCE INDEX ecological-socioeconomic","Resilience Index E", "Resilence Index S"
+        ),ncol=5,byrow = TRUE) %>% data.frame(stringsAsFactors = FALSE)
 
-p2 <- ggplot (sp, aes(Resilience_Index_E, Resilience_Index_I , col = SPECIE, linetype = SPECIE)) +
-  geom_point(aes(shape=SPECIE)) +
-  geom_smooth(se = TRUE, method = lm)+
-  #scale_x_continuous(limits = c(0,1),
-  #                   expand = c(0,0))+
-  scale_shape_manual(values=c(16,1))+
-  scale_color_manual(values=c("steelblue","steelblue"))+
-  ggtitle("RESILIENCE INDEX ecological-institutional") +
-  xlab("Resilience_Index_E")+
-  theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
-p2
+names(graph_defs) <- c("x","y","title","xlab","ylab")
 
-####**Socioeconomic Resilience vs Institutional Resilience**
+# Plot the graphs
 
-p3 <- ggplot (sp, aes(Resilience_Index_S, Resilience_Index_I , col = SPECIE, linetype = SPECIE)) +
-  geom_point(aes(shape=SPECIE)) +
-  geom_smooth(se = TRUE, method = lm)+
-  #scale_x_continuous(limits = c(0,1),
-  #                   expand = c(0,0))+
-  scale_shape_manual(values=c(16,1))+
-  scale_color_manual(values=c("steelblue","steelblue"))+
-  ggtitle("RESILIENCE INDEX socioeconomic-institutional") +
-  xlab("Resilience_Index_S")+
-  theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
-p3
+graphs <- 1:nrow(graph_defs) %>% lapply(function(i){
+  
+  
+  
+  x_var <- graph_defs[i,"x"] # x variable
+  y_var <- graph_defs[i,"y"] # y variable
+  title <- graph_defs[i,"title"] # title
+  xlab <- graph_defs[i,"xlab"] # x label
+  ylab <- graph_defs[i,"ylab"] # y label
+  
+  # Plot
+  
+  g <- ggplot (sp, aes_string(x=x_var, y=y_var , col = "SPECIE", linetype = "SPECIE")) +
+    geom_point(aes(shape=SPECIE)) +
+    geom_smooth(se = TRUE, method = lm)+
+    scale_shape_manual(values=c(16,1))+
+    scale_color_manual(values=c("steelblue","steelblue"))+
+    ggtitle(title) +
+    xlab(xlab)+
+    ylab(ylab)+
+    theme_classic()+
+    theme(plot.title = element_text(size=13, face="bold", color="black"),
+          axis.text = element_text(size=12, color="black"),
+          axis.title = element_text(size=14, color="black"),
+          legend.text = element_text(size=12,color = "black"),
+          legend.title = element_text(size=14,color="black"))
+  
+  g
+  
+})
+
+# Arrange in grid with shared legend and save to file.
+
+png("Figures/Fig dimensions.png",width=9.38,height=7.99,units="in",res=300)
+
+do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 2, ncol = 2)))
+
+dev.off()
 
