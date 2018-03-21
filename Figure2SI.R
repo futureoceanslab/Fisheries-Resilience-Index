@@ -1,3 +1,6 @@
+#' Reads data/eco_country_cod.csv, data/eco_country_hake.csv, 
+#' data/institutional_factors.csv and data/socioeconomic_factors.csv 
+#' and plots Figures/Fig 2 SI.png
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
