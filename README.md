@@ -10,4 +10,5 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
 
 - aux_functions.R: Contains auxiliary functions used in other scripts
 - Figure3.R: This script reads data/final_index.csv and plots Figure 3 in the paper.
+- Figure4SI.R: Reads data/ecological_indicators.csv, data/institutional_indicators.csv and data/socioeconomic_indicators.csv. Computes correlation matrices for each set of indicators and plots the correlation matrices in Figures/Fig 4 SI.png
 - fig_dimensions.R: This script reads data/sp.csv and plots Fig dimensions.png in the paper.
