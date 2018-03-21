@@ -1,6 +1,6 @@
-#' Reads ecological_indicators.csv, institutional_indicators.csv and 
-#' socioeconomic_indicators.csv. Computes correlation matrices for each set of
-#' indicators and saves the result in Fig 4 Si.png
+#' Reads data/ecological_indicators.csv, data/institutional_indicators.csv and 
+#' data/socioeconomic_indicators.csv. Computes correlation matrices for each set of
+#' indicators and plots the correlation matrices in Figures/Fig 4 SI.png
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
