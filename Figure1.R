@@ -1,5 +1,5 @@
 #' This script reads data/final_index.csv and plots
-#' Figure 2 in the paper.
+#' Figure 1 in the paper.
 #' 
 #' NOTE: As of 2018-03-21, CRAN version of ggplot2 does not include geom_sf.
 #' If you run the script and get an error that says that geom_sf is not found, then you
@@ -75,10 +75,22 @@ final_index <- read_csv("data/final_index.csv")
 
 ##### 4. PLOT #####
 
+# Plot one species per panel
 
 graphs <- c("COD","HAKE") %>% lapply(function(specie_name){
   
-  to.plot <- final_index %>% arrange(COUNTRIES,DIMENSION)  %>% mutate(SPECIE=toupper(SPECIE))  %>%  filter(SPECIE==specie_name) %>% merge(a, ., by="COUNTRIES", all.x=T) 
+  # Filter to keep data for one specie, then merge with map data
+  
+  to.plot <- final_index %>% 
+    arrange(COUNTRIES,DIMENSION)  %>% 
+    mutate(SPECIE=toupper(SPECIE))  %>%  
+    filter(SPECIE==specie_name) %>% 
+    group_by(COUNTRIES) %>%
+    summarise(Resilience_Index=mean(Resilience_Index,na.rm = TRUE)) %>%
+    ungroup() %>%
+    merge(a, ., by="COUNTRIES", all.x=T) 
+  
+  # Plot
   
   ggplot(to.plot) +
     geom_sf(aes(fill = Resilience_Index)) +
