@@ -53,13 +53,6 @@ packageVersion("tidyverse")
 
 source("aux_functions.R")
 
-library(grid)
-library(gridExtra)
-library(sf)
-library(ggplot2)
-library(devtools)
-library(tidyverse)
-library(RColorBrewer)
 
 ##### 2. PREPARE MAP #####
 
