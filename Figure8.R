@@ -1,5 +1,7 @@
+
 #' This script reads data/final_index.csv, plots
 #' Figures/Figure 8.png and creates Tables/Fig8_p_values.docx
+
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
@@ -56,6 +58,7 @@ source("aux_functions.R")
 
 final_index <- read_csv("data/final_index.csv")
 
+
 # SPECIES to plot. Vector names define legend title.
 
 species_to_plot <- c(COD="Cod",HAKE="Hake")
@@ -69,6 +72,7 @@ x_labels <- c(GDP.2016="GDP 2016",
               Inclusion.of.Requirements.2010="Compilance (scores)",
               Readiness="Readiness",
               Vulnerability="Vulnerability")
+
 
 
 ##### 3. P-VALUES #####
@@ -135,6 +139,7 @@ names(p_values_species) <- names(species_to_plot)
 
 ##### 4. PLOT ######
 
+
 graphs <- names(species_to_plot) %>% lapply(function(species_name){
   # species_name <- "HAKE"
   # Species
@@ -149,7 +154,9 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
   # Plot the graphs and save each graph in a list for later
   
   graphs_for_specie <- 1:length(x_labels) %>% lapply(function(i){
+
     # i <-5
+
     # Get the column name to plot
     column_name <- names(x_labels)[i]
     
@@ -188,6 +195,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
     
     
     # plot p-values
+
   
     # Locate p-values at the bottom center of the graph. y_center may fail with different ggplot versions
     x_center <- to.plot[,column_name] %>% range %>% mean
@@ -198,6 +206,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
 
     # plot the p-valuies
         
+
     if(nrow(p) >0){
       g<- g + geom_text(data=p,aes(x=x,y=y,label=p,col=DIMENSION,hjust=hjust),show.legend = FALSE,vjust=-0.1) +
       geom_text(label="p-value",col="black",x=x_center,y=y_center,vjust=-0.1,hjust=2)
@@ -209,14 +218,17 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
       
     }
     
+
     g
   })
   
   #Arrange all panels
+
   
   do.call(grid_arrange_shared_legend,c(graphs_for_specie, list(nrow = 4, ncol = 2)))
   
 })
+
 
 # Sae the two graphs in one file
 
@@ -229,6 +241,7 @@ dev.off()
 
 ##### 4. TABLES #####
 
+
 # New document
 
 doc <- docx()
@@ -239,6 +252,7 @@ for(species_name in names(species_to_plot)){
   
   species <- species_to_plot[species_name]
   
+
 
   # Get the p-values
   
@@ -251,10 +265,12 @@ for(species_name in names(species_to_plot)){
   doc %<>% addParagraph("")
   
   # Table title
+
   title <-  paste0(species,": p-values for trend lines in Fig 8")
   
   doc %<>% addParagraph(title,stylename = "En-tte")
   
+
   # Prepare the table
   
   Ft <- FlexTable(table_for_specie,add.rownames = FALSE)
@@ -281,4 +297,5 @@ for(species_name in names(species_to_plot)){
 }
 
 # Write document
+
 writeDoc(doc,file=paste0("Tables/Fig8_p_values.docx"))
