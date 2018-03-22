@@ -33,8 +33,6 @@ require(tidyverse)
 packageVersion("tidyverse")
 # [1] ‘1.2.1’
 
-source("aux_functions.R")
-
 ##### 2. READ DATA #####
 
 # Read the data
