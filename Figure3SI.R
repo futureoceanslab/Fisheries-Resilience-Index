@@ -1,3 +1,6 @@
+#' This script reads data/final_index.csv and plots
+#' Figures/Fig 3 SI.png in the paper.
+
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
 version                           
@@ -40,9 +43,12 @@ final_index <- read_csv("data/final_index.csv")
 
 to.plot <- final_index %>% mutate(SPECIE=toupper(SPECIE))
 
+# Compute average Resilience index per specie and country
+
 aggdata <- to.plot %>% group_by(COUNTRIES,SPECIE) %>% summarise(Resilience_Index=mean(Resilience_Index,na.rm=TRUE)) %>% ungroup()
 
 
+##### 3. PLOT #####
 
 ggplot(to.plot, aes(x=COUNTRIES, y=Resilience_Index))+
   scale_y_continuous(limits = c(0,2))+
@@ -60,5 +66,7 @@ ggplot(to.plot, aes(x=COUNTRIES, y=Resilience_Index))+
         axis.title = element_text(size=20, color="black"),
         legend.text = element_text(size=22,color = "black"),
         legend.title = element_text(size=24,color="black"))
+
+# Save
 
 ggsave("Figures/Fig 3 SI.png",width = 10,height = 8,units = "in")
