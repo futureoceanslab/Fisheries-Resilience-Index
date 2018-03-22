@@ -1,5 +1,5 @@
-#' This script reads data/final_index.csv and plots
-#' Figure 8 in the paper.
+#' This script reads data/final_index.csv, plots
+#' Figures/Figure 8.png and creates Tables/Fig8_p_values.docx
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
@@ -56,7 +56,9 @@ source("aux_functions.R")
 
 final_index <- read_csv("data/final_index.csv")
 
-##### 3. PLOT ######
+# SPECIES to plot. Vector names define legend title.
+
+species_to_plot <- c(COD="Cod",HAKE="Hake")
 
 # Columns to plot and their x label
 
@@ -68,11 +70,70 @@ x_labels <- c(GDP.2016="GDP 2016",
               Readiness="Readiness",
               Vulnerability="Vulnerability")
 
-# SPECIES to plot. Vector names define legend title.
 
-species_to_plot <- c(COD="Cod",HAKE="Hake")
+##### 3. P-VALUES #####
+
+# Compute p-values for plot and tables
 
 
+p_values_species <- names(species_to_plot) %>% lapply(function(species_name){
+  # species_name <- "HAKE"
+  # Species
+  
+  species <- species_to_plot[species_name]
+  
+  
+  # Filter species data
+  
+  final_index_species <- final_index %>% filter(SPECIE==species)
+  
+  # Compute the p-value for each colum name and create table
+  
+  table_for_specie <- names(x_labels) %>% lapply(function(column_name){
+    
+    # data to plot
+    
+    to.plot <- final_index_species %>% 
+      filter_at(vars(one_of(c(column_name,"Resilience_Index"))),all_vars(!is.na(.))) # remove NAs
+    
+    
+    # compute p-values
+    
+    model_formula <- as.formula(paste("Resilience_Index ~",column_name))
+    
+    dimension_names <- to.plot$DIMENSION %>% unique %>% sort
+    
+    
+    
+    p_values <-   dimension_names %>% lapply(function(x){
+      
+      # x <- "institutional"
+      d <- to.plot %>% filter(DIMENSION==x)
+      
+      model <-  lm(formula=model_formula,data=d) 
+      
+      p<- extract_p_value(model)
+      
+      
+      data.frame(Var=x_labels[column_name],DIMENSION=x,p=p)
+      
+    }) %>% bind_rows() %>% spread(DIMENSION,p)
+    
+    
+    
+    p_values
+    
+  }) %>% bind_rows() %>% data.frame
+  
+  
+})
+
+
+names(p_values_species) <- names(species_to_plot)
+
+
+
+##### 4. PLOT ######
 
 graphs <- names(species_to_plot) %>% lapply(function(species_name){
   # species_name <- "HAKE"
@@ -88,7 +149,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
   # Plot the graphs and save each graph in a list for later
   
   graphs_for_specie <- 1:length(x_labels) %>% lapply(function(i){
-    # i <-6
+    # i <-5
     # Get the column name to plot
     column_name <- names(x_labels)[i]
     
@@ -127,34 +188,16 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
     
     
     # plot p-values
-    
-    
-    
-    model_formula <- as.formula(paste("Resilience_Index ~",column_name))
-    
-    dimension_names <- to.plot$DIMENSION %>% unique %>% sort
-    
+  
+    # Locate p-values at the bottom center of the graph. y_center may fail with different ggplot versions
     x_center <- to.plot[,column_name] %>% range %>% mean
-    y_center <- ggplot_build(g)[["layout"]][["panel_ranges"]][[1]][["y.range"]] %>% min
+    y_center <- ggplot_build(g)[["layout"]][["panel_scales_y"]][[1]][["range"]][["range"]] %>% min
     
-    
-    p <-   dimension_names %>% lapply(function(x){
-      
-      # x <- "institutional"
-      d <- to.plot %>% filter(DIMENSION==x)
-      
-      model <-  lm(formula=model_formula,data=d) 
-      
-      p<- extract_p_value(model)
-      
-      
-      data.frame(DIMENSION=x,p=p)
-      
-    }) %>% bind_rows()   %>% filter(p<0.05) %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% mutate(x=x_center,y=y_center,hjust=c(1.2,0,-1.2)[1:nrow(.)])
-    
-    
-    
-    
+    # get the p-values
+    p <-  p_values_species[[species_name]] %>% gather(DIMENSION,p,-Var) %>% filter(Var==x_label)  %>% filter(p<0.05) %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% mutate(x=x_center,y=y_center,hjust=c(1.2,0,-1.2)[1:nrow(.)])
+
+    # plot the p-valuies
+        
     if(nrow(p) >0){
       g<- g + geom_text(data=p,aes(x=x,y=y,label=p,col=DIMENSION,hjust=hjust),show.legend = FALSE,vjust=-0.1) +
       geom_text(label="p-value",col="black",x=x_center,y=y_center,vjust=-0.1,hjust=2)
@@ -166,18 +209,16 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
       
     }
     
-  
-    
-    
     g
   })
   
+  #Arrange all panels
   
   do.call(grid_arrange_shared_legend,c(graphs_for_specie, list(nrow = 4, ncol = 2)))
   
 })
 
-
+# Sae the two graphs in one file
 
 png("Figures/Figure 8.png",width=10,height=20,units="in",res=300)
 
@@ -188,6 +229,8 @@ dev.off()
 
 ##### 4. TABLES #####
 
+# New document
+
 doc <- docx()
 
 for(species_name in names(species_to_plot)){
@@ -196,104 +239,46 @@ for(species_name in names(species_to_plot)){
   
   species <- species_to_plot[species_name]
   
+
+  # Get the p-values
   
-  # Filter species data
+ 
+  table_for_specie <-  p_values_species[[species_name]] %>% gather(DIMENSION,p,-Var) %>% 
+    mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% 
+    spread(DIMENSION,p)
   
-  final_index_species <- final_index %>% filter(SPECIE==species)
-  
-  # Plot the graphs and save each graph in a list for later
-  
-  table_for_specie <- 1:length(x_labels) %>% lapply(function(i){
-    # i <-6
-    # Get the column name to plot
-    column_name <- names(x_labels)[i]
-    
-    # Get the x label
-    x_label <- x_labels[column_name]
-    
-    # A letter for the subtitle
-    subtitle_letter <- LETTERS[i]
-    
-    # data to plot
-    
-    to.plot <- final_index_species %>% 
-      filter_at(vars(one_of(c(column_name,"Resilience_Index"))),all_vars(!is.na(.))) # remove NAs
-    
-    
-    
-    
-    
-    
-  
-    # compute p-values
-    
-    
-    
-    model_formula <- as.formula(paste("Resilience_Index ~",column_name))
-    
-    dimension_names <- to.plot$DIMENSION %>% unique %>% sort
-    
-    
-    
-    p <-   dimension_names %>% lapply(function(x){
-      
-      # x <- "institutional"
-      d <- to.plot %>% filter(DIMENSION==x)
-      
-      model <-  lm(formula=model_formula,data=d) 
-      
-      p<- extract_p_value(model)
-      
-      
-      data.frame(Var=x_labels[column_name],DIMENSION=x,p=p)
-      
-    }) %>% bind_rows() %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% spread(DIMENSION,p)
-    
-    
-    
-    
-    
-    
-    p
-    
-  }) %>% bind_rows() %>% data.frame
-  
-  
-  
+  # Empty line
   doc %<>% addParagraph("")
   
+  # Table title
   title <-  paste0(species,": p-values for trend lines in Fig 8")
   
   doc %<>% addParagraph(title,stylename = "En-tte")
   
+  # Prepare the table
   
   Ft <- FlexTable(table_for_specie,add.rownames = FALSE)
   
+  # Table header format
   Ft[to="header"] <- textProperties(font.size = 12,font.weight = "bold")
   Ft[to="header"] <- parProperties(text.align = "center")
   
-  
+  # General table format
   Ft[] <- textProperties(font.size = 12)
-  
-  Ft[,1] <- textProperties(font.size = 12,font.weight = "bold")
   
   Ft[] <- parProperties(text.align = "center")
   
+  # First column format
+  Ft[,1] <- textProperties(font.size = 12,font.weight = "bold")
+
   Ft[,1] <- parProperties(text.align = "left")
-  
+
+  # Add table  
   
   doc %<>% addFlexTable(Ft,offx=-1)
-  
-  #footer <- paste0("Notes: All models include year fixed effects.  Reported results are the predicted change in the probability of reporting poor health for a ",units," change in the state ",measure," [the sum of β(",measure,") + β(",measure," * income quintile)].  In the baseline model, for example, a ",units," increase in the state ",measure," predicts an increase of ",export.tbl[[i]][1,2] %>% strsplit("\\n") %>% `[[`(1) %>% `[`(1) %>% as.numeric()*100," percentage points in the probability of reporting poor health among people in the poorest income quintile in their state.  Robust 95% confidence intervals. N = ",export.tbl[[i]][6,2],". ")
-  
-  
-  
-  #doc %<>% addParagraph(pot(footer,format = textProperties(font.size=10)),stylename = "Pieddepage")
-  
-  
-  
   
   
 }
 
+# Write document
 writeDoc(doc,file=paste0("Tables/Fig8_p_values.docx"))
