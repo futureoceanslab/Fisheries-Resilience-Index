@@ -1,5 +1,10 @@
 #' This script reads data/final_index.csv and plots
-#' Figure 3 in the paper.
+#' Figure 2 in the paper.
+#' 
+#' NOTE: As of 2018-03-21, CRAN version of ggplot2 does not include geom_sf.
+#' If you run the script and get an error that says that geom_sf is not found, then you
+#' need the dev version in github. See bellow to see how to install the github version.
+
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
@@ -26,7 +31,18 @@ require(sf)
 packageVersion("sf")
 # [1] ‘0.6.0’
 
-require(ggplot2)
+# NOTE: As of 2018-03-21, CRAN version of ggplot2 does not include geom_sf.
+# If you run the script and get an error that says that geom_sf is not found. Then uncomment and run
+# the next lines
+
+# if(!require(devtools)){
+#   install.packages("devtools",dependencies = TRUE,repos='http://cran.us.r-project.org')
+# }
+# require(devtools)
+# install_github("tidyverse/ggplot2") 
+
+
+
 if(!require(tidyverse)){
   install.packages("tidyverse",dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
@@ -44,7 +60,8 @@ library(ggplot2)
 library(devtools)
 library(tidyverse)
 library(RColorBrewer)
-##### 2. WORLD MAP #####
+
+##### 2. PREPARE MAP #####
 
 download.file(url = "http://thematicmapping.org/downloads/TM_WORLD_BORDERS_SIMPL-0.3.zip",
               destfile = "data/world.zip", mode = "wb")
@@ -64,17 +81,30 @@ a<-filter(world_area, grepl('EG|AL|AD|AT|BY|BE|BA|BG|HR|CY|CZ|DK|EE|FO|FI|FR|DE|
 final_index <- read_csv("data/final_index.csv")
 
 
-plot_definition <- data.frame(DIMENSION=c("institutional","institutional","socioeconomic","socioeconomic","ecological","ecological"),SPECIES=c("Cod","Hake","Cod","Hake","Cod","Hake"),stringsAsFactors = FALSE)
+##### 4. PLOT #####
 
+# Define which dimension and species will be shown in each panel
+plot_definition <- data.frame(DIMENSION=c("institutional","institutional","socioeconomic","socioeconomic","ecological","ecological"),
+                              SPECIES=c("Cod","Hake","Cod","Hake","Cod","Hake"),
+                              stringsAsFactors = FALSE)
+
+
+# Plot each panel
 graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
-  # i <- 1
+  
+  # Get dimension and species for this panel
   dimension <- plot_definition$DIMENSION[i]
   specie <- plot_definition$SPECIES[i]
 
-  to.plot <-   final_index  %>% filter(DIMENSION==dimension,SPECIE==specie) %>% data.frame() %>% merge(a,.,by="COUNTRIES",all.x=T)
+  # Filter data for that dimension and specie.
+  
+  to.plot <-   final_index  %>% 
+    filter(DIMENSION==dimension,SPECIE==specie) %>% 
+    data.frame() %>% 
+    merge(a,.,by="COUNTRIES",all.x=T) # IMPORTANT!!!!: Cannot use full_join because sf structure is lost and map is not correlctly rendered
   
   
-  
+  # Plot
   ggplot(to.plot) +
     geom_sf(aes(fill = Resilience_Index)) +
     scale_colour_brewer() +
@@ -89,6 +119,7 @@ graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
     
 })
 
+# Arrange all the panels in one graph with a common legend
 
 png("Figures/Figure 2.png",width=10,height=10,units="in",res=300)
 
