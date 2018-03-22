@@ -1,3 +1,6 @@
+#' This script reads data/SSBLIM_FLIM_HAKE.csv and SSBLIM_FLIM_COD.csv
+#'  and plots Figures/Fig 6 SIa.png and Figures/Fig 6 SIb.png
+
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
 version                           
@@ -56,13 +59,28 @@ SSBFHAKE <- fread("data/SSBLIM_FLIM_HAKE.csv",check.names = TRUE)
 
 ##### 3. PLOT #####
 
+#' Plots Figure 6 SIx.png for one species
+#' 
+#' @param data (data.frame) the data to plot
+#' @param ASSESSID_to_keep (named character vector) values are used to filter the data by ASSESSID. Names are used for panel titles and x axis titles.
+#' @param filename (character) path of the figure to produce.
+#' @param xlim (numeric vector) x axis limits
+#' @param ylim (numeric vector) y axis limits
+#' @param fig.width (numeric) figure width in inches
+#' @param fig.height (numeric) figure height in inches
 plot_fig6si_species <- function(data,ASSESSID_to_keep,filename,xlim=c(0,1),ylim=c(0,1),fig.width=14,fig.height=7) {
   
+  # Each pannel shows an ASSESSID
   graphs <- names(ASSESSID_to_keep) %>% lapply(function(ASSESSID_name){
     
+    # Get the ASSESSID used fo this panel
     ASSESSID_to_keep <- ASSESSID_to_keep[ASSESSID_name]
     
+    # Keep only the ASSESSID for this panel
+    
     to.plot <- data %>% filter(ASSESSID.1 == ASSESSID_to_keep)  
+    
+    # Plot
     
     ggplot(data=to.plot, aes(x=SSB.SSBLIM, y=F.FLIM, color=TSYEAR)) +
       geom_point(size=5)+
@@ -84,6 +102,7 @@ plot_fig6si_species <- function(data,ASSESSID_to_keep,filename,xlim=c(0,1),ylim=
     
   })
   
+  # Save
   
   png(filename,width=fig.width,height=fig.height,units="in",res=300)
   
@@ -96,10 +115,11 @@ plot_fig6si_species <- function(data,ASSESSID_to_keep,filename,xlim=c(0,1),ylim=
 
 ##### 3.1. PLOT HAKE (Fig 6SIa) #####
 
+# Define ASSESSID_to_keep. Values are used to filter the data by ASSESSID. Names are used for panel titles and x axis titles.
 
 ASSESSID_to_keep_HAKE <- c(`Hake North`="WGHMM-HAKENRTN-1977-2007-JENNINGS", `Hake South`="WGHMM-HAKESOTH-1982-2007-JENNINGS")
 
-
+# plot
 
 plot_fig6si_species(data=SSBFHAKE,
                     ASSESSID_to_keep=ASSESSID_to_keep_HAKE,
@@ -112,6 +132,8 @@ plot_fig6si_species(data=SSBFHAKE,
 
 ##### 3.2. PLOT COD (Fig 6SIb) #####
 
+# Define ASSESSID_to_keep. Values are used to filter the data by ASSESSID. Names are used for panel titles and x axis titles.
+
 ASSESSID_to_keep_COD <- c(CODBA2532="WGBFAS-CODBA2532-1964-2007-JENNINGS", 
                       CODFAPL="NWWG-CODFAPL-1959-2006-MINTO", 
                       CODIS="WGNSDS-CODIS-1968-2006-MINTO", 
@@ -120,7 +142,7 @@ ASSESSID_to_keep_COD <- c(CODBA2532="WGBFAS-CODBA2532-1964-2007-JENNINGS",
                       CODNS="WGNSSK-CODNS-1962-2007-MINTO",
                       CODVIa="WGNSDS-CODVIa-1977-2006-MINTO" )
 
-
+# plot
 
 plot_fig6si_species(data=SSBFCOD,
                     ASSESSID_to_keep=ASSESSID_to_keep_COD,
