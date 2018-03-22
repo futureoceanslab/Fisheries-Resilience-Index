@@ -68,3 +68,19 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 3, 
   invisible(combined)
   
 }
+
+
+#' Extracts p-value from a model
+#' 
+#' @param model (lm) model fitted
+#' @return (numeric) p-value
+extract_p_value <- function(model) {
+  
+  # Get f statistic
+  fstat <- summary(model)$fstatistic
+  
+  # Compute p-value
+  
+  pf(fstat[1],fstat[2],fstat[3],lower.tail = FALSE)
+  
+}
