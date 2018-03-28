@@ -70,7 +70,7 @@ to.plot <- final_index %>%
 
 LatDim <- ggplot (na.omit(to.plot), aes(Resilience_Index, LAT, col = DIMENSION)) +
   geom_point(aes(shape=DIMENSION)) +
-  geom_smooth(se = TRUE, method = "lm")+
+  geom_smooth(se = TRUE, method = "lm", size= 1,alpha=0.2)+
   scale_color_manual(values=c("seagreen4","cornsilk3","yellow3"))+
   xlab("R.I")+
   ylab("Latitude (º)") +
@@ -85,7 +85,7 @@ LatDim
 
 LatSp <- ggplot (na.omit(to.plot), aes(Resilience_Index, LAT, col = SPECIE, linetype = SPECIE)) +
   geom_point(aes(shape=SPECIE)) +
-  geom_smooth(se = TRUE, method = "lm")+
+  geom_smooth(se = TRUE, method = "lm", size= 1,alpha=0.2)+
   scale_shape_manual(values=c(16,1))+
   scale_color_manual(values=c("steelblue","steelblue4"))+
   xlab("R.I")+
