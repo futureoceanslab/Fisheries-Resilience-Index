@@ -92,26 +92,11 @@ p_values_species<- names(species_to_plot) %>% lapply(function(species_name){
   
   # Compute the p-value for each colum name and create table
   
-  table_for_specie <- names(x_labels) %>% lapply(function(column_name){
+  table_for_specie <- p_values_for_columns_and_classes_in_column(final_index_species,names(x_labels),"DIMENSION")
     
-    # data to plot
-    
-    to.plot <- final_index_species %>% 
-      filter_at(vars(one_of(c(column_name,"Resilience_Index"))),all_vars(!is.na(.))) # remove NAs
-    
-    
-    # compute p-values
-    
-    
-    
-    
-    p_values <- p_values_for_classes_in_column(to.plot,"DIMENSION",column_name) %>% mutate(Var=x_labels[column_name]) 
-    
-
-    p_values %>% select(Var,one_of(names(p_values)))
-    
-  }) %>% bind_rows() %>% data.frame
   
+  table_for_specie %<>% mutate(Var=x_labels[Var])
+    
   
 })
 
