@@ -20,6 +20,20 @@ version
 # version.string R version 3.3.0 (2016-05-03)
 # nickname       Supposedly Educational          
 
+if(!require(magrittr)){
+  install.packages('magrittr',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(magrittr)
+packageVersion("magrittr")
+# [1] ‘1.5’
+
+if(!require(ReporteRs)){
+  install.packages('ReporteRs',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(ReporteRs)
+packageVersion("ReporteRs")
+# [1] ‘0.8.8’
+
 if(!require(gridExtra)){
   install.packages("gridExtra",dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
@@ -163,3 +177,62 @@ png("Figures/Fig 5 SI.png",width=9,height=9,units="in",res=300)
 grid.arrange(ggplotGrob(LatDim), ggplotGrob(LatSp), layout_matrix = cbind(c(1,2)))
 
 dev.off()
+
+
+##### 6. TABLES #####
+
+
+# New document
+
+doc <- docx()
+
+
+# Get the p-values
+
+doc.table <-  bind_rows(p_values_dimensions %>% mutate(Var="Dimension"),p_values_species  %>% mutate(Var="Species")) %>%
+  gather(col,p,-Var)%>%  filter(!is.na(p)) %>%
+  mutate_if(is.numeric,funs(ifelse(.<0.01,"<0.01",sprintf("%0.2f",.)))) %>% # Format the p-values
+  rename(` `=col, ` `=Var,`p-value`=p)
+
+
+
+# Empty line
+doc %<>% addParagraph("")
+
+# Table title
+
+title <-  "p-values for trend lines in Fig 5"
+
+doc %<>% addParagraph(title,stylename = "En-tte")
+
+
+# Prepare the table
+
+Ft <- FlexTable(doc.table,add.rownames = FALSE,header.columns = FALSE) # Do not create the header, now.
+
+# Add header. First header cell spans two columns
+
+Ft <- addHeaderRow(Ft,c("","p-values"),colspan = c(2,1))
+
+# Table header format
+Ft[to="header"] <- textProperties(font.size = 12,font.weight = "bold")
+Ft[to="header"] <- parProperties(text.align = "center")
+
+# General table format
+Ft[] <- textProperties(font.size = 12)
+
+Ft[] <- parProperties(text.align = "center")
+
+Ft <- spanFlexTableRows(Ft,1,runs = doc.table[,1])
+
+# Add table  
+
+doc %<>% addFlexTable(Ft,offx=-1)
+
+
+
+
+# Write document
+
+writeDoc(doc,file=paste0("Tables/Fig5_p_values.docx"))
+
