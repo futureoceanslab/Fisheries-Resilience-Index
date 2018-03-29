@@ -62,9 +62,57 @@ to.plot <- final_index %>%
   data.frame() %>% 
   merge(a,.,by="COUNTRIES",all.x=T) # IMPORTANT!!!!: Cannot use full_join because sf structure is lost and map is not correlctly rendered
 
+dimensions <- to.plot %>% filter(!is.na(DIMENSION)) %>% pull("DIMENSION") %>% unique
+
+species <- to.plot %>% filter(!is.na(SPECIE)) %>% pull("SPECIE") %>% unique
+
+
+
+# Compute the p-value for each dimension name and create table
+
+p_values_dimensions  <- p_values_for_column(to.plot,"DIMENSION","LAT")
+
+# Compute the p-value for each species name and create table
+
+p_values_species <- p_values_for_column(to.plot,"SPECIE","LAT")
+
+
+
 
 
 ##### 4. PLOT #####
+
+
+#' Plots p-values < 0.05 in the upper left_corner of the panel
+#' 
+#' @param g (ggplot) graph
+#' @param data (data.frame) data used to plot g
+#' @param p_values (data.frame) p_values for the trend lines displayed
+#' @param column_name (character) column name of the classe used to plot the trend lines
+#' @return (ggplot) graph with the p-values
+plot_p_values <- function(g,data,p_values,column_name){
+  # Locate p-values at the bottom center of the graph. y_center may fail with different ggplot versions
+  x_center <- data[,"Resilience_Index"] %>% min(na.rm=TRUE)
+  y_center <- data[,"LAT"] %>% max(na.rm=TRUE)
+  
+  
+  # get the p-values
+  p <-  p_values %>% gather(var,p) %>% filter(p<0.05) %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% mutate(x=x_center,y=y_center,hjust=c(0,-1.2,-2.4)[1:nrow(.)])
+  
+  names(p)[1] <- column_name
+  
+  # plot the p-values
+  
+  
+  if(nrow(p) >0){
+    g<- g + geom_text(data=p,aes_string(x="x",y="y",label="p",col=column_name,hjust="hjust"),show.legend = FALSE,vjust=2) +
+      geom_text(label="p-value",col="black",x=x_center,y=y_center,vjust=0,hjust=0)
+    
+  }
+  
+  g
+  
+}
 
 # By dimension
 
@@ -78,8 +126,15 @@ LatDim <- ggplot (na.omit(to.plot), aes(Resilience_Index, LAT, col = DIMENSION))
   theme(axis.text = element_text(size=16, color="black"),
         axis.title = element_text(size=20, color="black"),
         legend.text = element_text(size=12,color = "black"),
-        legend.title = element_text(size=14,color="black"))
+        legend.title = element_text(size=14,color="black")) 
+
+LatDim <- plot_p_values(LatDim, na.omit(to.plot),p_values_dimensions,"DIMENSION") # plot p-values
 LatDim
+
+
+
+
+
 
 # By species
 
@@ -95,6 +150,10 @@ LatSp <- ggplot (na.omit(to.plot), aes(Resilience_Index, LAT, col = SPECIE, line
         axis.title = element_text(size=20, color="black"),
         legend.text = element_text(size=12,color = "black"),
         legend.title = element_text(size=14,color="black"))
+
+LatSp <- plot_p_values(LatSp, na.omit(to.plot),p_values_species,"SPECIE") # plot p-values
+
+
 LatSp
 
 # Arrange both panels in one graph and save
