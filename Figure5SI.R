@@ -66,21 +66,21 @@ dimensions <- to.plot %>% filter(!is.na(DIMENSION)) %>% pull("DIMENSION") %>% un
 
 species <- to.plot %>% filter(!is.na(SPECIE)) %>% pull("SPECIE") %>% unique
 
-
+##### 4. p-values #####
 
 # Compute the p-value for each dimension name and create table
 
-p_values_dimensions  <- p_values_for_column(to.plot,"DIMENSION","LAT")
+p_values_dimensions  <- p_values_for_classes_in_column(to.plot,"DIMENSION","LAT")
 
 # Compute the p-value for each species name and create table
 
-p_values_species <- p_values_for_column(to.plot,"SPECIE","LAT")
+p_values_species <- p_values_for_classes_in_column(to.plot,"SPECIE","LAT")
 
 
 
 
 
-##### 4. PLOT #####
+##### 5. PLOT #####
 
 
 #' Plots p-values < 0.05 in the upper left_corner of the panel

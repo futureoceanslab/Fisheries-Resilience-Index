@@ -90,10 +90,10 @@ extract_p_value <- function(model) {
 #' in column_name
 #' 
 #' @param data (data.frame) the data
-#' @param column_name (character) the column name with the classes
+#' @param class_column_name (character) the column name with the classes
 #' @param x_column (character) column name to be used as x in lm
 #' @return (data.frame) with p-values for each class
-p_values_for_column <- function(data,column_name,x_column){
+p_values_for_classes_in_column <- function(data,class_column_name,x_column){
   
   # Get the classes
   

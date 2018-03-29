@@ -105,7 +105,7 @@ p_values_species<- names(species_to_plot) %>% lapply(function(species_name){
     
     
     
-    p_values <- p_values_for_column(to.plot,"DIMENSION",column_name) %>% mutate(Var=x_labels[column_name]) 
+    p_values <- p_values_for_classes_in_column(to.plot,"DIMENSION",column_name) %>% mutate(Var=x_labels[column_name]) 
     
 
     p_values %>% select(Var,one_of(names(p_values)))
