@@ -84,3 +84,81 @@ extract_p_value <- function(model) {
   pf(fstat[1],fstat[2],fstat[3],lower.tail = FALSE)
   
 }
+
+
+#' Computes the p-value of lm(Resilience_Index ~ x_column) for each class
+#' in column_name
+#' 
+#' @param data (data.frame) the data
+#' @param class_column_name (character) the column name with the classes
+#' @param x_column (character) column name to be used as x in lm
+#' @return (data.frame) with p-values for each class
+p_values_for_classes_in_column <- function(data,class_column_name,x_column){
+  
+  # Get the classes
+  
+  classes <- data %>% filter_at(vars(one_of(class_column_name)),all_vars(!is.na(.))) %>% pull(class_column_name) %>% unique
+  
+  # Compute p-values for each class
+  
+  p_values_class <- classes %>% lapply(function(a_class){
+    
+    
+    # data for dimension used to compute trend line Resilience vs LAT. Note, trend-lin in graphs is computed as LAT ~ Resilience_Index. 
+    
+    to.compute <- data %>% 
+      filter_at(vars(one_of(c(class_column_name,"Resilience_Index",x_column))),all_vars(!is.na(.))) %>% # remove NAs
+      filter_at(vars(one_of(class_column_name)),all_vars(.==a_class)) # keep only data for a_class
+    
+    
+    # compute p-values
+    
+    model_formula <- as.formula(paste("Resilience_Index ~",x_column))
+    
+    
+    model <-  lm(formula=model_formula,data=to.compute) 
+    
+    p<- extract_p_value(model)
+    
+    
+    result <- data.frame(var=a_class,p=p)
+    
+    names(result)[1] <- class_column_name
+    
+    result
+    
+  })  %>% bind_rows() %>% spread(class_column_name,p)
+  
+}
+
+#' Computes the p-value of lm(Resilience_Index ~ x_column) for each class
+#' in column_name and each x_column in column names
+#' 
+#' @param data (data.frame) the data
+#' @param column_names (character) column names to be used as x in lm
+#' @param class_column_name (character) the column name with the classes
+#' @return (data.frame) with p-values for each class (columns) and column in column_names (rows)
+p_values_for_columns_and_classes_in_column <- function(data,column_names,class_column_name){
+  
+  p_values_column <- column_names %>% lapply(function(column_name){
+    
+    # data to plot
+    
+    to.compute <- data %>% 
+      filter_at(vars(one_of(c(column_name,"Resilience_Index"))),all_vars(!is.na(.))) # remove NAs
+    
+    
+    # compute p-values
+    
+    
+    
+    
+    p_values <- p_values_for_classes_in_column(to.compute,class_column_name,column_name) %>% mutate(Var=column_name) 
+    
+    
+    p_values %>% select(Var,one_of(names(p_values)))
+    
+  }) %>% bind_rows() %>% data.frame
+  
+  
+}

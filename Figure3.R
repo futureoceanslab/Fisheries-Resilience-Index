@@ -1,5 +1,5 @@
 #' This script reads data/final_index.csv and plots
-#' Figure 3 in the paper.
+#' Figures/Figure 3.png
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
@@ -34,8 +34,6 @@ source("aux_functions.R")
 
 final_index <- read_csv("data/final_index.csv")
 
-##### 3. PLOT ######
-
 # Columns to plot and their x label
 
 x_labels <- c(GDP.2016="GDP 2016",
@@ -45,6 +43,17 @@ x_labels <- c(GDP.2016="GDP 2016",
               Inclusion.of.Requirements.2010="Compilance (scores)",
               Readiness="Readiness",
               Vulnerability="Vulnerability")
+
+##### 3. p-values #####
+
+
+p_values <- p_values_for_columns_and_classes_in_column(final_index,names(x_labels),"SPECIE")
+
+
+
+##### 4. PLOT ######
+
+
 
 
 
@@ -90,7 +99,29 @@ graphs <- 1:length(x_labels) %>% lapply(function(i){
           axis.title = element_text(size=14, color="black"),
           legend.text = element_text(size=12,color = "black"),
           legend.title = element_text(size=14,color="black"))
+  
+  # Locate p-values at the top left of the graph.
+  x_center <- to.plot[,column_name] %>% min(na.rm=TRUE)
+  y_center <- to.plot[,"Resilience_Index"] %>% max(na.rm=TRUE) %>% add(0.1)
+  
+  
+  # get the p-values
+  p <-  p_values %>% filter(Var==column_name) %>% select(-Var) %>% gather(var,p) %>% filter(p<0.05) %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% mutate(x=x_center,y=y_center,hjust=c(-2,-3.2)[1:nrow(.)])
+  
+  names(p)[1] <- "SPECIE"
+  
+  # plot the p-values
+  
+  
+  if(nrow(p) >0){
+    g<- g + geom_text(data=p,aes_string(x="x",y="y",label="p",col="SPECIE",hjust="hjust"),show.legend = FALSE,vjust=0.5) +
+      geom_text(label="p-value",col="black",x=x_center,y=y_center,vjust=0.5,hjust=0)
+    
+  }
+  
   g
+  
+  
 })
 
 
