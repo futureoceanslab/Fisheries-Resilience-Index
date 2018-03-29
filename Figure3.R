@@ -1,5 +1,5 @@
-#' This script reads data/final_index.csv and plots
-#' Figures/Figure 3.png
+#' This script reads data/final_index.csv,  plots
+#' Figures/Figure 3.png and creates Tables/Fig3_p_values.docx
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
