@@ -1,5 +1,5 @@
-#' This script reads data/final_index.csv and plots
-#' Figures/Figure 3.png
+#' This script reads data/final_index.csv,  plots
+#' Figures/Figure 3.png and creates Tables/Fig3_p_values.docx
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
@@ -18,6 +18,20 @@ version
 # language       R                           
 # version.string R version 3.3.0 (2016-05-03)
 # nickname       Supposedly Educational          
+
+if(!require(magrittr)){
+  install.packages('magrittr',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(magrittr)
+packageVersion("magrittr")
+# [1] ‘1.5’
+
+if(!require(ReporteRs)){
+  install.packages('ReporteRs',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(ReporteRs)
+packageVersion("ReporteRs")
+# [1] ‘0.8.8’
 
 if(!require(tidyverse)){
   install.packages("tidyverse",dependencies = TRUE,repos='http://cran.us.r-project.org')
@@ -72,7 +86,7 @@ graphs <- 1:length(x_labels) %>% lapply(function(i){
   
   # Define point shapes
   point_shapes <- case_when(column_name=="Inclusion.of.Requirements.2010" ~ c(c(1,2)),
-                      TRUE ~ c(16,1))
+                            TRUE ~ c(16,1))
   # data to plot
   
   to.plot <- final_index %>% 
@@ -134,3 +148,55 @@ do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 4, ncol = 2)))
 dev.off()
 
 
+##### 5. TABLES #####
+
+
+# New document
+
+doc <- docx()
+
+# Get the p-values
+
+
+doc.table <-  p_values  %>% 
+  mutate_if(is.numeric,funs(ifelse(.<0.01,"<0.01",sprintf("%0.2f",.)))) %>% # Format the p-values
+  mutate(Var=x_labels[Var]) %>% rename(` `=Var) # First colum header empty
+
+# Empty line
+doc %<>% addParagraph("")
+
+# Table title
+
+title <-  "p-values for trend lines in Fig 3"
+
+doc %<>% addParagraph(title,stylename = "En-tte")
+
+
+# Prepare the table
+
+Ft <- FlexTable(doc.table,add.rownames = FALSE)
+
+# Table header format
+Ft[to="header"] <- textProperties(font.size = 12,font.weight = "bold")
+Ft[to="header"] <- parProperties(text.align = "center")
+
+# General table format
+Ft[] <- textProperties(font.size = 12)
+
+Ft[] <- parProperties(text.align = "center")
+
+# First column format
+Ft[,1] <- textProperties(font.size = 12,font.weight = "bold")
+
+Ft[,1] <- parProperties(text.align = "left")
+
+# Add table  
+
+doc %<>% addFlexTable(Ft,offx=-1)
+
+
+
+
+# Write document
+
+writeDoc(doc,file=paste0("Tables/Fig3_p_values.docx"))
