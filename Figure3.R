@@ -19,6 +19,20 @@ version
 # version.string R version 3.3.0 (2016-05-03)
 # nickname       Supposedly Educational          
 
+if(!require(magrittr)){
+  install.packages('magrittr',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(magrittr)
+packageVersion("magrittr")
+# [1] ‘1.5’
+
+if(!require(ReporteRs)){
+  install.packages('ReporteRs',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(ReporteRs)
+packageVersion("ReporteRs")
+# [1] ‘0.8.8’
+
 if(!require(tidyverse)){
   install.packages("tidyverse",dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
@@ -145,7 +159,7 @@ doc <- docx()
 
 
 doc.table <-  p_values  %>% 
-  mutate_at(vars(one_of(to.plot$SPECIE %>% unique)),funs(ifelse(.<0.01,"<0.01",sprintf("%0.2f",.)))) %>% # Format the p-values
+  mutate_if(is.numeric,funs(ifelse(.<0.01,"<0.01",sprintf("%0.2f",.)))) %>% # Format the p-values
   mutate(Var=x_labels[Var]) %>% rename(` `=Var) # First colum header empty
 
 # Empty line
