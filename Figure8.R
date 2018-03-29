@@ -79,8 +79,7 @@ x_labels <- c(GDP.2016="GDP 2016",
 
 # Compute p-values for plot and tables
 
-
-p_values_species <- names(species_to_plot) %>% lapply(function(species_name){
+p_values_species<- names(species_to_plot) %>% lapply(function(species_name){
   # species_name <- "HAKE"
   # Species
   
@@ -103,29 +102,13 @@ p_values_species <- names(species_to_plot) %>% lapply(function(species_name){
     
     # compute p-values
     
-    model_formula <- as.formula(paste("Resilience_Index ~",column_name))
-    
-    dimension_names <- to.plot$DIMENSION %>% unique %>% sort
     
     
     
-    p_values <-   dimension_names %>% lapply(function(x){
-      
-      # x <- "institutional"
-      d <- to.plot %>% filter(DIMENSION==x)
-      
-      model <-  lm(formula=model_formula,data=d) 
-      
-      p<- extract_p_value(model)
-      
-      
-      data.frame(Var=x_labels[column_name],DIMENSION=x,p=p)
-      
-    }) %>% bind_rows() %>% spread(DIMENSION,p)
+    p_values <- p_values_for_column(to.plot,"DIMENSION",column_name) %>% mutate(Var=x_labels[column_name]) 
     
-    
-    
-    p_values
+
+    p_values %>% select(Var,one_of(names(p_values)))
     
   }) %>% bind_rows() %>% data.frame
   
@@ -134,7 +117,6 @@ p_values_species <- names(species_to_plot) %>% lapply(function(species_name){
 
 
 names(p_values_species) <- names(species_to_plot)
-
 
 
 ##### 4. PLOT ######
@@ -204,7 +186,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
     # get the p-values
     p <-  p_values_species[[species_name]] %>% gather(DIMENSION,p,-Var) %>% filter(Var==x_label)  %>% filter(p<0.05) %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% mutate(x=x_center,y=y_center,hjust=c(1.2,0,-1.2)[1:nrow(.)])
 
-    # plot the p-valuies
+    # plot the p-values
         
 
     if(nrow(p) >0){
