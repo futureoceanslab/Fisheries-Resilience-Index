@@ -1,5 +1,5 @@
 #' This script reads data/final_index.csv and plots
-#' Figures/Fig 5 SI.
+#' Figures/Fig 5 SI.png.
 
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####

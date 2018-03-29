@@ -206,7 +206,7 @@ do.call(grid.arrange,c(graphs, list(ncol = 1)))
 dev.off()
 
 
-##### 4. TABLES #####
+##### 5. TABLES #####
 
 
 # New document

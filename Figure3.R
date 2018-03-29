@@ -1,5 +1,5 @@
 #' This script reads data/final_index.csv and plots
-#' Figure 3 in the paper.
+#' Figures/Figure 3.png
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
