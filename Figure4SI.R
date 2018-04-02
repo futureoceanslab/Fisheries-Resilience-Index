@@ -54,9 +54,12 @@ packageVersion("tidyverse")
 
 # Read the data
 
-eco_indicators <- fread("data/ecological_indicators.csv")
-ins_indicators <- fread("data/institutional_indicators.csv")
-soc_indicators <- fread("data/socioeconomic_indicators.csv")
+eco_indicators <- bind_rows(fread("data/ecological_indicators_cod.csv"),
+                            fread("data/ecological_indicators_hake.csv"))
+ins_indicators <- bind_rows(fread("data/institutional_indicators_cod.csv"),
+                            fread("data/institutional_indicators_hake.csv"))
+soc_indicators <- bind_rows(fread("data/socioeconomic_indicators_cod.csv"),
+                            fread("data/socioeconomic_indicators_hake.csv"))
 
 ##### 3. PLOT #####
 
