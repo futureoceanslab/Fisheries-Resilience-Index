@@ -39,3 +39,12 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
     - data/Readiness.csv
     - data/Vulnerability.csv
 
+## Instructions
+
+First run preprocess.R to compute data/final_index.csv. Then run all the figure scripts to generate the figures and tables in Figures and Tables.
+
+## Notes
+
+ Figure1.R, Figure2.R and Fig5SI.R require an Internet connection to download the map files.
+ 
+ Since some of the packages used in this repository make use of the library rJava, please check that your Java version is updated and that you have installed the right version (32-bit or 64-bit) for your R distribution.
