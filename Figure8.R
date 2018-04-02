@@ -148,7 +148,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
       geom_point(aes(shape=DIMENSION)) +
       geom_smooth(se = TRUE, method = "lm", fill= "gray77", size= 1,alpha=0.25)+
       scale_shape_manual(values=c(1,5,6))+
-      scale_color_manual(values=c("yellow3","seagreen4","cornsilk3"))+
+      scale_color_manual(values=c("seagreen4","cornsilk3","yellow3"))+
       ylab("R.I")+
       scale_fill_discrete(name=species_name)+
       xlab(x_label)+
