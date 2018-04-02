@@ -58,7 +58,7 @@ ggplot(to.plot, aes(x=COUNTRIES, y=Resilience_Index))+
   ylab("Resilience Index")+
   theme_classic()+
   theme(legend.position = "bottom",
-        strip.text = element_text(size=18,margin="right",color="black",face="bold",hjust=0),
+        strip.text = element_text(size=18,color="black",face="bold",hjust=0),
         strip.background = element_blank(),
         axis.text = element_text(size=16, color="black"),
         axis.title = element_text(size=20, color="black"),
