@@ -1,3 +1,29 @@
+#' Reads:
+#' 
+#' data/institutional_indicators_hake.csv
+#' data/institutional_indicators_cod.csv
+#' data/socioeconomic_indicators_hake.csv
+#' data/socioeconomic_indicators_cod.csv
+#' data/institutional_factors_hake.csv
+#' data/institutional_factors_cod.csv
+#' data/socioeconomic_factors_hake.csv
+#' data/socioeconomic_factors_cod.csv
+#' data/eco_country_cod.csv
+#' data/eco_country_hake.csv
+#' data/GDP.csv
+#' data/OHI.csv
+#' data/OHIeco.csv
+#' data/Tech.csv
+#' data/Requirements.csv
+#' data/Readiness.csv
+#' data/Vulnerability.csv
+#' 
+#' and produces
+#' 
+#' data/final_index.csv
+
+
+
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
 
 version                           
@@ -38,7 +64,7 @@ packageVersion("tidyverse")
 # [1] ‘1.2.1’
 
 
-##### 1. Compute dimension data #####
+##### 1. Compute Resilience Index #####
 
 #' Reads data file and preprocess indicators data
 #' 
@@ -71,6 +97,18 @@ ins_indicators <- bind_rows(preprocess_indicators("data/institutional_indicators
 soc_indicators <- bind_rows(preprocess_indicators("data/socioeconomic_indicators_hake.csv","Stockdep.sp") %>% select(SPECIES,COUNTRIES,CATCH.DEP=Stockdep.spnorm),
                             preprocess_indicators("data/socioeconomic_indicators_cod.csv","Stockdep.sp") %>% select(SPECIES,COUNTRIES,CATCH.DEP=Stockdep.spnorm))
 
+# Preprocess insitutional factors
+
+ins_factors <- bind_rows(fread("data/institutional_factors_hake.csv",check.names = TRUE),
+                         fread("data/institutional_factors_cod.csv",check.names = TRUE)) %>% # Read data
+  select(COUNTRIES,SPECIES,STOCK,DEVELOPMENT,PROPERTY.RIGHTS,CO.MANAGEMENT) %>% 
+  left_join(ins_indicators,by=c("COUNTRIES","SPECIES")) %>% # merge with institutional indicators
+  gather(FACTOR,VALUE,-COUNTRIES,-SPECIES,-STOCK,factor_key = TRUE) %>% # Gather all factors in two columns
+  group_by(SPECIES,COUNTRIES,FACTOR) %>% # Group by species, country and factor
+  summarise(VALUE=mean(VALUE,na.rm=TRUE)) %>%  # Compute mean
+  ungroup() %>%
+  mutate(DIMENSION="institutional") # Add dimension name
+
 # Preprocess socioeconomic factors.
 
 soc_factors <- bind_rows(fread("data/socioeconomic_factors_hake.csv",check.names = TRUE),
@@ -83,17 +121,7 @@ soc_factors <- bind_rows(fread("data/socioeconomic_factors_hake.csv",check.names
   ungroup() %>%
   mutate(DIMENSION="socioeconomic") # Add dimension name
 
-# Preprocess insitutional factors
 
-ins_factors <- bind_rows(fread("data/institutional_factors_hake.csv",check.names = TRUE),
-                         fread("data/institutional_factors_cod.csv",check.names = TRUE)) %>% # Read data
-  select(COUNTRIES,SPECIES,STOCK,DEVELOPMENT,PROPERTY.RIGHTS,CO.MANAGEMENT) %>% 
-  left_join(ins_indicators,by=c("COUNTRIES","SPECIES")) %>% # merge with institutional indicators
-  gather(FACTOR,VALUE,-COUNTRIES,-SPECIES,-STOCK,factor_key = TRUE) %>% # Gather all factors in two columns
-  group_by(SPECIES,COUNTRIES,FACTOR) %>% # Group by species, country and factor
-  summarise(VALUE=mean(VALUE,na.rm=TRUE)) %>%  # Compute mean
-  ungroup() %>%
-  mutate(DIMENSION="institutional") # Add dimension name
 
 
 # Preprocess ecologic data
@@ -119,7 +147,7 @@ resilience_index <- bind_rows(ecountries,ins_factors,soc_factors) %>%
   ungroup()
 
 
-
+###### 2. Include other variables #####
 
 # Read other data sources to add to the resilience index
 

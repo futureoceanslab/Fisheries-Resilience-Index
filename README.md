@@ -12,7 +12,7 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
 - aux_functions.R: Contains auxiliary functions used in other scripts
 - Figure1.R: This script reads data/final_index.csv and plots Figures/Figure 1.png.
 - Figure2.R: This script reads data/final_index.csv and plots Figures/Figure 2.png.
-- Figure2SI.R: Reads data/eco_country_cod.csv, data/eco_country_hake.csv, data/institutional_factors.csv and data/socioeconomic_factors.csv and plots Figures/Fig 2 SI.png
+- Figure2SI.R: Reads data/eco_country_cod.csv, data/eco_country_hake.csv, data/institutional_factors_cod.csv, data/institutional_factors_hake.csv, data/socioeconomic_factors_cod.csv  and data/socioeconomic_factors_hake.csv and plots Figures/Fig 2 SI.png
 - Figure3.R: This script reads data/final_index.csv, plots Figures/Figure 3.png and creates Tables/Fig3_p_values.docx.
 - Figure3SI.R: This script reads data/final_index.csv and plots Figures/Fig 3 SI.png.
 - Figure4SI.R: Reads data/ecological_indicators.csv, data/institutional_indicators.csv and data/socioeconomic_indicators.csv. Computes correlation matrices for each set of indicators and plots the correlation matrices in Figures/Fig 4 SI.png
@@ -20,3 +20,22 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
 - Figure6SIa_b.R: This script reads data/SSBLIM_FLIM_HAKE.csv and SSBLIM_FLIM_COD.csv and plots Figures/Fig 6 SIa.png and Figures/Fig 6 SIb.png.
 - Figure8.R This script reads data/final_index.csv, plots Figures/Figure 8.png and creates Tables/Fig8_p_values.docx.
 - fig_dimensions.R: This script reads data/sp.csv and plots Figures/Fig dimensions.png.
+- preprocess.R: produces data/final_index.csv from:
+    - data/institutional_indicators_hake.csv
+    - data/institutional_indicators_cod.csv
+    - data/socioeconomic_indicators_hake.csv
+    - data/socioeconomic_indicators_cod.csv
+    - data/institutional_factors_hake.csv
+    - data/institutional_factors_cod.csv
+    - data/socioeconomic_factors_hake.csv
+    - data/socioeconomic_factors_cod.csv
+    - data/eco_country_cod.csv
+    - data/eco_country_hake.csv
+    - data/GDP.csv
+    - data/OHI.csv
+    - data/OHIeco.csv
+    - data/Tech.csv
+    - data/Requirements.csv
+    - data/Readiness.csv
+    - data/Vulnerability.csv
+
