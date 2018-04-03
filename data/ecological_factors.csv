@@ -1,0 +1,12 @@
+"SPECIES","STOCK","ABUNDANCE","OVEREXPLOITATION","RECOVERY","TEMPERATURE"
+"European hake","HAKENRTN",0.467,0.863,0.669,0.643
+"European hake","HAKESOTH",0,0.5,0.528,0.643
+"Atlantic cod","CODCOASTNOR",0.5,NA,NA,0.214
+"Atlantic cod","CODNEAR",1,1,NA,0.214
+"Atlantic cod","CODFAPL",0.833,0.667,0.976,0.214
+"Atlantic cod","CODICE",NA,NA,NA,0.214
+"Atlantic cod","CODBA2532",1,0.499,0.528,0.214
+"Atlantic cod","CODKAT",0.033,0.81,0.953,0.214
+"Atlantic cod","CODIS",0.45,0.218,0.504,0.214
+"Atlantic cod","CODVIa",NA,0,NA,0.214
+"Atlantic cod","CODNS",0.417,0.266,0.504,0.214
