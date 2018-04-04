@@ -123,6 +123,10 @@ write_doc <- function(Ft,title,outfile){
 
 normalize <-function(x) (x - min(x,na.rm = TRUE))/(max(x,na.rm = TRUE)-min(x,na.rm = TRUE))
 
+species_sort_name <- function(x) case_when(x=="Atlantic cod" ~ "cod",
+                                           x=="European hake" ~ "hake",
+                                           TRUE ~ x
+                                           )
 
 ##### 2. ECOLOGICAL INDICATORS #####
 
@@ -304,7 +308,9 @@ write.csv(eco_countries,file="data/eco_country.csv",row.names = FALSE)
 
 ##### 3. SOCIOECONOMIC INDICATORS #####
 
-soc_indicators <- bind_rows(fread("data/socioeconomic_indicators_cod.csv",check.names = TRUE),fread("data/socioeconomic_indicators_hake.csv",check.names = TRUE)) %>% arrange(COUNTRIES,STOCK)
+soc_indicators <- bind_rows(fread("data/socioeconomic_indicators_cod.csv",check.names = TRUE),
+                            fread("data/socioeconomic_indicators_hake.csv",check.names = TRUE)) %>% 
+  arrange(COUNTRIES,STOCK)
 
 
 ##### 3.1 GEAR.DIVERSITY #####
@@ -435,4 +441,161 @@ Ft<- format_table(to.plot)
 write_doc(Ft,
           "Table 15. Socioeconomic Factors",
           "Tables/Table15SI.docx")
+
+
+##### 4 INSTITUTIONAL INDICATORS #####
+
+
+ins_indicators <- bind_rows(fread("data/institutional_indicators_cod.csv",check.names = TRUE),
+                            fread("data/institutional_indicators_hake.csv",check.names = TRUE)) %>% 
+  arrange(COUNTRIES,STOCK)
+
+##### 4.1 CO.MANAGEMENT (I1) #####
+
+
+Table16 <-ins_indicators %>% 
+  select(COUNTRIES,Norganizations) %>%
+  distinct %>%
+  mutate(Norganizations_norm=normalize(Norganizations)) %>%
+  rowwise() %>%
+  mutate(CO.MANAGEMENT=Norganizations_norm) %>% 
+  ungroup()
+
+to.plot <- Table16 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame
+
+to.plot[is.na(to.plot)] <- "-"
+
+to.plot <- to.plot[match(all_countries,to.plot$COUNTRIES),]
+
+Ft<- format_table(to.plot)
+
+write_doc(Ft,
+          "Table 16. Values, normalization and Co-Management factor.",
+          "Tables/Table16SI.docx")
+
+##### 4.2 PROPERTY.RIGHTS (I2) #####
+
+Table17 <- ins_indicators %>% 
+  select(COUNTRIES,Swaps) %>%
+  distinct %>%
+  mutate(Swaps_norm=normalize(Swaps)) %>%
+  rowwise() %>%
+  mutate(PROPERTY.RIGHTS=Swaps_norm) %>% 
+  ungroup()
+
+to.plot <- Table17 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame
+
+to.plot[is.na(to.plot)] <- "-"
+
+to.plot <- to.plot[match(all_countries,to.plot$COUNTRIES),]
+
+Ft<- format_table(to.plot)
+
+write_doc(Ft,
+          "Table 17. Indicators and normalization of Property Rights.",
+          "Tables/Table17SI.docx")
+
+
+##### 4.3 CATCH QUOTAS (I3) #####
+
+Table18 <- ins_indicators %>% 
+  select(COUNTRIES,STOCK,TAC) %>% 
+  spread(COUNTRIES,TAC,-STOCK)
+
+to.plot <- Table18 %>% data.frame
+
+to.plot[is.na(to.plot)] <- "-"
+
+to.plot <- to.plot[,match(c("STOCK",all_countries),names(to.plot))]
+
+Ft<- format_table(to.plot)
+
+Ft[,1] <- textProperties(font.size = 8,font.weight = "bold")
+
+write_doc(Ft,
+          "Table 18. TAC (million tons) per stock and country (2015)",
+          "Tables/Table18SI.docx")
+
+
+Table19 <- ins_indicators %>% 
+  select(SPECIES,COUNTRIES,TAC) %>%
+  group_by(SPECIES,COUNTRIES) %>% 
+  summarise(TAC=mean(TAC,na.rm=TRUE)) %>%
+  ungroup() %>%
+  group_by(SPECIES) %>%
+  mutate(TAC_norm=normalize(TAC)) %>%
+  ungroup() %>%
+  mutate(QUOTAS=TAC_norm)
+
+
+to.plot <- Table19 %>% select(SPECIES,COUNTRIES,QUOTAS) %>% 
+  mutate_if(is.numeric,funs(round(.,digits = 3))) %>% 
+  mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
+  spread(SPECIES,QUOTAS)
+
+
+to.plot[is.na(to.plot)] <- 0.0
+
+to.plot <- to.plot[match(all_countries,to.plot$COUNTRIES),]
+
+Ft<- format_table(to.plot)
+
+
+
+write_doc(Ft,
+          "Table 19. Factor Quota values per country.",
+          "Tables/Table19SI.docx")
+
+##### 4.4 DEVELOPMENT (I4) #####
+
+Table20 <-ins_indicators %>% 
+  select(COUNTRIES,HDI) %>%
+  distinct %>%
+  mutate(HDI_norm=normalize(HDI)) %>%
+  rowwise() %>%
+  mutate(DEVELOPMENT=HDI_norm) %>% 
+  ungroup()
+
+to.plot <- Table20 %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame
+
+to.plot[is.na(to.plot)] <- "-"
+
+to.plot <- to.plot[match(all_countries,to.plot$COUNTRIES),]
+
+Ft<- format_table(to.plot)
+
+write_doc(Ft,
+          "Table 20. Development indicator and factor.",
+          "Tables/Table20SI.docx")
+
+
+##### 4.5 INSTITUTIONAL FACTORS #####
+
+Table21 <- reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
+            Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
+            Table19 %>% select(SPECIES,COUNTRIES,QUOTAS),
+            Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES")
+
+
+
+to.plot <- Table21 %>% 
+  mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
+  spread(SPECIES,QUOTAS) %>% 
+  mutate_at(vars(starts_with("QUOTAS")),funs(ifelse(is.na(.),0.0,round(.,digits = 3)))) %>% 
+  mutate_at(vars(starts_with("CO.MANAG"),starts_with("PROPERTY")),funs(round(.,digits = 2))) %>%
+  mutate_at(vars(starts_with("DEVELOPMENT")),funs(round(.,digits = 3))) %>% data.frame
+
+
+
+to.plot[is.na(to.plot)] <- "-"
+
+to.plot <- to.plot[match(all_countries,to.plot$COUNTRIES),]
+
+Ft<- format_table(to.plot)
+
+
+
+write_doc(Ft,
+          "Table 21. List of Institutional factors.",
+          "Tables/Table21SI.docx")
 
