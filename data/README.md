@@ -69,3 +69,28 @@ Columns:
 - CATCH.DEP (numeric): Catch dependency factor. See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
 - FLEET.MOBILITY (numeric): Fleet mobility factor. See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
 - GEAR.DIVERSITY (numeric): Gear diversity factor. See "GEAR.DIVERSITY (S1)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+
+## institutional_indicators_cod.csv and institutional_indicators_hake.csv
+
+Columns:
+
+- SPECIES (character): Species
+- COUNTRIES (character): ISO Alpha-2 Country code.
+- STOCK (character): Stock
+- HDI (numeric): Development indicator. Human Development Index. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details
+- TAC (integer): Catch quotas indicator. Totall allowable catch. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+- Swaps (numeric): Property rights indicator. Monetary exchange of quota in a country. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details
+- Norganizations (integer): Co-Management indicator. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details
+
+## institutional_factors_cod.csv and institutional_factors_hake.csv
+
+Columns: 
+
+- SPECIES (character): Species
+- COUNTRIES (character): ISO Alpha-2 Country code.
+- STOCK (character): Stock
+- DEVELOPMENT (numeric): Development factor. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+- QUOTAS (numeric): Catch quotas factor. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+- PROPERTY.RIGHTS (numeric): Property rights factor. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+- CO.MANAGEMENT (numeric): Co-management factor. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
