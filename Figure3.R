@@ -83,10 +83,7 @@ graphs <- 1:length(x_labels) %>% lapply(function(i){
   
   # A letter for the subtitle
   subtitle_letter <- LETTERS[i]
-  
-  # Define point shapes
-  point_shapes <- case_when(column_name=="Inclusion.of.Requirements.2010" ~ c(c(1,2)),
-                            TRUE ~ c(16,1))
+ 
   # data to plot
   
   to.plot <- final_index %>% 
@@ -98,12 +95,13 @@ graphs <- 1:length(x_labels) %>% lapply(function(i){
   hake.data <- to.plot %>% filter(SPECIE=="Hake")
   
   # Plot
-  g <- ggplot(to.plot, aes_string(column_name, "Resilience_Index", col = "SPECIE", linetype = "SPECIE")) +
+  g <- ggplot(to.plot, aes_string(column_name, "Resilience_Index", col = "SPECIE", linetype = "SPECIE",fill="SPECIE")) +
     geom_point(aes(shape=SPECIE)) +
     geom_smooth(data = hake.data,method = lm, se = TRUE, linetype = "dotted")+
     geom_smooth(data = cod.data,method = lm, se = TRUE)+
-    scale_shape_manual(values=point_shapes)+
+    scale_shape_manual(values=c(16,1))+
     scale_color_manual(values=c("steelblue","steelblue"))+
+    scale_fill_manual(values=c("gray30","gray60"))+
     ylab("R.I")+
     xlab(x_label)+
     labs(subtitle = subtitle_letter)+
