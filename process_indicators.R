@@ -1,3 +1,7 @@
+#' this script produces ecological, socioeconomic and insititutional 
+#' factors from the corresponding indicators. 
+#' Also, creates tables for "SI 2. INDICATORS AND FACTORS"
+#' 
 #' Reads:
 #' 
 #' data/institutional_indicators_hake.csv
@@ -26,6 +30,12 @@
 #' Tables/Table12SI.docx
 #' Tables/Table14SI.docx
 #' Tables/Table15SI.docx
+#' Tables/Table16SI.docx
+#' Tables/Table17SI.docx
+#' Tables/Table18SI.docx
+#' Tables/Table19SI.docx
+#' Tables/Table20SI.docx
+#' Tables/Table21SI.docx
 
 
 
