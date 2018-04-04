@@ -98,9 +98,14 @@ format_table <- function(data){
   Ft
 }
 
-write_doc <- function(Ft,title,outfile){
+write_doc <- function(Ft,title,outfile,landscape=FALSE){
   
   doc <- docx()
+  
+  if(landscape){
+    doc %<>% addSection(landscape=TRUE)
+  }
+  
   # Empty line
   doc %<>% addParagraph("")
   
@@ -116,6 +121,10 @@ write_doc <- function(Ft,title,outfile){
   # Add table  
   
   doc %<>% addFlexTable(Ft,offx=-1)
+  
+  if(landscape){
+    doc %<>% addSection()
+  }
   
   writeDoc(doc,file=outfile)
   
@@ -154,7 +163,7 @@ Ft<- format_table(to.plot)
 
 write_doc(Ft,
           "Table 3. Normalization of Abundance indicators and Abundance factor calculation.",
-          "Tables/Table3SI.docx")
+          "Tables/Table3SI.docx",landscapt=TRUE)
 
 
 
