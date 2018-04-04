@@ -111,4 +111,19 @@ do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 1, ncol = 3)))
 
 dev.off()
 
+##### 4. CIRCULAR #####
 
+data <- bind_rows(soc_factors %>% mutate(dimension="socioeconomic"),eco_factors %>% mutate(dimension="ecological"),ins_factors %>% mutate(dimension="institutional"))
+
+ggplot(data=data, aes(x= interaction(FACTOR,COUNTRIES) , y=VALUE, fill=interaction(SPECIES,dimension), group=interaction(SPECIES,dimension)))+
+  geom_bar(stat = "identity", position=position_dodge(width=0.4), width=0.3) + ylim(-0.5,1) +
+  scale_fill_manual(values=c("seagreen3","seagreen4","cornsilk3","cornsilk4","yellow3","yellow4"),name="SPECIES and dimension")+
+  facet_wrap(~dimension,ncol=2)+
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-2,4), "cm")) + coord_polar(start = 0)# +
+  #geom_text(data=data, aes(x = interaction(FACTOR,COUNTRIES), y = -0.05, label=interaction(COUNTRIES)), colour = "black",  size=1, inherit.aes = FALSE)
+  
