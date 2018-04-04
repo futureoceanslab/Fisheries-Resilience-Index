@@ -38,11 +38,11 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
     - data/Requirements.csv
     - data/Readiness.csv
     - data/Vulnerability.csv
- - process_indicators: this script produces ecological, socioeconomic and insititutional factors from the corresponding indicators. Also, creates tables for "SI 2. INDICATORS AND FACTORS"
+ - process_indicators.R: this script produces ecological, socioeconomic and insititutional factors from the corresponding indicators. Also, creates tables for "SI 2. INDICATORS AND FACTORS"
 
 ## Instructions
 
-First run preprocess.R to compute data/final_index.csv. Then run all the figure scripts to generate the figures and tables in Figures and Tables.
+First run process_indicators.R to compute factors from indicators and get tables for "SI 2. INDICATORS AND FACTORS", then preprocess.R to compute data/final_index.csv. Then run all the figure scripts to generate the figures and tables in Figures and Tables.
 
 ## Notes
 
