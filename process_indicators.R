@@ -259,6 +259,7 @@ write_doc(Ft,
           "Table 7. Ecological factors per stock.",
           "Tables/Table7SI.docx")
 
+
 Table7%>% mutate_if(is.numeric,funs(round(.,digits = 4))) %>% 
   select(SPECIES,STOCK,ABUNDANCE,TEMPERATURE,OVEREXPLOITATION,RECOVERY) %>%
   write.csv2(file="data/ecological_factors.csv",row.names = FALSE,quote = FALSE)
@@ -319,13 +320,14 @@ to.plot <- Table9[match(all_countries,Table9$COUNTRIES),]
 to.plot[is.na(to.plot)] <- "-"
 
 
-
 Ft<- format_table(to.plot)
 
 Ft<- addHeaderRow(Ft,c("","Cod","Hake"),c(1,4,4),first = TRUE)
+
 write_doc(Ft,
           "Table 9. Ecological Factors per fishing country and species.",
           "Tables/Table9SI.docx")
+
 
 
 eco_countries %>%  mutate_if(is.numeric,funs(round(.,digits = 9))) %>% 
@@ -401,6 +403,7 @@ write_doc(Ft,
 Table13 <- Table12 %>% 
   group_by(SPECIES,COUNTRIES) %>% 
   summarise(CATCH.DEP=mean(CATCH.DEP,na.rm=TRUE)) %>% 
+
   ungroup() 
 
 to.plot <- Table13 %>%
@@ -444,6 +447,7 @@ write_doc(Ft,
 ##### 3.5 SOCIOECONOMIC FACTORS #####
 
 Table15 <- reduce(list(Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
+
                        Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP) %>%
                          mutate(SPECIES=paste0("CATCH.DEP\n",species_sort_name(SPECIES))) %>%
                          spread(SPECIES,CATCH.DEP) ,
@@ -470,6 +474,7 @@ Ft<- format_table(to.plot)
 write_doc(Ft,
           "Table 15. Socioeconomic Factors",
           "Tables/Table15SI.docx")
+
 
 reduce(list(Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
                        Table12 %>% select(SPECIES,STOCK,COUNTRIES,CATCH.DEP),
@@ -536,7 +541,7 @@ write_doc(Ft,
 Table18 <- ins_indicators %>% 
   select(COUNTRIES,STOCK,TAC) %>% 
   spread(COUNTRIES,TAC)
-
+  
 to.plot <- Table18 %>% data.frame
 
 to.plot[is.na(to.plot)] <- "-"
@@ -549,8 +554,8 @@ Ft[,1] <- textProperties(font.size = 8,font.weight = "bold")
 
 write_doc(Ft,
           "Table 18. TAC (million tons) per stock and country (2015)",
-          "Tables/Table18SI.docx",landscape = TRUE)
 
+          "Tables/Table18SI.docx",landscape = TRUE)
 
 Table19 <- ins_indicators %>% 
   select(SPECIES,COUNTRIES,TAC) %>%
@@ -633,6 +638,7 @@ Ft<- format_table(to.plot)
 write_doc(Ft,
           "Table 21. List of Institutional factors.",
           "Tables/Table21SI.docx")
+
 
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
