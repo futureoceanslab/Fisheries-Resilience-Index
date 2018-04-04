@@ -42,7 +42,7 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
 
 ## Instructions
 
-First run preprocess.R to compute data/final_index.csv. Then run all the figure scripts to generate the figures and tables in Figures and Tables.
+First run process_indicators.R to compute factors from indicators and get tables for "SI 2. INDICATORS AND FACTORS", then preprocess.R to compute data/final_index.csv. Then run all the figure scripts to generate the figures and tables in Figures and Tables.
 
 ## Notes
 
