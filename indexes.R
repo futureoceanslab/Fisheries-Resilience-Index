@@ -10,13 +10,7 @@
 #' data/socioeconomic_factors_cod.csv
 #' data/eco_country_cod.csv
 #' data/eco_country_hake.csv
-#' data/GDP.csv
-#' data/OHI.csv
-#' data/OHIeco.csv
-#' data/Tech.csv
-#' data/Requirements.csv
-#' data/Readiness.csv
-#' data/Vulnerability.csv
+#' data/Other_index.csv
 #' 
 #' and produces
 #' 
@@ -149,23 +143,17 @@ resilience_index <- bind_rows(ecountries,ins_factors,soc_factors) %>%
 
 ###### 2. Include other variables #####
 
-# Read other data sources to add to the resilience index
+# Read other indexes and merge with the resilience index
 
-GDP <- fread("data/GDP.csv",check.names = TRUE)
-OHI <- fread("data/OHI.csv",check.names = TRUE)
-OHIeco <- fread("data/OHIeco.csv",check.names = TRUE)
-Tech <- fread("data/Tech.csv",check.names = TRUE)
-Requi <- fread("data/Requirements.csv",check.names = TRUE)
-Readiness <- fread("data/Readiness.csv",check.names = TRUE)
-Vulnerability <- fread("data/Vulnerability.csv",check.names = TRUE)
 
-# merge all vars by country
-
-all_vars <- reduce(list(GDP,OHI,OHIeco,Tech,Requi,Readiness,Vulnerability),full_join,by="COUNTRY") %>% rename(COUNTRIES=COUNTRY)
+other_index <- fread("data/Other_index.csv",check.names = TRUE) %>% rename(OHI.2016=OHI.wild.caught)
 
 # merge with resilience index
 
-final_index <- all_vars %>% left_join(resilience_index,by=c("COUNTRIES")) %<>% mutate(SPECIES=c(`Atlantic cod`="Cod",`European hake`="Hake")[SPECIES]) %>% rename(SPECIE=SPECIES) %>% arrange(SPECIE,COUNTRIES,DIMENSION)
+final_index <- other_index %>% 
+  left_join(resilience_index,by=c("COUNTRIES")) %<>% 
+  mutate(SPECIES=c(`Atlantic cod`="Cod",`European hake`="Hake")[SPECIES]) %>% rename(SPECIE=SPECIES) %>% 
+  arrange(SPECIE,COUNTRIES,DIMENSION) %>% select(SPECIE,COUNTRIES,DIMENSION,everything())
 
 
 # Save final index. This file is used by several scripts to produce most figures in the repository. 

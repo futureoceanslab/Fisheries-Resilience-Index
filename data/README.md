@@ -94,3 +94,30 @@ Columns:
 - PROPERTY.RIGHTS (numeric): Property rights factor. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
 - CO.MANAGEMENT (numeric): Co-management factor. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
 
+## Other_index.csv
+
+Columns: 
+
+- COUNTRIES (character): ISO Alpha-2 Country code.
+- GDP.2016 (numeric): GDP 2016. International Monetary Bank
+- OHI.wild.caught (numeric): OHI 2016. OHI webpage wild caught fisheries
+- OHI.eco (numeric): OHI eco 2016. Coastal Livelihoods and Economies
+- Tech..develop..2013 (numeric): Tech Develop 2013. number of inventions OECD.stat
+- Inclusion.of.Requirements.2010 (numeric): Inclusion of Requirements 2010. Member state for inclusion of required elements in annual reports. 
+- Readiness (numeric): ND-Gain Index: Readiness. 2016
+- Vulnerability (numeric): ND-Gain Index: Vulnerability 2016
+
+## final_index.csv
+
+- SPECIES (character): Species
+- COUNTRIES (character): ISO Alpha-2 Country code.
+- DIMENSION (character): ecological, socioeconomic or institutional.
+- GDP.2016 (numeric): GDP 2016. International Monetary Bank
+- OHI.2016 (numeric): OHI 2016. OHI webpage wild caught fisheries
+- OHI.eco (numeric): OHI eco 2016. Coastal Livelihoods and Economies
+- Tech..develop..2013 (numeric): Tech Develop 2013. number of inventions OECD.stat
+- Inclusion.of.Requirements.2010 (numeric): Inclusion of Requirements 2010. Member state for inclusion of required elements in annual reports. 
+- Readiness (numeric): ND-Gain Index: Readiness. 2016
+- Vulnerability (numeric): ND-Gain Index: Vulnerability 2016
+- Resilience_Index (numeric): Resilience index computed in the script indexes.R
+

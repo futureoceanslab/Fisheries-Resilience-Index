@@ -20,7 +20,7 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
 - Figure6SIa_b.R: This script reads data/SSBLIM_FLIM_HAKE.csv and SSBLIM_FLIM_COD.csv and plots Figures/Fig 6 SIa.png and Figures/Fig 6 SIb.png.
 - Figure8.R This script reads data/final_index.csv, plots Figures/Figure 8.png and creates Tables/Fig8_p_values.docx.
 - fig_dimensions.R: This script reads data/sp.csv and plots Figures/Fig dimensions.png.
-- preprocess.R: produces data/final_index.csv from:
+- indexes.R: produces data/final_index.csv from:
     - data/institutional_indicators_hake.csv
     - data/institutional_indicators_cod.csv
     - data/socioeconomic_indicators_hake.csv
@@ -31,18 +31,12 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
     - data/socioeconomic_factors_cod.csv
     - data/eco_country_cod.csv
     - data/eco_country_hake.csv
-    - data/GDP.csv
-    - data/OHI.csv
-    - data/OHIeco.csv
-    - data/Tech.csv
-    - data/Requirements.csv
-    - data/Readiness.csv
-    - data/Vulnerability.csv
+    - Other_index.csv
  - process_indicators.R: this script produces ecological, socioeconomic and insititutional factors from the corresponding indicators. Also, creates tables for "SI 2. INDICATORS AND FACTORS"
 
 ## Instructions
 
-First run process_indicators.R to compute factors from indicators and get tables for "SI 2. INDICATORS AND FACTORS", then preprocess.R to compute data/final_index.csv. Then run all the figure scripts to generate the figures and tables in Figures and Tables.
+First run process_indicators.R to compute factors from indicators and get tables for "SI 2. INDICATORS AND FACTORS", then indexes.R to compute data/final_index.csv. Then run all the figure scripts to generate the figures and tables in Figures and Tables.
 
 ## Notes
 
