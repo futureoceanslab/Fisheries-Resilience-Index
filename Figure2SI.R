@@ -49,29 +49,34 @@ source("aux_functions.R")
 ##### 2. READ DATA #####
 
 # Read the data
+# 
+# eco_countryCOD <- fread("data/eco_country_cod.csv",check.names = TRUE)
+# eco_countryHAKE <- fread("data/eco_country_hake.csv",check.names = TRUE)
+# 
+# ins_factors <- bind_rows(fread("data/institutional_factors_hake.csv",check.names = TRUE),
+#                          fread("data/institutional_factors_cod.csv",check.names = TRUE))
+# 
+# 
+# soc_factors <- bind_rows(fread("data/socioeconomic_factors_hake.csv",check.names = TRUE),
+#                          fread("data/socioeconomic_factors_cod.csv",check.names = TRUE))
+# 
+# eco_countryCOD$SPECIES<-"Atlantic Cod"
+# eco_countryCOD %<>% gather(FACTOR, VALUE, ABUNDANCE:RECOVERY, factor_key=TRUE)
+# eco_countryHAKE$SPECIES<-"European Hake"
+# eco_countryHAKE %<>% gather(FACTOR, VALUE, ABUNDANCE:RECOVERY, factor_key=TRUE)
+# 
+# eco_factors <- rbind(eco_countryCOD, eco_countryHAKE) %>% rename(COUNTRIES=COUNTRY) %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR))) %>% mutate(FACTOR=factor(FACTOR,levels = c("ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY")))
+# 
+# 
+# soc_factors %<>% gather(FACTOR, VALUE, ADAPTIVE.MNG:FLEET.MOBILITY, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ADAPTIVE MNG","CATCH DEP","FLEET MOBILITY")))
+# 
+# ins_factors %<>% gather(FACTOR, VALUE, DEVELOPMENT:CO.MANAGEMENT, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR))) %>% mutate(FACTOR=factor(FACTOR,levels = c("DEVELOPMENT","QUOTAS","PROPERTY RIGHTS","CO MANAGEMENT")))
 
-eco_countryCOD <- fread("data/eco_country_cod.csv",check.names = TRUE)
-eco_countryHAKE <- fread("data/eco_country_hake.csv",check.names = TRUE)
+eco_factors <- fread("data/ecological_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY")))
 
-ins_factors <- bind_rows(fread("data/institutional_factors_hake.csv",check.names = TRUE),
-                         fread("data/institutional_factors_cod.csv",check.names = TRUE))
+soc_factors <- fread("data/socioeconomic_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ADAPTIVE MNG","CATCH DEP","FLEET MOBILITY")))
 
-
-soc_factors <- bind_rows(fread("data/socioeconomic_factors_hake.csv",check.names = TRUE),
-                         fread("data/socioeconomic_factors_cod.csv",check.names = TRUE))
-
-eco_countryCOD$SPECIES<-"Atlantic Cod"
-eco_countryCOD %<>% gather(FACTOR, VALUE, ABUNDANCE:RECOVERY, factor_key=TRUE)
-eco_countryHAKE$SPECIES<-"European Hake"
-eco_countryHAKE %<>% gather(FACTOR, VALUE, ABUNDANCE:RECOVERY, factor_key=TRUE)
-
-eco_factors <- rbind(eco_countryCOD, eco_countryHAKE) %>% rename(COUNTRIES=COUNTRY) %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR))) %>% mutate(FACTOR=factor(FACTOR,levels = c("ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY")))
-
-
-soc_factors %<>% gather(FACTOR, VALUE, ADAPTIVE.MNG:FLEET.MOBILITY, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ADAPTIVE MNG","CATCH DEP","FLEET MOBILITY")))
-
-ins_factors %<>% gather(FACTOR, VALUE, DEVELOPMENT:CO.MANAGEMENT, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR))) %>% mutate(FACTOR=factor(FACTOR,levels = c("DEVELOPMENT","QUOTAS","PROPERTY RIGHTS","CO MANAGEMENT")))
-
+ins_factors <- fread("data/institutional_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("DEVELOPMENT","QUOTAS","PROPERTY RIGHTS","CO MANAGEMENT")))
 
 ##### 3. PLOT #####
 
@@ -82,7 +87,7 @@ dimension_colors <- list(eco_factors=c("seagreen3","seagreen4"),
                          ins_factors=c("cornsilk3","cornsilk4"))
                          
 graphs <- dimensions  %>% lapply(function(dimension){
-  # var <- "eco_factors"
+  # dimension <- "soc_factors"
   x<- get(dimension)
 
   g <- ggplot(data=na.omit(x), aes(x= COUNTRIES , y=VALUE, fill=SPECIES, group=SPECIES))+

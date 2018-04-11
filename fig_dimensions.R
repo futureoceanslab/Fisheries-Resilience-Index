@@ -32,7 +32,11 @@ source("aux_functions.R")
 
 # Read the data
 
-sp <- read_csv("data/sp.csv")
+sp <- fread("data/final_index.csv") %>% select(COUNTRIES,DIMENSION,Resilience_Index,SPECIE) %>% 
+  mutate(DIMENSION=c(ecological="Resilience_Index_E",socioeconomic="Resilience_Index_S",institutional="Resilience_Index_I")[DIMENSION]) %>%
+  spread(DIMENSION,Resilience_Index)
+
+ #<- read_csv("data/sp.csv")
 
 
 ##### 3. PLOT #####

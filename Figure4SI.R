@@ -54,12 +54,11 @@ packageVersion("tidyverse")
 
 # Read the data
 
-eco_indicators <- bind_rows(fread("data/ecological_indicators_cod.csv"),
-                            fread("data/ecological_indicators_hake.csv"))
-ins_indicators <- bind_rows(fread("data/institutional_indicators_cod.csv"),
-                            fread("data/institutional_indicators_hake.csv"))
-soc_indicators <- bind_rows(fread("data/socioeconomic_indicators_cod.csv"),
-                            fread("data/socioeconomic_indicators_hake.csv"))
+eco_indicators <- fread("data/ecological_indicators.csv")
+                            
+ins_indicators <- fread("data/institutional_indicators.csv")
+                            
+soc_indicators <- fread("data/socioeconomic_indicators.csv")
 
 ##### 3. PLOT #####
 
@@ -69,21 +68,23 @@ par(mfrow = c(1, 3))
 
 # socioeconomic correlations
 
-soc_to_correlate <- soc_indicators[, 4:10]
+soc_to_correlate <- soc_indicators %>% select(-SPECIES,-COUNTRIES,-STOCK)
 soc_correlations <- cor(soc_to_correlate, use="pairwise.complete.obs")
 p1 <- corrplot(soc_correlations, order ="AOE")
 
 
 # institutional correlations
 
-ins_to_correlate <- ins_indicators[, 4:7]
+ins_to_correlate <- ins_indicators %>% select(-SPECIES,-COUNTRIES,-STOCK)
 ins_correlations <- cor(ins_to_correlate, use="pairwise.complete.obs")
 p2 <- corrplot(ins_correlations, order ="AOE")
 
 
 # Ecological correlations
 
-eco_to_correlate <- eco_indicators[, 3:13]
+eco_to_correlate <- eco_indicators %>%
+  mutate(SSBrecent=B_SSBrecent/SSB.average,SSBhistoric=B_SSBhistoric/SSB.average,Ftrend=B_Ftrend/F.average,Rtrend=B_Rtrend/R.average)  %>% 
+  select(-SPECIES,-STOCK,-starts_with("B_"),-ends_with(".average"))
 eco_correlations <- cor(eco_to_correlate, use="pairwise.complete.obs")
 p3 <- corrplot(eco_correlations, order ="AOE")
 
