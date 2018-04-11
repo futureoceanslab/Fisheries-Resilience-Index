@@ -17,6 +17,7 @@
 #' data/institutional_factors_country.csv
 #' data/ecological_factors_country.csv
 #' 
+#' Tables/Table2SI.docx
 #' Tables/Table3SI.docx
 #' Tables/Table4SI.docx
 #' Tables/Table5SI.docx
@@ -84,98 +85,7 @@ require(tidyverse)
 packageVersion("tidyverse")
 # [1] ‘1.2.1’
 
-
-format_table <- function(data){
-  # Prepare the table
-  
-  Ft <- FlexTable(data,add.rownames = FALSE)
-  
-  # Table header format
-  Ft[to="header"] <- textProperties(font.size = 10,font.weight = "bold")
-  Ft[to="header"] <- parProperties(text.align = "center")
-  
-  # General table format
-  Ft[] <- textProperties(font.size = 10)
-  
-  Ft[] <- parProperties(text.align = "center")
-  
-  # First column format
-  Ft[,1] <- textProperties(font.size = 10,font.style   = "italic")
-  
-  Ft[to="header"] <- textProperties(font.style = "italic")
-  
-  Ft[,1] <- parProperties(text.align = "left")
-  
-  Ft[,2:ncol(data)] <- cellProperties(border.style="none")
-  
-  Ft[1:(nrow(data)),1] <- cellProperties(border.bottom.style =  "none",border.top.style = "none",border.left.style = "none")
-  
-  Ft[to="header"] <- cellProperties(border.right.style =  "none",border.top.style = "none",border.left.style = "none")
-  
-  Ft[seq(1,nrow(data),2),2:ncol(data)] <- cellProperties(background.color = "gray90",border.style="none")
-  
-  Ft[nrow(data),2:ncol(data)] <- cellProperties(background.color = ifelse(nrow(data)%%2==0,"white","gray90"),border.bottom.style = "solid",border.right.style =  "none",border.top.style = "none",border.left.style = "none")
-  
-  Ft[nrow(data),1] <- cellProperties(border.bottom.style =  "solid",border.top.style = "none",border.left.style = "none")
-  
-  Ft
-}
-
-write_doc <- function(Ft,title,outfile,landscape=FALSE){
-  
-  doc <- docx()
-  
-  if(landscape){
-    doc %<>% addSection(landscape=TRUE)
-  }
-  
-  # Empty line
-  doc %<>% addParagraph("")
-  
-  # Table title
-  
-  
-  
-  doc %<>% addParagraph(title,stylename = "En-tte")
-  
-  
-  
-  
-  # Add table  
-  
-  doc %<>% addFlexTable(Ft,offx=-1)
-  
-  if(landscape){
-    doc %<>% addSection()
-  }
-  
-  writeDoc(doc,file=outfile)
-  
-}
-
-countries_order <- c("BE","DK","DE","EE","IE","ES","FR","LV","LT","NL","PL","PT","FI","SE")
-species_order <- c("European hake","Atlantic cod")
-stocks_order1 <- c("HAKENRTN","HAKESOTH","CODCOASTNOR_CODNEAR","CODFAPL","CODICE","CODBA2532","CODKAT","CODIS","CODVIa","CODNS")
-
-
-arrange_table <- function(df,stocks_order=stocks_order1) df %>% 
-  mutate(SPECIES=factor(SPECIES,levels=species_order),STOCK=factor(STOCK,levels=stocks_order),COUNTRIES=factor(COUNTRIES,levels=countries_order)) %>% 
-  arrange(COUNTRIES,SPECIES,STOCK) %>% 
-  mutate(SPECIES=as.character(SPECIES),STOCK=as.character(STOCK),COUNTRIES=as.character(COUNTRIES))
-
-normalize_positive <-function(x) (x - min(x,na.rm = TRUE))/(max(x,na.rm = TRUE)-min(x,na.rm = TRUE))
-
-normalize_negative <-function(x) (max(x,na.rm = TRUE)-x)/(max(x,na.rm = TRUE)-min(x,na.rm = TRUE))
-
-species_sort_name <- function(x) case_when(x=="Atlantic cod" ~ "cod",
-                                           x=="European hake" ~ "hake",
-                                           TRUE ~ x
-)
-
-species_long_name <- function(x) case_when(x=="cod" ~"Atlantic cod",
-                                           x=="hake" ~"European hake",
-                                           TRUE ~ x
-)
+source("aux_functions.R")
 
 
 ##### 2. ECOLOGICAL INDICATORS #####
@@ -192,42 +102,98 @@ species_long_name <- function(x) case_when(x=="cod" ~"Atlantic cod",
 eco_indicators <- fread("data/ecological_indicators.csv",check.names = TRUE)
 
 
+###### 2.1 AREA (E1) #####
+
+# See section "AREA (E1)" in 1.A in "SI 2. Indicators and Factors" for details.
+
+# Table 1
+
+area_2 <- 261895.6 # 2nd percentile of the distribution of area ranges in García-Molinos et al. (2015)
+area_98 <- 83378496 # 98th percentile of the distribution of area ranges in García-Molinos et al. (2015)
+
+Table1 <- eco_indicators  %>% 
+  select(SPECIES,area2006,area2100) %>% 
+  distinct() %>%
+  mutate(area2006_norm=(area2006-area_2)/(area_98-area_2), # Normalization positive
+         area2100_norm=(area2100-area_2)/(area_98-area_2) # Normalization positive
+  ) %>% 
+  rowwise() %>%  # AREA factor is the mean of the normalized indicators above for each species (row)
+  mutate(AREA=mean(area2006_norm,area2100_norm),
+         area_2=area_2,
+         area_98=area_98)
+
+# Prepare for word
+to.plot <- Table1 %>% 
+  data.frame %>% 
+  select(SPECIES,area2006,area2100,area_2,area_98,area2006_norm,area2100_norm,AREA) %>%
+  set_names(c("SPECIES","Area2006\n(km^2)","Area2100\n(km^2)","area 2%\n(km^2)","area 98%\n(km^2)","Area06'\nNormalized","Area100\nNormalized","AREA"))
+
+to.plot[is.na(to.plot)] <- "-"
+
+
+# Save to word
+
+Ft<- format_table(to.plot)
+write_doc(Ft,
+          "Table1. Area indicators and factor.",
+          "Tables/Table1SI.docx")
 
 
 
 ###### 2.1 ABUNDANCE (E2) #####
 
-Table2 <- eco_indicators %>% select(STOCK,B_SSBrecent,B_SSBhistoric,B_F=B_Ftrend,B_R=B_Rtrend,SSB.average,F.average,R.average)
+# See "Abundance (E2)" in 1.A in "SI 2. Indicators and Factors" for details
 
-to.plot <- Table2 %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame
+# Table 2
+
+# Create table
+Table2 <- eco_indicators %>% 
+  select(STOCK,B_SSBrecent,B_SSBhistoric,B_F=B_Ftrend,B_R=B_Rtrend,SSB.average,F.average,R.average)
+
+# Prepare for word
+to.plot <- Table2 %>% 
+  mutate_if(is.numeric,funs(round(.,digits = 3))) %>% # round numerics to 3 digits
+  data.frame
 
 to.plot[is.na(to.plot)] <- "-"
 
+# Save to word
 
 Ft<- format_table(to.plot)
-
-
 
 write_doc(Ft,
           "Table 2. Value of the coefficients (ß) from the linear models of SSB historic (1950- 2010), SSB recent (1980-2010), R and F in ICES data series. Significance at the 0.001 (***), 0.01 (**) and 0.05 (*) levels.",
           "Tables/Table2SI.docx",landscape=TRUE)
 
+# Table 3
 
-Table3 <- eco_indicators  %>% select(SPECIES,STOCK,B_SSBrecent,B_SSBhistoric,B_Ftrend,B_Rtrend,SSB.average,F.average,R.average)%>%
-  mutate(SSBrecent=B_SSBrecent/SSB.average,SSBhistoric=B_SSBhistoric/SSB.average,Ftrend=B_Ftrend/F.average,Rtrend=B_Rtrend/R.average) %>%
-  mutate(SSBrecent_norm=normalize_positive(SSBrecent),SSBhistoric_norm=normalize_positive(SSBhistoric),Ftrend_norm=normalize_negative(Ftrend),Rtrend_norm=normalize_positive(Rtrend)) %>%
-  rowwise %>% mutate(ABUNDANCE=mean(SSBhistoric_norm,SSBrecent_norm,Ftrend_norm,Rtrend_norm,na.rm=TRUE)) %>% 
-  ungroup() %>% select(-starts_with("B_"),-ends_with(".average"))
+Table3 <- eco_indicators  %>% 
+  select(SPECIES,STOCK,B_SSBrecent,B_SSBhistoric,B_Ftrend,B_Rtrend,SSB.average,F.average,R.average)%>%
+  mutate(SSBrecent=B_SSBrecent/SSB.average, # Divide slopes by average
+         SSBhistoric=B_SSBhistoric/SSB.average,
+         Ftrend=B_Ftrend/F.average,
+         Rtrend=B_Rtrend/R.average) %>%
+  mutate(SSBrecent_norm=normalize_positive(SSBrecent), # Normalize positive
+         SSBhistoric_norm=normalize_positive(SSBhistoric), # Positive
+         Ftrend_norm=normalize_negative(Ftrend), # Negative
+         Rtrend_norm=normalize_positive(Rtrend) # Positive
+         ) %>%
+  rowwise %>% # ABUNDANCE factor is the mean of the normalized indicators above for each stock (row)
+  mutate(ABUNDANCE=mean(SSBhistoric_norm,SSBrecent_norm,Ftrend_norm,Rtrend_norm,na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  select(-starts_with("B_"),-ends_with(".average")) # Remove slopes and averages from the table
 
+# Prepare for word
 
-to.plot <- Table3%>% select(-SPECIES) %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame
+to.plot <- Table3%>% 
+  select(-SPECIES) %>% 
+  mutate_if(is.numeric,funs(round(.,digits = 3))) %>% # Round numerics to 3 digits
+  data.frame
 
 to.plot[is.na(to.plot)] <- "-"
 
-
+# Save to word
 Ft<- format_table(to.plot)
-
-
 
 write_doc(Ft,
           "Table 3. Normalization of Abundance indicators and Abundance factor calculation.",
@@ -237,15 +203,28 @@ write_doc(Ft,
 
 ###### 2.2 TEMPERATURE (E3) #####
 
-Trange_2 <- 0
-Trange_98 <- 11
-T50_2 <- 0
-T50_98 <- 28
+# See section "Temperature (E3)" in 1.A in "SI 2. Indicators and Factors" for details.
 
-Table4 <- eco_indicators  %>% select(SPECIES,T50,Trange)%>% distinct() %>%
-  mutate(Trange_norm=(Trange-Trange_2)/(Trange_98-Trange_2),T50_norm=(T50-T50_2)/(T50_98-T50_2)) %>% 
-  mutate(TEMPERATURE=T50_norm,Trange_2=Trange_2,Trange_98=Trange_98,T50_2=T50_2,T50_98=T50_98)
+# Table 4
 
+Trange_2 <- 0 # 2nd percentile of the distribution of temperature range. Cheung et al. (2010)
+Trange_98 <- 11 # 98th percentile of the distribution of temperature range. Cheung et al. (2010)
+T50_2 <- 0 # 2nd percentile of the distribution of temperature range. Cheung et al. (2010)
+T50_98 <- 28 # 98th percentile of the distribution of temperature range. Cheung et al. (2010)
+
+Table4 <- eco_indicators  %>% 
+  select(SPECIES,T50,Trange)%>% 
+  distinct() %>%
+  mutate(Trange_norm=(Trange-Trange_2)/(Trange_98-Trange_2), # Normalization
+         T50_norm=(T50-T50_2)/(T50_98-T50_2) # Normalization
+         ) %>% 
+  mutate(TEMPERATURE=T50_norm, # TEMPERATURE factor is normalized T50
+         Trange_2=Trange_2,
+         Trange_98=Trange_98,
+         T50_2=T50_2,
+         T50_98=T50_98)
+
+# Prepare for word
 to.plot <- Table4 %>% 
   mutate_if(is.numeric,funs(round(.,digits = 3))) %>% 
   data.frame %>% 
@@ -254,7 +233,8 @@ to.plot <- Table4 %>%
 
 to.plot[is.na(to.plot)] <- "-"
 
-to.plot
+
+# Save to word
 
 Ft<- format_table(to.plot)
 write_doc(Ft,
@@ -265,11 +245,20 @@ write_doc(Ft,
 
 ###### 2.3 OVEREXPLOITATION (E4) #####
 
-Table5 <- eco_indicators  %>% select(SPECIES,STOCK,OverMSY,Status) %>% 
-  mutate(OverMSY_norm=normalize_negative(OverMSY),Status_norm=normalize_positive(Status)) %>% 
-  rowwise() %>%
-  mutate(OVEREXPLOITATION=mean(c(OverMSY_norm,Status_norm),na.rm=TRUE))
+# See section "Overexploitation (E4)"" in 1.A in "SI 2. Indicators and Factors" for details
 
+# Table5
+
+Table5 <- eco_indicators  %>% 
+  select(SPECIES,STOCK,OverMSY,Status) %>% 
+  mutate(OverMSY_norm=normalize_negative(OverMSY), # Normalize negative
+         Status_norm=normalize_positive(Status) # Normalize positive
+         ) %>% 
+  rowwise() %>% # OVEREXPLOITATION factor is the mean of the normalized indicators above for each stock (row)
+  mutate(OVEREXPLOITATION=mean(c(OverMSY_norm,Status_norm),na.rm=TRUE)) %>%
+  ungroup()
+
+# Prepare for word
 to.plot <- Table5 %>% 
   select(-SPECIES) %>% 
   mutate_if(is.numeric,funs(round(.,digits = 3))) %>%
@@ -280,8 +269,9 @@ to.plot <- Table5 %>%
 
 to.plot[is.na(to.plot)] <- "-"
 
-
+# Save to word
 Ft<- format_table(to.plot)
+
 write_doc(Ft,
           "Table 5. Overexploitation indicators, normalization and factor.",
           "Tables/Table5SI.docx")
@@ -290,13 +280,19 @@ write_doc(Ft,
 
 ##### 2.4 RECOVERY (E5) #####
 
-recovery_2 <- 1
-recovery_98 <- 43.34
+# See section "Recovery (E5)"" in 1.A in "SI 2. Indicators and Factors" for details
 
-Table6 <- eco_indicators  %>% select(SPECIES,STOCK,Recovery) %>% 
-  mutate(Recovery_norm=1-(Recovery-recovery_2)/(recovery_98-recovery_2)) %>% 
-  rowwise() %>%
-  mutate(RECOVERY=Recovery_norm,recovery_2=recovery_2,recovery_98=recovery_98)
+# Table 6
+
+recovery_2 <- 1 # 2% recovery time of sample on Neubawer et al., 2013
+recovery_98 <- 43.34 # 98% recovery time of sample on Neubawer et al., 2013
+
+Table6 <- eco_indicators  %>% 
+  select(SPECIES,STOCK,Recovery) %>% 
+  mutate(Recovery_norm=(recovery_98-Recovery)/(recovery_98-recovery_2)) %>% # Normalization
+  mutate(RECOVERY=Recovery_norm,recovery_2=recovery_2,recovery_98=recovery_98)  # RECOVERY factor is the normalized recovery
+
+# Prepare for word
 
 to.plot <- Table6 %>% 
   select(-SPECIES) %>% 
@@ -307,8 +303,10 @@ to.plot <- Table6 %>%
 
 to.plot[is.na(to.plot)] <- "-"
 
+# Save to word
 
 Ft<- format_table(to.plot)
+
 write_doc(Ft,
           "Table 6. Recovery indicator, normalization and factor.",
           "Tables/Table6SI.docx")
@@ -316,12 +314,18 @@ write_doc(Ft,
 
 ##### 2.5. ECOLOGICAL FACTORS #####
 
+# See section 1.B in "SI 2. Indicators and Factors" for details
+
 # Table 7
+
+# Merge all the factors in one table
 
 Table7 <- reduce(list(Table3 %>% select(SPECIES,STOCK,ABUNDANCE),
                       Table5 %>% select(SPECIES,STOCK,OVEREXPLOITATION),
                       Table6 %>% select(SPECIES,STOCK,RECOVERY)),full_join,by=c("SPECIES","STOCK")) %>% 
   full_join(Table4 %>% select(SPECIES,TEMPERATURE),by="SPECIES")
+
+# Prepare for word
 
 to.plot <- Table7 %>% 
   select(STOCK,ABUNDANCE,TEMPERATURE,OVEREXPLOITATION,RECOVERY) %>% 
@@ -330,12 +334,14 @@ to.plot <- Table7 %>%
 
 to.plot[is.na(to.plot)] <- "-"
 
+# Save to word
 
 Ft<- format_table(to.plot)
 write_doc(Ft,
           "Table 7. Ecological factors per stock.",
           "Tables/Table7SI.docx")
 
+# Save ecological_factors.csv
 
 Table7 %>% 
   select(SPECIES,STOCK,ABUNDANCE,TEMPERATURE,OVEREXPLOITATION,RECOVERY) %>%
@@ -344,6 +350,7 @@ Table7 %>%
 
 # Table 8
 
+# Which countries fish  each stock
 countries_fishing <- list(HAKENRTN=c("BE","DK","DE","ES","FR","NL","PT","SE"),
                           HAKESOTH=c("ES","FR","PT"),
                           CODCOASTNOR=c("DK","DE","EE","EI","ES","FR","PL","PT"),
@@ -357,7 +364,7 @@ countries_fishing <- list(HAKENRTN=c("BE","DK","DE","ES","FR","NL","PT","SE"),
                           CODNS=c("FR"))
 
 
-
+# Prepare for word
 
 stocks_fished <-  lapply(countries_fishing, function(x) countries_order %in% x) %>% 
   data.frame() %>% t %>% data.frame()  %>% 
@@ -369,6 +376,7 @@ Table8 <- stocks_fished %>% mutate_if(is.logical,funs(ifelse(.,"yes","-")))
 
 to.plot <- Table8 %>% data.frame
 
+# Save to word
 
 Ft<- format_table(to.plot)
 write_doc(Ft,
@@ -378,27 +386,31 @@ write_doc(Ft,
 
 # Table 9
 
+# Compute mean factor for each country. Stock CODNEAR excluded.
 
-eco_countries <- lapply(countries_order, function(country){
+eco_countries <- lapply(countries_order, function(country){ # For each country
   
-  #country <- "PT" 
   
   stocks_fished %>% 
-    filter_at(vars(one_of(country)),all_vars(.)) %>% 
-    filter(STOCK!="CODNEAR") %>% 
+    filter_at(vars(one_of(country)),all_vars(.)) %>% # Keep the data for that country 
+    filter(STOCK!="CODNEAR") %>% # Remove data for stock CODNEAR
     select(STOCK) %>% 
-    left_join(Table7,by="STOCK") %>% 
+    left_join(Table7,by="STOCK") %>% # Merge with data by stock
     select(-STOCK) %>% 
-    group_by(SPECIES) %>%
-    summarise_all(funs(mean(.,na.rm=TRUE))) %>% 
+    group_by(SPECIES) %>% # For each species
+    summarise_all(funs(mean(.,na.rm=TRUE))) %>% # Compute the mean of each factor
     ungroup() %>% 
     mutate(COUNTRIES=country)
   
   
-}) %>% bind_rows() %>% arrange(SPECIES,COUNTRIES) %>% select(COUNTRIES,SPECIES,one_of(names(.)))
+}) %>% bind_rows() %>% # put all countries together
+  arrange(SPECIES,COUNTRIES) %>% # ORder by species and countries
+  select(COUNTRIES,SPECIES,everything()) # Reorder columns
 
+# Prepare for word
 
-Table9 <- eco_countries %>% gather(FACTOR,VALUE,-SPECIES,-COUNTRIES) %>% 
+Table9 <- eco_countries %>% 
+  gather(FACTOR,VALUE,-SPECIES,-COUNTRIES) %>% 
   unite(SP_FACTOR,SPECIES,FACTOR) %>% 
   spread(SP_FACTOR,VALUE) %>% 
   mutate_if(is.numeric,funs(round(.,digits = 3))) %>% 
@@ -409,9 +421,11 @@ to.plot <- Table9[match(countries_order,Table9$COUNTRIES),]
 
 to.plot[is.na(to.plot)] <- "-"
 
+# Save to word
 
 Ft<- format_table(to.plot)
 
+# Extra header
 Ft<- addHeaderRow(Ft,c("","Cod","Hake"),c(1,4,4),first = TRUE)
 
 write_doc(Ft,
@@ -419,6 +433,7 @@ write_doc(Ft,
           "Tables/Table9SI.docx",landscape = TRUE)
 
 
+# Save factors by county to ecological_factors_country.csv
 
 eco_countries %>%  mutate_if(is.numeric,funs(round(.,digits = 9))) %>% 
   select(SPECIES,COUNTRIES,"ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY") %>%

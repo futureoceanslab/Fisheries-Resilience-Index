@@ -14,6 +14,8 @@ require(grid)
 packageVersion("grid")
 # [1] ‘3.3.0’
 
+##### PLOTS #####
+
 #' Arranges plots in a grid with a shared legend.
 #' 
 #' Arranges the plots in a grid and adds a shared legend
@@ -69,6 +71,7 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 3, 
   
 }
 
+##### P-VALUES #####
 
 #' Extracts p-value from a model
 #' 
@@ -162,3 +165,132 @@ p_values_for_columns_and_classes_in_column <- function(data,column_names,class_c
   
   
 }
+
+
+##### WORD TABLES #####
+
+#' Formats a table to be printed in a word document
+#' 
+#' @param data (data.frame) data to be formatted
+#' @return (FlexTable) table formatted
+format_table <- function(data){
+  # Prepare the table
+  
+  # Convert data into a flex table, no rownames
+  Ft <- FlexTable(data,add.rownames = FALSE)
+  
+  # Table header format: font size 10, italic, center alignment. Only bottom border.
+  Ft[to="header"] <- textProperties(font.size = 10,font.style = "italic")
+  
+  Ft[to="header"] <- parProperties(text.align = "center")
+  
+  Ft[to="header"] <- cellProperties(border.right.style =  "none",border.top.style = "none",border.left.style = "none")
+  
+  # General table format: font size 10, center alignment
+  Ft[] <- textProperties(font.size = 10)
+  
+  Ft[] <- parProperties(text.align = "center")
+  
+  # First column format: font size 10, italic, left alignment. No left border, bottom border only in last column
+  
+  Ft[,1] <- textProperties(font.size = 10,font.style   = "italic")
+  
+  Ft[,1] <- parProperties(text.align = "left")
+  
+  Ft[1:(nrow(data)),1] <- cellProperties(border.bottom.style =  "none",border.top.style = "none",border.left.style = "none")
+  
+  Ft[nrow(data),1] <- cellProperties(border.bottom.style =  "solid",border.top.style = "none",border.left.style = "none")
+  
+  # Table body format: No borders, odd rows background is grey
+  
+  Ft[,2:ncol(data)] <- cellProperties(border.style="none")
+  
+  Ft[seq(1,nrow(data),2),2:ncol(data)] <- cellProperties(background.color = "gray90",border.style="none")
+  
+  Ft[nrow(data),2:ncol(data)] <- cellProperties(background.color = ifelse(nrow(data)%%2==0,"white","gray90"),border.bottom.style = "solid",border.right.style =  "none",border.top.style = "none",border.left.style = "none")
+  
+  
+  Ft
+}
+
+#' Writes a table to a docx document
+#' 
+#' @param Ft (FlexTable) table formated using format_table
+#' @param title (character) Table title
+#' @param outfile (character) file path to save the word document
+#' @param landscape (logical) if TRUE, prints the table in a landscape section in the document.
+#' @return NULL
+write_doc <- function(Ft,title,outfile,landscape=FALSE){
+  
+  # New document
+  doc <- docx()
+  
+  # If the table is printed landscape, add a landscape section
+  if(landscape){
+    doc %<>% addSection(landscape=TRUE)
+  }
+  
+  # Empty line
+  doc %<>% addParagraph("")
+  
+  # Table title
+  
+  doc %<>% addParagraph(title,stylename = "En-tte")
+  
+  # Add table  
+  
+  doc %<>% addFlexTable(Ft)
+  
+  # Close landscape section if the table is printed landscape
+  if(landscape){
+    doc %<>% addSection()
+  }
+  
+  # Save the document
+  writeDoc(doc,file=outfile)
+  
+  NULL
+}
+
+##### TABLE FORMATTING #####
+
+# Order in which counties, species and stocks should appear in the Word tables.
+countries_order <- c("BE","DK","DE","EE","IE","ES","FR","LV","LT","NL","PL","PT","FI","SE")
+species_order <- c("European hake","Atlantic cod")
+stocks_order1 <- c("HAKENRTN","HAKESOTH","CODCOASTNOR_CODNEAR","CODFAPL","CODICE","CODBA2532","CODKAT","CODIS","CODVIa","CODNS")
+stocks_order2 <- c("HAKENRTN","HAKESOTH","CODCOASTNOR","CODNEAR","CODFAPL","CODICE","CODBA2532","CODKAT","CODIS","CODVIa","CODNS")
+
+#' Arranges table according to the order of countries, species,and stocks
+arrange_table <- function(df,stocks_order=stocks_order1) {
+  df %>% 
+    mutate(SPECIES=factor(SPECIES,levels=species_order),STOCK=factor(STOCK,levels=stocks_order),COUNTRIES=factor(COUNTRIES,levels=countries_order)) %>% 
+    arrange(COUNTRIES,SPECIES,STOCK) %>% 
+    mutate(SPECIES=as.character(SPECIES),STOCK=as.character(STOCK),COUNTRIES=as.character(COUNTRIES))
+}
+
+#' Replaces long species name with short name
+species_sort_name <- function(x) {
+  case_when(x=="Atlantic cod" ~ "cod",
+            x=="European hake" ~ "hake",
+            TRUE ~ x
+  )
+}  
+#' Replaces short species name with long name
+species_long_name <- function(x) {
+  case_when(x=="cod" ~"Atlantic cod",
+            x=="hake" ~"European hake",
+            TRUE ~ x
+  )
+}
+##### NORMALIZATION #####
+
+normalize_positive <-function(x) {
+  (x - min(x,na.rm = TRUE))/(max(x,na.rm = TRUE)-min(x,na.rm = TRUE))
+}
+
+normalize_negative <-function(x) {
+  (max(x,na.rm = TRUE)-x)/(max(x,na.rm = TRUE)-min(x,na.rm = TRUE))
+}
+
+
+
