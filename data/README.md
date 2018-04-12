@@ -1,3 +1,5 @@
+# Input files
+
 ## ecological_indicators.csv
 
 Columns:
@@ -28,6 +30,70 @@ Columns:
 
 - **B_Rtrend** (numeric): Abundance indicator. Recruitment. Trend R 19??-20??/R stock average. See "Abundance (E2)" in 1.A in "SI 2. Indicators and Factors" for details on computation. 
 
+## socioeconomic_indicators.csv
+
+Columns:
+
+- **SPECIES** (character): Species
+
+- **COUNTRIES** (character): ISO Alpha-2 Country code.
+
+- **STOCK** (character): Stock
+
+- **SPgear** (integer): Gear diversity indicator. Number of different gear types fisherman can use. ICES Stock Annex. See "GEAR.DIVERSITY (S1)" in 2.A in "SI 2. Indicators and Factors" for details
+
+- **ICESareas5** (numeric): Fleet mobility indicator. Distance fleet can do in last 5 years average. ICES database. See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details
+
+- **ICESareasEU** (numeric): Fleet mobility indicator. Distances that fleet can do compare before and after EU. ICES database. See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details
+
+- **Stockdep.sp** (numeric): Catch dependency indicator. Total catches of species dependent of total catch of stock. ICES database, Eurostat, RAM's Legacy. See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details
+
+- **Stockdep.total** (numeric): Catch dependency indicator. Total landings dependent of stock catches. ICES database,
+Eurostat, RAM's Legacy. See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details
+
+- **Research** (integer): Adaptive management indicator. Total subsidies in research Amount US$ '000 for specified year (2009). Fisheries Research investment. Fisheries research and development in http://www.seaaroundus.org/data/#/subsidy/192. See "ADAPTIVE MANAGEMENT (S4)" in 2.A in "SI 2. Indicators and Factors" for details
+
+- **Management** (integer): Adaptive management indicator. Total subsidies in management. Fisheries management programs and services in http://www.seaaroundus.org/data/#/subsidy/193.  See "ADAPTIVE MANAGEMENT (S4)" in 2.A in "SI 2. Indicators and Factors" for details
+
+## institutional_indicators.csv
+
+Columns:
+
+- **SPECIES** (character): Species
+
+- **COUNTRIES** (character): ISO Alpha-2 Country code.
+
+- **STOCK** (character): Stock
+
+- **HDI** (numeric): Development indicator. Human Development Index. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details
+
+- **TAC** (integer): Catch quotas indicator. Totall allowable catch. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+
+- **Swaps** (numeric): Property rights indicator. Monetary exchange of quota in a country. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details
+
+- **Norganizations** (integer): Co-Management indicator. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details
+
+## Other_index.csv
+
+Columns: 
+
+- **COUNTRIES** (character): ISO Alpha-2 Country code.
+
+- **GDP.2016** (numeric): GDP 2016. International Monetary Bank
+
+- **OHI.wild.caught** (numeric): OHI 2016. OHI webpage wild caught fisheries
+
+- **OHI.eco** (numeric): OHI eco 2016. Coastal Livelihoods and Economies
+
+- **Tech..develop..2013** (numeric): Tech Develop 2013. number of inventions OECD.stat
+
+- **Inclusion.of.Requirements.2010** (numeric): Inclusion of Requirements 2010. Member state for inclusion of required elements in annual reports. 
+
+- **Readiness** (numeric): ND-Gain Index: Readiness. 2016
+
+- **Vulnerability** (numeric): ND-Gain Index: Vulnerability 2016
+
+# Output files
 
 ## ecological_factors.csv
 
@@ -65,83 +131,103 @@ Columns:
 - **RECOVERY** (numeric): Recovery factor. See section "Recovery (E5)"" in 1.A in "SI 2. Indicators and Factors" for details on computation.
 
 
-
-
-## socioeconomic_indicators_cod.csv and socioeconomic_indicators_hake.csv
-
-Columns:
-
-- SPECIES (character): Species
-- COUNTRIES (character): ISO Alpha-2 Country code.
-- STOCK (character): Stock
-- SPgear (integer): Gear diversity indicator.See "GEAR.DIVERSITY (S1)" in 2.A in "SI 2. Indicators and Factors" for details
-- ICESareas5 (numeric): Fleet mobility indicator.See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details
-- ICESareasEU (numeric): Fleet mobility indicator. See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details
-- Stockdep.sp (numeric): Catch dependency indicator. See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details
-- Stockdep.total (numeric): Catch dependency indicator. See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details
-- Research (integer): Adaptive management indicator. Fisheries Research investment. See "ADAPTIVE MANAGEMENT (S4)" in 2.A in "SI 2. Indicators and Factors" for details
-- Management (integer): Adaptive management indicator. Fisheries Management investment. See "ADAPTIVE MANAGEMENT (S4)" in 2.A in "SI 2. Indicators and Factors" for details
-
-## socioeconomic_factors_cod.csv and socioeconomic_factors_hake.csv
+## socioeconomic_factors.csv
 
 Columns: 
 
-- SPECIES (character): Species
-- COUNTRIES (character): ISO Alpha-2 Country code.
-- STOCK (character): Stock
-- ADAPTIVE.MNG (numeric): Adaptive management factor. See "ADAPTIVE MANAGEMENT (S4)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
-- CATCH.DEP (numeric): Catch dependency factor. See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
-- FLEET.MOBILITY (numeric): Fleet mobility factor. See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
-- GEAR.DIVERSITY (numeric): Gear diversity factor. See "GEAR.DIVERSITY (S1)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+- **SPECIES** (character): Species
 
-## institutional_indicators_cod.csv and institutional_indicators_hake.csv
+- **COUNTRIES** (character): ISO Alpha-2 Country code.
 
-Columns:
+- **STOCK** (character): Stock
 
-- SPECIES (character): Species
-- COUNTRIES (character): ISO Alpha-2 Country code.
-- STOCK (character): Stock
-- HDI (numeric): Development indicator. Human Development Index. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details
-- TAC (integer): Catch quotas indicator. Totall allowable catch. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
-- Swaps (numeric): Property rights indicator. Monetary exchange of quota in a country. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details
-- Norganizations (integer): Co-Management indicator. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details
+- **ADAPTIVE.MNG** (numeric): Adaptive management factor. See "ADAPTIVE MANAGEMENT (S4)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
 
-## institutional_factors_cod.csv and institutional_factors_hake.csv
+- **CATCH.DEP** (numeric): Catch dependency factor. See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **FLEET.MOBILITY** (numeric): Fleet mobility factor. See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **GEAR.DIVERSITY** (numeric): Gear diversity factor. See "GEAR.DIVERSITY (S1)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+
+## socioeconomic_factors_country.csv
 
 Columns: 
 
-- SPECIES (character): Species
-- COUNTRIES (character): ISO Alpha-2 Country code.
-- STOCK (character): Stock
-- DEVELOPMENT (numeric): Development factor. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
-- QUOTAS (numeric): Catch quotas factor. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
-- PROPERTY.RIGHTS (numeric): Property rights factor. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
-- CO.MANAGEMENT (numeric): Co-management factor. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+- **SPECIES** (character): Species
 
-## Other_index.csv
+- **COUNTRIES** (character): ISO Alpha-2 Country code.
+
+- **ADAPTIVE.MNG** (numeric): Adaptive management factor. See "ADAPTIVE MANAGEMENT (S4)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **CATCH.DEP** (numeric): Catch dependency factor. See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **FLEET.MOBILITY** (numeric): Fleet mobility factor. See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **GEAR.DIVERSITY** (numeric): Gear diversity factor. See "GEAR.DIVERSITY (S1)" in 2.A in "SI 2. Indicators and Factors" for details on computation.
+
+
+## institutional_factors.csv
 
 Columns: 
 
-- COUNTRIES (character): ISO Alpha-2 Country code.
-- GDP.2016 (numeric): GDP 2016. International Monetary Bank
-- OHI.wild.caught (numeric): OHI 2016. OHI webpage wild caught fisheries
-- OHI.eco (numeric): OHI eco 2016. Coastal Livelihoods and Economies
-- Tech..develop..2013 (numeric): Tech Develop 2013. number of inventions OECD.stat
-- Inclusion.of.Requirements.2010 (numeric): Inclusion of Requirements 2010. Member state for inclusion of required elements in annual reports. 
-- Readiness (numeric): ND-Gain Index: Readiness. 2016
-- Vulnerability (numeric): ND-Gain Index: Vulnerability 2016
+- **SPECIES** (character): Species
+
+- **COUNTRIES** (character): ISO Alpha-2 Country code.
+
+- **STOCK** (character): Stock
+
+- **DEVELOPMENT** (numeric): Development factor. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **QUOTAS** (numeric): Catch quotas factor. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **PROPERTY.RIGHTS** (numeric): Property rights factor. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **CO.MANAGEMENT** (numeric): Co-management factor. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
+## institutional_factors_country.csv
+
+Columns: 
+
+- **SPECIES** (character): Species
+
+- **COUNTRIES** (character): ISO Alpha-2 Country code.
+
+- **STOCK** (character): Stock
+
+- **DEVELOPMENT** (numeric): Development factor. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **QUOTAS** (numeric): Catch quotas factor. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **PROPERTY.RIGHTS** (numeric): Property rights factor. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
+- **CO.MANAGEMENT** (numeric): Co-management factor. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+
+
+
 
 ## final_index.csv
 
-- SPECIES (character): Species
-- COUNTRIES (character): ISO Alpha-2 Country code.
-- DIMENSION (character): ecological, socioeconomic or institutional.
-- GDP.2016 (numeric): GDP 2016. International Monetary Bank
-- OHI.2016 (numeric): OHI 2016. OHI webpage wild caught fisheries
-- OHI.eco (numeric): OHI eco 2016. Coastal Livelihoods and Economies
-- Tech..develop..2013 (numeric): Tech Develop 2013. number of inventions OECD.stat
-- Inclusion.of.Requirements.2010 (numeric): Inclusion of Requirements 2010. Member state for inclusion of required elements in annual reports. 
-- Readiness (numeric): ND-Gain Index: Readiness. 2016
-- Vulnerability (numeric): ND-Gain Index: Vulnerability 2016
-- Resilience_Index (numeric): Resilience index computed in the script indexes.R
+Columns:
+
+- **SPECIES** (character): Species
+
+- **COUNTRIES** (character): ISO Alpha-2 Country code.
+
+- **DIMENSION** (character): ecological, socioeconomic or institutional.
+
+- **GDP.2016** (numeric): GDP 2016. International Monetary Bank
+
+- **OHI.2016** (numeric): OHI 2016. OHI webpage wild caught fisheries
+
+- **OHI.eco** (numeric): OHI eco 2016. Coastal Livelihoods and Economies
+
+- **Tech..develop..2013** (numeric): Tech Develop 2013. number of inventions OECD.stat
+
+- **Inclusion.of.Requirements.2010** (numeric): Inclusion of Requirements 2010. Member state for inclusion of required elements in annual reports. 
+
+- **Readiness** (numeric): ND-Gain Index: Readiness. 2016
+
+- **Vulnerability** (numeric): ND-Gain Index: Vulnerability 2016
+
+- **Resilience_Index** (numeric): Resilience index computed in the script indexes.R
 

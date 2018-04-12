@@ -87,7 +87,9 @@ packageVersion("tidyverse")
 
 source("aux_functions.R")
 
-
+# Disable scientific notation
+scipen <- getOption("scipen")
+options(scipen=999)
 ##### 2. ECOLOGICAL INDICATORS #####
 
 # Preprocess ecologic data
@@ -140,7 +142,7 @@ write_doc(Ft,
 
 
 
-###### 2.1 ABUNDANCE (E2) #####
+###### 2.2 ABUNDANCE (E2) #####
 
 # See "Abundance (E2)" in 1.A in "SI 2. Indicators and Factors" for details
 
@@ -152,10 +154,9 @@ Table2 <- eco_indicators %>%
 
 # Prepare for word
 to.plot <- Table2 %>% 
-  mutate_if(is.numeric,funs(round(.,digits = 3))) %>% # round numerics to 3 digits
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
 
-to.plot[is.na(to.plot)] <- "-"
 
 # Save to word
 
@@ -177,7 +178,7 @@ Table3 <- eco_indicators  %>%
          SSBhistoric_norm=normalize_positive(SSBhistoric), # Positive
          Ftrend_norm=normalize_negative(Ftrend), # Negative
          Rtrend_norm=normalize_positive(Rtrend) # Positive
-         ) %>%
+  ) %>%
   rowwise %>% # ABUNDANCE factor is the mean of the normalized indicators above for each stock (row)
   mutate(ABUNDANCE=mean(SSBhistoric_norm,SSBrecent_norm,Ftrend_norm,Rtrend_norm,na.rm=TRUE)) %>% 
   ungroup() %>% 
@@ -187,10 +188,8 @@ Table3 <- eco_indicators  %>%
 
 to.plot <- Table3%>% 
   select(-SPECIES) %>% 
-  mutate_if(is.numeric,funs(round(.,digits = 3))) %>% # Round numerics to 3 digits
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
-
-to.plot[is.na(to.plot)] <- "-"
 
 # Save to word
 Ft<- format_table(to.plot)
@@ -201,7 +200,7 @@ write_doc(Ft,
 
 
 
-###### 2.2 TEMPERATURE (E3) #####
+###### 2.3 TEMPERATURE (E3) #####
 
 # See section "Temperature (E3)" in 1.A in "SI 2. Indicators and Factors" for details.
 
@@ -217,7 +216,7 @@ Table4 <- eco_indicators  %>%
   distinct() %>%
   mutate(Trange_norm=(Trange-Trange_2)/(Trange_98-Trange_2), # Normalization
          T50_norm=(T50-T50_2)/(T50_98-T50_2) # Normalization
-         ) %>% 
+  ) %>% 
   mutate(TEMPERATURE=T50_norm, # TEMPERATURE factor is normalized T50
          Trange_2=Trange_2,
          Trange_98=Trange_98,
@@ -226,12 +225,12 @@ Table4 <- eco_indicators  %>%
 
 # Prepare for word
 to.plot <- Table4 %>% 
-  mutate_if(is.numeric,funs(round(.,digits = 3))) %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame %>% 
   select(SPECIES,Trange,T50,Trange_2,Trange_98,T50_2,T50_98,Trange_norm,T50_norm,TEMPERATURE) %>%
   set_names(c("SPECIES","temperature\nrange\n(ºC)","mean\ntemp\n(ºC)","Trang\ne2%\n(ºC)","Trang\ne98%\n(ºC)","T50\ne2%\n(ºC)","T50\ne98%\n(ºC)","Trange'\normalized","T50'\nnormalized","TEMPERATURE"))
 
-to.plot[is.na(to.plot)] <- "-"
+
 
 
 # Save to word
@@ -243,7 +242,7 @@ write_doc(Ft,
 
 
 
-###### 2.3 OVEREXPLOITATION (E4) #####
+###### 2.4 OVEREXPLOITATION (E4) #####
 
 # See section "Overexploitation (E4)"" in 1.A in "SI 2. Indicators and Factors" for details
 
@@ -253,7 +252,7 @@ Table5 <- eco_indicators  %>%
   select(SPECIES,STOCK,OverMSY,Status) %>% 
   mutate(OverMSY_norm=normalize_negative(OverMSY), # Normalize negative
          Status_norm=normalize_positive(Status) # Normalize positive
-         ) %>% 
+  ) %>% 
   rowwise() %>% # OVEREXPLOITATION factor is the mean of the normalized indicators above for each stock (row)
   mutate(OVEREXPLOITATION=mean(c(OverMSY_norm,Status_norm),na.rm=TRUE)) %>%
   ungroup()
@@ -261,13 +260,12 @@ Table5 <- eco_indicators  %>%
 # Prepare for word
 to.plot <- Table5 %>% 
   select(-SPECIES) %>% 
-  mutate_if(is.numeric,funs(round(.,digits = 3))) %>%
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   select(STOCK,OverMSY,Status,OverMSY_norm,Status_norm,OVEREXPLOITATION) %>%
   data.frame %>% 
   set_names(c("STOCK","OverMSY","Status","OverMSY'\normalized","Status'\nnormalized","OVEREXPLOITATION"))
-  
 
-to.plot[is.na(to.plot)] <- "-"
+
 
 # Save to word
 Ft<- format_table(to.plot)
@@ -278,7 +276,7 @@ write_doc(Ft,
 
 
 
-##### 2.4 RECOVERY (E5) #####
+##### 2.5 RECOVERY (E5) #####
 
 # See section "Recovery (E5)"" in 1.A in "SI 2. Indicators and Factors" for details
 
@@ -296,12 +294,11 @@ Table6 <- eco_indicators  %>%
 
 to.plot <- Table6 %>% 
   select(-SPECIES) %>% 
-  mutate_if(is.numeric,funs(round(.,digits = 2))) %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
   select(STOCK,Recovery,recovery_2,recovery_98,Recovery_norm,RECOVERY) %>%
   data.frame %>%
   set_names(c("STOCK","recovery","recovery 2%","recovery 98%","Recovery'\nnormalized","RECOVERY"))
 
-to.plot[is.na(to.plot)] <- "-"
 
 # Save to word
 
@@ -312,7 +309,7 @@ write_doc(Ft,
           "Tables/Table6SI.docx")
 
 
-##### 2.5. ECOLOGICAL FACTORS #####
+##### 2.6 ECOLOGICAL FACTORS #####
 
 # See section 1.B in "SI 2. Indicators and Factors" for details
 
@@ -329,10 +326,8 @@ Table7 <- reduce(list(Table3 %>% select(SPECIES,STOCK,ABUNDANCE),
 
 to.plot <- Table7 %>% 
   select(STOCK,ABUNDANCE,TEMPERATURE,OVEREXPLOITATION,RECOVERY) %>% 
-  mutate_if(is.numeric,funs(round(.,digits = 4))) %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.4f",.)))) %>% # Numbers to string
   data.frame
-
-to.plot[is.na(to.plot)] <- "-"
 
 # Save to word
 
@@ -346,7 +341,7 @@ write_doc(Ft,
 Table7 %>% 
   select(SPECIES,STOCK,ABUNDANCE,TEMPERATURE,OVEREXPLOITATION,RECOVERY) %>%
   write_excel_csv("data/ecological_factors.csv")
-  
+
 
 # Table 8
 
@@ -413,20 +408,18 @@ Table9 <- eco_countries %>%
   gather(FACTOR,VALUE,-SPECIES,-COUNTRIES) %>% 
   unite(SP_FACTOR,SPECIES,FACTOR) %>% 
   spread(SP_FACTOR,VALUE) %>% 
-  mutate_if(is.numeric,funs(round(.,digits = 3))) %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   set_names(gsub("Atlantic cod_|European hake_","",names(.)))
-  
 
 to.plot <- Table9[match(countries_order,Table9$COUNTRIES),]
 
-to.plot[is.na(to.plot)] <- "-"
 
 # Save to word
 
 Ft<- format_table(to.plot)
 
 # Extra header
-Ft<- addHeaderRow(Ft,c("","Cod","Hake"),c(1,4,4),first = TRUE)
+Ft<- addHeaderRow(Ft,c("","COD","HAKE"),c(1,4,4),first = TRUE, cell.properties = cellProperties(border.top.style = "none",border.left.style = "none",border.right.style = "none"),par.properties = parProperties(text.align = "center"))
 
 write_doc(Ft,
           "Table 9. Ecological Factors per fishing country and species.",
@@ -452,15 +445,23 @@ soc_indicators <- fread("data/socioeconomic_indicators.csv")
 
 ##### 3.1 GEAR.DIVERSITY #####
 
+# See "GEAR.DIVERSITY (S1)" in 2.A in "SI 2. Indicators and Factors" for details
+
+# Table 10
 
 Table10 <- soc_indicators %>% 
   select(SPECIES,SPgear) %>% 
   distinct %>% 
-  mutate(SPgear_norm=normalize_positive(SPgear), GEAR.DIVERSITY=SPgear_norm)
+  mutate(SPgear_norm=normalize_positive(SPgear), # Normalize positive
+         GEAR.DIVERSITY=SPgear_norm) # GEAR.DIVERSITY factor is the SPgear normalized.
+
+# Prepare for word
 
 to.plot <- Table10 %>% mutate(SPECIES=tools::toTitleCase(species_sort_name(SPECIES))) %>%
   data.frame %>%
   set_names("","Gear Diversity","NormalizedGearDiv","GEAR.DIVERSITY")
+
+# Save to word
 
 Ft <- format_table(to.plot)
 
@@ -470,23 +471,33 @@ write_doc(Ft,
 
 ###### 3.2 FLEET.MOBILITY #####
 
+# See "FLEET MOBILITY (S2)" in 2.A in "SI 2. Indicators and Factors" for details
+
+# Table 11
+
 Table11 <- soc_indicators %>% 
   select(COUNTRIES,ICESareas5,ICESareasEU) %>% 
   distinct %>% 
-  mutate(ICESareas5_norm=normalize_positive(ICESareas5),ICESareasEU_norm=normalize_positive(ICESareasEU)) %>% 
-  rowwise() %>%
+  mutate(ICESareas5_norm=normalize_positive(ICESareas5), # Normalization positive
+         ICESareasEU_norm=normalize_positive(ICESareasEU) # Normalization positive
+  ) %>% 
+  rowwise() %>% # FLEET.MOBILITY factor is the mean of the normalized indicators above for each country (row)
   mutate(FLEET.MOBILITY=mean(c(ICESareas5_norm,ICESareasEU_norm),na.rm=TRUE)) %>% 
   ungroup()
 
-to.plot <- Table11 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame %>%
+# Prepare for word
+
+to.plot <- Table11 %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
+  data.frame %>%
   set_names(c("COUNTRIES","ICESareas5","ICESareasEU","Normalized\nICESareas5","Normalized\nICESareasEU","FLEET.MOBILITY"))
 
-to.plot[is.na(to.plot)] <- "-"
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
-Ft<- format_table(to.plot)
+# Save to word
 
+Ft<- format_table(to.plot)
 
 write_doc(Ft,
           "Table 11. Indicators and normalization of Fleet Mobility factor.",
@@ -495,19 +506,31 @@ write_doc(Ft,
 
 ##### 3.3 CATCH.DEP #####
 
-Table12 <- soc_indicators %>% arrange(COUNTRIES,SPECIES,STOCK) %>% 
+# See "CATCH DEPENDENCY (S3)" in 2.A in "SI 2. Indicators and Factors" for details
+
+# Table 12
+
+Table12 <- soc_indicators %>% 
+  complete(nesting(SPECIES,STOCK),COUNTRIES) %>%
+  arrange(COUNTRIES,SPECIES,STOCK) %>% 
   select(SPECIES,COUNTRIES,STOCK,Stockdep.sp,Stockdep.total) %>%
-  mutate(Stockdep.sp_norm=normalize_negative(Stockdep.sp),Stockdep.total_norm=1-normalize_positive(Stockdep.total)) %>%
-  rowwise() %>%
+  mutate(Stockdep.sp_norm=normalize_negative(Stockdep.sp), # Normalization negative
+         Stockdep.total_norm=normalize_negative(Stockdep.total) # Normalization negative
+  ) %>%
+  rowwise() %>% # CATCH.DEP factor is the mean of the normalized indicators above for each stock (row)
   mutate(CATCH.DEP=mean(c(Stockdep.sp_norm,Stockdep.total_norm),na.rm=TRUE)) %>% 
   ungroup() %>% arrange_table()
 
+# Prepare for word
 
-
-to.plot <- Table12 %>% select(-SPECIES) %>% mutate_if(is.numeric,funs(round(.,digits = 4))) %>% data.frame %>%
+to.plot <- Table12 %>% 
+  select(-SPECIES) %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.4f",.)))) %>% # Numbers to string
+  data.frame %>%
   set_names(c("COUNTRIES","STOCK","Sockdep.sp","Stockdep.total","normalized\nspecie","normalized\ntotal","CATCH.DEP"))
 
-to.plot[is.na(to.plot)] <- "-"
+
+# Save to word
 
 Ft<- format_table(to.plot)
 
@@ -515,15 +538,30 @@ Ft <- spanFlexTableRows(Ft,1,runs = to.plot[,1])
 
 Ft[,2] <- parProperties(text.align = "left")
 
+country_rows <- rle(to.plot$COUNTRIES)$lengths %>% cumsum()
+
+Ft[,2] <- cellProperties(border.bottom.style = "none",border.top.style = "none",border.left.style = "solid",border.right.style = "solid")
+
+Ft[country_rows,1:2] <- cellProperties(border.bottom.style = "solid",border.top.style = "none",border.left.style = "none")
+for(country_row in country_rows){
+
+  Ft[country_row,3:ncol(to.plot)] <- cellProperties(background.color = ifelse(country_row%%2==0,"white","gray90"),border.bottom.style = "solid",border.right.style =  "none",border.top.style = "none",border.left.style = "none")
+    
+}
+
+
 write_doc(Ft,
           "Table 12. Catch dependency of countries on stocks.",
           "Tables/Table12SI.docx")
 
+# Table 13
+
 Table13 <- Table12 %>% 
-  group_by(SPECIES,COUNTRIES) %>% 
-  summarise(CATCH.DEP=mean(CATCH.DEP,na.rm=TRUE)) %>% 
-  
+  group_by(SPECIES,COUNTRIES) %>%
+  summarise(CATCH.DEP=mean(CATCH.DEP,na.rm=TRUE)) %>%  # Average catch dependency for each country
   ungroup() 
+
+# Prepare for word
 
 to.plot <- Table13 %>%
   mutate(SPECIES=paste0("CATCH.DEP\n",tools::toTitleCase(species_sort_name(SPECIES)))) %>%
@@ -532,6 +570,8 @@ to.plot <- Table13 %>%
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
 to.plot[is.na(to.plot)] <- "-"
+
+# Save to word
 
 Ft<- format_table(to.plot)
 
@@ -542,13 +582,21 @@ write_doc(Ft,
 
 ###### 3.4 ADAPTIVE MANAGEMENT #####
 
+# See "ADAPTIVE MANAGEMENT (S4)" in 2.A in "SI 2. Indicators and Factors" for details.
+
+# Table 14
+
 Table14 <- soc_indicators %>% 
   select(COUNTRIES,Research,Management) %>%
   distinct %>%
-  mutate(Research_norm=normalize_positive(Research),Management_norm=normalize_positive(Management)) %>%
-  rowwise() %>%
+  mutate(Research_norm=normalize_positive(Research), # Normalization positive
+         Management_norm=normalize_positive(Management) # Normalization negative
+  ) %>%
+  rowwise() %>% # ADAPTIVE.MNG factor is the mean of the normalized indicators above for each country (row)
   mutate(ADAPTIVE.MNG=mean(c(Research_norm,Management_norm),na.rm=TRUE)) %>% 
   ungroup()
+
+# Prepare for word
 
 to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame %>%
   set_names(c("COUNTRIES","Research","Management","normalizedResearch","normalizedMng","ADAPTIVE.MNG"))
@@ -556,6 +604,8 @@ to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.
 to.plot[is.na(to.plot)] <- "-"
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
+
+# Save to word
 
 Ft<- format_table(to.plot)
 
@@ -566,27 +616,41 @@ write_doc(Ft,
 
 ##### 3.5 SOCIOECONOMIC FACTORS #####
 
-Table15 <- reduce(list(Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
-                       Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP) %>%
-                         mutate(SPECIES=paste0("CATCH.DEP\n",species_sort_name(SPECIES))) %>%
-                         spread(SPECIES,CATCH.DEP) ,
-                       Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)),full_join,by="COUNTRIES")
+# See section 2.B in "SI 2. Indicators and Factors" for details.
+
+# Table 15
+
+# Merge tables 11, 13 and 14.
+
+Table15 <- reduce(
+  list(
+    Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
+    Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP) %>%
+      mutate(SPECIES=paste0("CATCH.DEP\n",species_sort_name(SPECIES))) %>% # One column for each species
+      spread(SPECIES,CATCH.DEP) ,
+    Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
+  ),full_join,by="COUNTRIES")
 
 
-
-
-t10 <- Table10 %>% select(SPECIES,GEAR.DIVERSITY) %>% mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>%
+# Merge table 10 with all the others
+t10 <- Table10 %>% select(SPECIES,GEAR.DIVERSITY) %>% 
+  mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>% # One column for each species
   spread(SPECIES,GEAR.DIVERSITY)
 
 Table15 <- bind_cols(Table15,t10[rep(1,nrow(Table15)),])
 
-to.plot <- Table15 %>% mutate_at(vars(starts_with("CATCH")),funs(round(.,digits = 3))) %>%
+# Prepare for word
+to.plot <- Table15 %>% 
+  mutate_at(vars(starts_with("CATCH")),funs(round(.,digits = 3))) %>%
   mutate_at(vars(starts_with("ADAP"),starts_with("FLEET")),funs(round(.,digits = 2)))%>% 
-  select(COUNTRIES,starts_with("GEAR"),FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% data.frame
+  select(COUNTRIES,starts_with("GEAR"),FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% 
+  data.frame
 
 to.plot[is.na(to.plot)] <- "-"
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
+
+# Save to word
 
 Ft<- format_table(to.plot)
 
@@ -594,20 +658,29 @@ write_doc(Ft,
           "Table 15. Socioeconomic Factors",
           "Tables/Table15SI.docx")
 
+# Merge tables 11, 12, 10 and 14 to produce socioeconomic factors per stock: socioeconomic_factors.csv
 
-reduce(list(Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
-            Table12 %>% select(SPECIES,STOCK,COUNTRIES,CATCH.DEP),
-            Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)),full_join,by="COUNTRIES") %>%
-  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% 
-  select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>%
-  write_excel_csv("data/socioeconomic_factors.csv")
+reduce( # Merge tables 11, 12 and 14
+  list(
+    Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
+    Table12 %>% select(SPECIES,STOCK,COUNTRIES,CATCH.DEP),
+    Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
+  ),full_join,by="COUNTRIES") %>%
+  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
+  select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
+  write_excel_csv("data/socioeconomic_factors.csv") # Save to csv
 
-reduce(list(Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
-            Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP),
-            Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)),full_join,by="COUNTRIES") %>%
-  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% 
-  select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>%
-  write_excel_csv("data/socioeconomic_factors_country.csv")
+# Merge tables 11, 13, 10 and 14 to produce socioeconomic factors per country: socioeconomic_factors_country.csv
+
+reduce( # Merge tables 11, 13 and 14
+  list(
+    Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
+    Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP),
+    Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
+  ),full_join,by="COUNTRIES") %>%
+  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
+  select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
+  write_excel_csv("data/socioeconomic_factors_country.csv") # Save to csv
 
 
 ##### 4 INSTITUTIONAL INDICATORS #####
@@ -792,3 +865,10 @@ reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
   select(SPECIES,COUNTRIES,DEVELOPMENT,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
   mutate_if(is.numeric,funs(round(.,digits = 4))) %>% 
   write_excel_csv("data/institutional_factors_country.csv")
+
+
+
+# Enable scientific notation again
+
+options(scipen=scipen)
+
