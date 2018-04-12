@@ -701,20 +701,28 @@ ins_indicators <- fread("data/institutional_indicators.csv")
 
 ##### 4.1 CO.MANAGEMENT (I1) #####
 
+# See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details
+
+# Table 16
 
 Table16 <-ins_indicators %>% 
   select(COUNTRIES,Norganizations) %>%
   distinct %>%
-  mutate(Norganizations_norm=normalize_positive(Norganizations)) %>%
+  mutate(Norganizations_norm=normalize_positive(Norganizations)) %>% # Normalization positive
   rowwise() %>%
-  mutate(CO.MANAGEMENT=Norganizations_norm) %>% 
+  mutate(CO.MANAGEMENT=Norganizations_norm) %>% # CO.MANAGEMENT is Norganizations normalized
   ungroup()
 
-to.plot <- Table16 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame
+# Prepare for word
 
-to.plot[is.na(to.plot)] <- "-"
+to.plot <- Table16 %>%
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
+  data.frame 
 
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
+  set_names(c("","Norganizations\n2017","Norganizations'\n(normalized)","CO.MANAGEMENT"))
+
+# Save to word
 
 Ft<- format_table(to.plot)
 
@@ -724,19 +732,28 @@ write_doc(Ft,
 
 ##### 4.2 PROPERTY.RIGHTS (I2) #####
 
+# See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details
+
+# Table 17
+
 Table17 <- ins_indicators %>% 
   select(COUNTRIES,Swaps) %>%
   distinct %>%
-  mutate(Swaps_norm=normalize_positive(Swaps)) %>%
+  mutate(Swaps_norm=normalize_positive(Swaps)) %>% # Normalization positive
   rowwise() %>%
-  mutate(PROPERTY.RIGHTS=Swaps_norm) %>% 
+  mutate(PROPERTY.RIGHTS=Swaps_norm) %>% # PROPERTY.RIGHTS factor equals Swaps normalized
   ungroup()
 
-to.plot <- Table17 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame
+# Prepare for word
 
-to.plot[is.na(to.plot)] <- "-"
+to.plot <- Table17 %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
+  data.frame
 
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
+  set_names(c("COUNTRIES","Swaps\n(million € 2000 - 2006)","Swaps'\n(normalized)","PROPERTY.RIGHTS"))
+
+# Save to word
 
 Ft<- format_table(to.plot)
 
@@ -747,9 +764,15 @@ write_doc(Ft,
 
 ##### 4.3 CATCH QUOTAS (I3) #####
 
+# See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+
+# Table 18
+
 Table18 <- ins_indicators  %>% 
   select(COUNTRIES,STOCK,TAC) %>% 
   spread(COUNTRIES,TAC)
+
+# Prepare for word
 
 to.plot <- Table18 %>% data.frame
 
@@ -757,39 +780,45 @@ to.plot[is.na(to.plot)] <- "-"
 
 to.plot <- to.plot[,match(c("STOCK",countries_order),names(to.plot))]
 
+to.plot$STOCK <- gsub("_","/\n",to.plot$STOCK)
+
+# Save to word
+
 Ft<- format_table(to.plot)
 
-Ft[,1] <- textProperties(font.size = 8,font.weight = "bold")
+Ft[,1] <- textProperties(font.size = 10,font.style = "italic")
 
 write_doc(Ft,
           "Table 18. TAC (million tons) per stock and country (2015)",
           
           "Tables/Table18SI.docx",landscape = TRUE)
 
+
+# Table 19
+
 Table19p <- ins_indicators %>% 
   select(SPECIES,STOCK,COUNTRIES,TAC)
 
 Table19 <- Table19p %>%
   group_by(COUNTRIES,SPECIES) %>% 
-  summarise(TAC=sum(TAC,na.rm=TRUE)) %>%
+  summarise(TAC=sum(TAC,na.rm=TRUE)) %>% # Sum stocks by country and species
   ungroup() %>%
-  mutate(TAC_norm=normalize_positive(TAC)) %>%
-  mutate(QUOTAS=TAC_norm)
+  mutate(TAC_norm=normalize_positive(TAC)) %>% # Normalize positive
+  mutate(QUOTAS=TAC_norm) # QUOTAS factor is the normalized TAC
 
+# Prepare for word
 
 to.plot <- Table19 %>% select(SPECIES,COUNTRIES,QUOTAS) %>% 
-  mutate_if(is.numeric,funs(round(.,digits = 3))) %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numbers to string
   mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
   spread(SPECIES,QUOTAS)
 
 
-to.plot[is.na(to.plot)] <- 0.0
-
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
+# Save to word
+
 Ft<- format_table(to.plot)
-
-
 
 write_doc(Ft,
           "Table 19. Factor Quota values per country.",
@@ -797,19 +826,28 @@ write_doc(Ft,
 
 ##### 4.4 DEVELOPMENT (I4) #####
 
+# See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details
+
+# Table 20
+
 Table20 <-ins_indicators %>% 
   select(COUNTRIES,HDI) %>%
   distinct %>%
-  mutate(HDI_norm=normalize_positive(HDI)) %>%
+  mutate(HDI_norm=normalize_positive(HDI)) %>% # Normalization positive
   rowwise() %>%
-  mutate(DEVELOPMENT=HDI_norm) %>% 
+  mutate(DEVELOPMENT=HDI_norm) %>% # DEVELOPMENT factos is HDI normalized
   ungroup()
 
-to.plot <- Table20 %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame
+# Prepare for word
 
-to.plot[is.na(to.plot)] <- "-"
+to.plot <- Table20 %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
+  data.frame
 
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
+  set_names(c("COUNTRIES","HDI","HDI'\n(normalized)","DEVELOPMENT"))
+
+# Save to word
 
 Ft<- format_table(to.plot)
 
@@ -820,50 +858,51 @@ write_doc(Ft,
 
 ##### 4.5 INSTITUTIONAL FACTORS #####
 
+# See section 3.B in "SI 2. Indicators and Factors" for details
+
+# Table 21. Merge tables 16, 17, 19 and 20
+
 Table21 <- reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
                        Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
                        Table19 %>% select(SPECIES,COUNTRIES,QUOTAS),
                        Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES")
 
-
+# Prepare for word
 
 to.plot <- Table21 %>% 
   mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
   spread(SPECIES,QUOTAS) %>% 
-  mutate_at(vars(starts_with("QUOTAS")),funs(ifelse(is.na(.),0.0,round(.,digits = 3)))) %>% 
-  mutate_at(vars(starts_with("CO.MANAG"),starts_with("PROPERTY")),funs(round(.,digits = 2))) %>%
-  mutate_at(vars(starts_with("DEVELOPMENT")),funs(round(.,digits = 3))) %>% data.frame
-
-
-
-to.plot[is.na(to.plot)] <- "-"
+  mutate_at(vars(starts_with("QUOTAS")),funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numeric to string
+  mutate_at(vars(starts_with("CO.MANAG"),starts_with("PROPERTY")),funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>%  # Numeric to string
+  mutate_at(vars(starts_with("DEVELOPMENT")),funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% data.frame  # Numeric to string
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
+# Save to word
+
 Ft<- format_table(to.plot)
-
-
 
 write_doc(Ft,
           "Table 21. List of Institutional factors.",
           "Tables/Table21SI.docx")
 
 
+# Merge tables 16, 17, 19 not normalized and 20 to produce institutional factors per stock: institutional_factors.csv
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
             Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
             Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
   select(SPECIES,COUNTRIES,STOCK,DEVELOPMENT,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
-  mutate_if(is.numeric,funs(round(.,digits = 4))) %>% 
   write_excel_csv("data/institutional_factors.csv")
+
+# Merge tables 16, 17, 19 and 20 to produce institutional factors per country: institutional_factors_country.csv
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
             Table19 %>% select(SPECIES, COUNTRIES,QUOTAS),
             Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
   select(SPECIES,COUNTRIES,DEVELOPMENT,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
-  mutate_if(is.numeric,funs(round(.,digits = 4))) %>% 
   write_excel_csv("data/institutional_factors_country.csv")
 
 

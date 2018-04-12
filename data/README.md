@@ -65,13 +65,13 @@ Columns:
 
 - **STOCK** (character): Stock
 
-- **HDI** (numeric): Development indicator. Human Development Index. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details
+- **HDI** (numeric): Development indicator. Human Development Index. UNDP. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details
 
-- **TAC** (integer): Catch quotas indicator. Totall allowable catch. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+- **TAC** (integer): Catch quotas indicator. Totall allowable catch per country and stock. europa.eu. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
 
-- **Swaps** (numeric): Property rights indicator. Monetary exchange of quota in a country. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details
+- **Swaps** (numeric): Property rights indicator. Monetary exchange of quota in a country. Total ITQ per country and stock 2000-2006. Andersen et al., 2009. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details
 
-- **Norganizations** (integer): Co-Management indicator. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details
+- **Norganizations** (integer): Co-Management indicator. Number of recognized producer organizations in the fishery and aquaculture sector. europa.eu. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details
 
 ## Other_index.csv
 
@@ -97,6 +97,8 @@ Columns:
 
 ## ecological_factors.csv
 
+Ecological factors per stock and country. Computed in process_indicators.R
+
 Columns:
 
 - **SPECIES** (character): Species
@@ -115,7 +117,7 @@ Columns:
 
 Ecological factors per stock are converted to factors per country based on whether the stock is being fished by the EU member country, based on the data from ICES Historical Nominal Catches 1950-2010 (http://www.ices.dk/marine-data/dataset- collections/Pages/Fish-catch-and-stock-assessment.aspx) See table 8 in "SI 2. Indicators and Factors".
 
-The values of ecological factors in countries are calculated as the mean of the values of ecological factors in stocks that these countries fish. Therefore, the values in these files are computed from ecological_factors_cod.csv and ecological_factors_hake.csv.
+The values of ecological factors in countries are calculated as the mean of the values of ecological factors in stocks that these countries fish. Computed in process_indicators.R
 
 
 Columns:
@@ -132,6 +134,8 @@ Columns:
 
 
 ## socioeconomic_factors.csv
+
+Socioeconomic factors per stock and country. Computed in process_indicators.R
 
 Columns: 
 
@@ -151,6 +155,8 @@ Columns:
 
 ## socioeconomic_factors_country.csv
 
+Socioeconomic factors per country. Computed in process_indicators.R
+
 Columns: 
 
 - **SPECIES** (character): Species
@@ -167,6 +173,8 @@ Columns:
 
 
 ## institutional_factors.csv
+
+Institutional factors per stock and country. Computed in process_indicators.R
 
 Columns: 
 
@@ -185,6 +193,8 @@ Columns:
 - **CO.MANAGEMENT** (numeric): Co-management factor. See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
 
 ## institutional_factors_country.csv
+
+Institutional factors per country. Computed in process_indicators.R
 
 Columns: 
 
@@ -206,6 +216,8 @@ Columns:
 
 
 ## final_index.csv
+
+Resilience index and other indexes. Computed in indexes.R
 
 Columns:
 
