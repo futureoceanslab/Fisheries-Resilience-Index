@@ -372,14 +372,13 @@ write_doc(Ft,
 
 # Table 9
 
-# Compute mean factor for each country. Stock CODNEAR excluded.
+# Compute mean factor for each country. 
 
 eco_countries <- lapply(countries_order, function(country){ # For each country
   
   
   stocks_fished %>% 
     filter_at(vars(one_of(country)),all_vars(.)) %>% # Keep the data for that country 
-    filter(STOCK!="CODNEAR") %>% # Remove data for stock CODNEAR
     select(STOCK) %>% 
     left_join(Table7,by="STOCK") %>% # Merge with data by stock
     select(-STOCK) %>% 
