@@ -195,7 +195,7 @@ format_table <- function(data){
   
   Ft[,1] <- textProperties(font.size = 10,font.style   = "italic")
   
-  Ft[,1] <- parProperties(text.align = "left")
+  Ft[,1] <- parProperties(text.align = "right")
   
   Ft[1:(nrow(data)),1] <- cellProperties(border.bottom.style =  "none",border.top.style = "none",border.left.style = "none")
   
