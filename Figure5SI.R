@@ -105,9 +105,10 @@ p_values_species <- p_values_for_classes_in_column(to.plot,"SPECIE","LAT")
 #' @param column_name (character) column name of the classe used to plot the trend lines
 #' @return (ggplot) graph with the p-values
 plot_p_values <- function(g,data,p_values,column_name){
+  
   # Locate p-values at the bottom center of the graph. y_center may fail with different ggplot versions
-  x_center <- data[,"Resilience_Index"] %>% min(na.rm=TRUE)
-  y_center <- data[,"LAT"] %>% max(na.rm=TRUE)
+  x_center <- data %>% pull("Resilience_Index") %>% min(na.rm=TRUE)
+  y_center <- data %>% pull("LAT") %>% max(na.rm=TRUE)
   
   
   # get the p-values
