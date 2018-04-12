@@ -92,15 +92,6 @@ scipen <- getOption("scipen")
 options(scipen=999)
 ##### 2. ECOLOGICAL INDICATORS #####
 
-# Preprocess ecologic data
-
-# ab <- fread("../abundance_indicators.csv",check.names = TRUE,na.strings = ".") %>% select(STOCK,B_SSBrecent=SSBrecent,B_SSBhistoric=SSBhistoric,B_Ftrend=Ftrend,B_Rtrend=Rtrend,ends_with(".average"))
-# 
-# eco_indicators <- bind_rows(fread("data/ecological_indicators_hake.csv",check.names = TRUE),
-#                             fread("data/ecological_indicators_cod.csv",check.names = TRUE))
-# 
-# eco_indicators %>% select(-SSBhistoric,-SSBrecent,-Ftrend,-Rtrend) %>% left_join(ab,by="STOCK") %>% write_excel_csv("data/ecological_indicators.csv")
-
 eco_indicators <- fread("data/ecological_indicators.csv",check.names = TRUE)
 
 
@@ -434,13 +425,6 @@ eco_countries %>%  mutate_if(is.numeric,funs(round(.,digits = 9))) %>%
 
 ##### 3. SOCIOECONOMIC INDICATORS #####
 
-# soc_indicators <- bind_rows(fread("data/socioeconomic_indicators_cod.csv",check.names = TRUE),
-#                             fread("data/socioeconomic_indicators_hake.csv",check.names = TRUE)) %>%
-#   arrange(COUNTRIES,STOCK)
-# 
-# 
-# write_excel_csv(soc_indicators,"data/socioeconomic_indicators.csv")
-
 soc_indicators <- fread("data/socioeconomic_indicators.csv")
 
 ##### 3.1 GEAR.DIVERSITY #####
@@ -684,17 +668,6 @@ reduce( # Merge tables 11, 13 and 14
 
 
 ##### 4 INSTITUTIONAL INDICATORS #####
-
-
-# ins_indicators <- bind_rows(fread("data/institutional_indicators_cod.csv",check.names = TRUE),
-#                             fread("data/institutional_indicators_hake.csv",check.names = TRUE)) %>% 
-#   arrange(COUNTRIES,STOCK)
-# 
-# quota <- readxl::read_excel("../institutionalfactors.xlsx","QUOTA",na = "NA") %>% select(1:4) %>% mutate(SPECIES=species_long_name(SPECIES))
-# 
-# ins_indicators %<>% select(-TAC) %>% full_join(quota,by=c("SPECIES","COUNTRIES","STOCK"))
-# 
-# write_excel_csv(ins_indicators,"data/institutional_indicators.csv")
 
 ins_indicators <- fread("data/institutional_indicators.csv")
 

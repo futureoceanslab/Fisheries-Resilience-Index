@@ -51,103 +51,17 @@ packageVersion("tidyverse")
 # [1] ‘1.2.1’
 
 
-##### 1. Compute Resilience Index #####
 
-#' Reads data file and preprocess indicators data
-#' 
-#' Computes mean of column_name by species/country and normalizes for each species using
-#' (mean-min(mean))/(max(mean)-min(mean)). Returns column mean and normalized values by species/country
-#' 
-#' @param (filepath) path of the file to preprocess
-#' @param (column_name) column name to preprocess
-# preprocess_indicators <- function(filepath,column_name){
-#   
-#   fread(filepath,check.names = TRUE) %>% # Read data
-#     group_by(SPECIES,COUNTRIES) %>% # Group by species and country
-#     summarise_at(c(column_name),funs(mean=mean(.,na.rm = TRUE))) %>% # Compute mean for each species/country
-#     ungroup() %>%
-#     group_by(SPECIES) %>%  # Group by species
-#     mutate(norm=(mean-min(mean,na.rm=TRUE))/(max(mean,na.rm = TRUE)-min(mean,na.rm=TRUE))) %>% # Normalize
-#     ungroup() %>%
-#     rename_at(c("mean","norm"),funs(paste0(column_name,.))) # Rename
-#   
-#   
-# }
+##### 1. Read factors #####
 
-# Preprocess institutional indicators
-
-# ins_indicators <- bind_rows(preprocess_indicators("data/institutional_indicators_hake.csv","TAC"),
-#                             preprocess_indicators("data/institutional_indicators_cod.csv","TAC")) %>% select(SPECIES,COUNTRIES,QUOTAS=TACnorm)
-
-# Preprocess socioeconomic indicators
-
-# soc_indicators <- bind_rows(preprocess_indicators("data/socioeconomic_indicators_hake.csv","Stockdep.sp") %>% select(SPECIES,COUNTRIES,CATCH.DEP=Stockdep.spnorm),
-#                             preprocess_indicators("data/socioeconomic_indicators_cod.csv","Stockdep.sp") %>% select(SPECIES,COUNTRIES,CATCH.DEP=Stockdep.spnorm))
-
-# Preprocess insitutional factors
-
-# ins_factors <- bind_rows(fread("data/institutional_factors_hake.csv",check.names = TRUE),
-#                          fread("data/institutional_factors_cod.csv",check.names = TRUE)) %>% # Read data
-#   select(COUNTRIES,SPECIES,STOCK,DEVELOPMENT,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
-#   left_join(ins_indicators,by=c("COUNTRIES","SPECIES")) %>% # merge with institutional indicators
-#   gather(FACTOR,VALUE,-COUNTRIES,-SPECIES,-STOCK,factor_key = TRUE) %>% # Gather all factors in two columns
-#   group_by(SPECIES,COUNTRIES,FACTOR) %>% # Group by species, country and factor
-#   summarise(VALUE=mean(VALUE,na.rm=TRUE)) %>%  # Compute mean
-#   ungroup() %>%
-#   mutate(DIMENSION="institutional") # Add dimension name
-# 
-# ins_factors <- fread("data/institutional_factors.csv",check.names = TRUE)
-# 
-# q <- ins_factors %>% group_by(SPECIES,COUNTRIES) %>% summarise(QUOTAS=sum(QUOTAS,na.rm=TRUE))
-# 
-# ins_factors %<>% select(-QUOTAS) %>%
-#   gather(FACTOR,VALUE,-COUNTRIES,-SPECIES,-STOCK,factor_key = TRUE) %>% # Gather all factors in two columns
-#   group_by(SPECIES,COUNTRIES,FACTOR) %>% # Group by species, country and factor
-#   summarise(VALUE=mean(VALUE,na.rm=TRUE)) %>%  # Compute mean
-#   ungroup() %>%
-#   mutate(DIMENSION="institutional") %>%# Add dimension name
-#   full_join(q,by=c("SPECIES","COUNTRIES"))
-
-# Preprocess socioeconomic factors.
-# 
-# soc_factors <- bind_rows(fread("data/socioeconomic_factors_hake.csv",check.names = TRUE),
-#                          fread("data/socioeconomic_factors_cod.csv",check.names = TRUE)) %>% # Read data
-#   select(COUNTRIES,SPECIES,STOCK,ADAPTIVE.MNG,FLEET.MOBILITY) %>%
-#   left_join(soc_indicators,by=c("COUNTRIES","SPECIES")) %>% # merge with socioeconomic indicator
-#   gather(FACTOR,VALUE,-COUNTRIES,-SPECIES,-STOCK,factor_key = TRUE) %>% # Gather all factors in two columns
-#   group_by(SPECIES,COUNTRIES,FACTOR) %>% # Group by species, country and factor
-#   summarise(VALUE=mean(VALUE,na.rm=TRUE)) %>%  # Compute mean
-#   ungroup() %>%
-#   mutate(DIMENSION="socioeconomic") # Add dimension name
-
-# soc_factors <- fread("data/socioeconomic_factors.csv",check.names = TRUE) %>%
-#   gather(FACTOR,VALUE,-COUNTRIES,-SPECIES,-STOCK,factor_key = TRUE) %>% # Gather all factors in two columns
-#   group_by(SPECIES,COUNTRIES,FACTOR) %>% # Group by species, country and factor
-#   summarise(VALUE=mean(VALUE,na.rm=TRUE)) %>%  # Compute mean
-#   ungroup() %>%
-#   mutate(DIMENSION="socioeconomic") # Add dimension name
-
-
-
-# Preprocess ecologic data
-# 
-# ecountriesCOD <- fread("data/eco_country_cod.csv",check.names = TRUE) %>% # Read data
-#   gather(FACTOR,VALUE,-COUNTRY,factor_key = TRUE) %>% # Gather colums in factors
-#   mutate(SPECIES="Atlantic cod",DIMENSION="ecological") %>% # add species name and dimension
-#   rename(COUNTRIES=COUNTRY)
-# 
-# ecountriesHAKE <- fread("data/eco_country_hake.csv",check.names = TRUE) %>% # Read data
-#   gather(FACTOR,VALUE,-COUNTRY,factor_key = TRUE) %>% # Gather colums in factors
-#   mutate(SPECIES="European hake",DIMENSION="ecological") %>% # add species name and dimension
-#   rename(COUNTRIES=COUNTRY)
-# 
-# ecountries <- bind_rows(ecountriesHAKE,ecountriesCOD)
 
 eco_factors <- fread("data/ecological_factors_country.csv") %>% mutate(DIMENSION="ecological")
 
 ins_factors <- fread("data/institutional_factors_country.csv")  %>% mutate(DIMENSION="institutional")
 
 soc_factors <- fread("data/socioeconomic_factors_country.csv")  %>% mutate(DIMENSION="socioeconomic")
+
+##### 2. Compute Resilience Index #####
 
 # Compute resilience index. For that put together all the factors computed above and compute 
 # their mean by species, dimension and country
@@ -159,7 +73,7 @@ resilience_index <- bind_rows(eco_factors,ins_factors,soc_factors) %>%
   ungroup()
 
 
-###### 2. Include other variables #####
+###### 3. Merge other indexes #####
 
 # Read other indexes and merge with the resilience index
 
@@ -177,8 +91,3 @@ final_index <- other_index %>%
 # Save final index. This file is used by several scripts to produce most figures in the repository. 
 
 write.csv(final_index,file="data/final_index.csv",row.names = FALSE)
-
-# f_in <- fread("../repo/final dimension scripts/data/final_index.csv")
-# 
-# 
-# final_index %>% select(COUNTRIES,SPECIE,DIMENSION,Resilience_Index) %>% full_join(f_in %>% select(COUNTRIES,SPECIE,DIMENSION,Resilience_Index),by=c("COUNTRIES","SPECIE","DIMENSION")) %>% mutate(d=abs(Resilience_Index.x-Resilience_Index.y)) %>% filter(d>0.001)
