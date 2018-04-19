@@ -10,6 +10,8 @@
 
 - **Fig dimensions.png**: Graph dimensions comparison.
 
+- **Figure 8.png**: Graph comparison of Resilience Index with other index per dimension.
+
 ### SSMM:
 
 - **Fig 2 SI.png**: Values of resilience factors per species. Dark colour European hake and light colour Atlantic cod. 
