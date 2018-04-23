@@ -736,9 +736,9 @@ write_doc(Ft,
           "Tables/Table17SI.docx")
 
 
-##### 4.3 CATCH QUOTAS (I3) #####
+##### 4.3 ABOVE.TAC (I3) #####
 
-# See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+# See "Above_TAC (I3)" in 3.A in "SI 2. Indicators and Factors" for details
 
 # Table 18
 
@@ -763,7 +763,7 @@ Ft<- format_table(to.plot)
 Ft[,1] <- textProperties(font.size = 10,font.style = "italic")
 
 write_doc(Ft,
-          "Table 18. TAC (million tons) per stock and country (2015)",
+          "Table 18. TAC (million tons) above advice (2001-2015)",
           
           "Tables/Table18SI.docx",landscape = TRUE)
 
@@ -774,18 +774,18 @@ Table19p <- ins_indicators %>%
   select(SPECIES,STOCK,COUNTRIES,TAC)
 
 Table19 <- Table19p %>%
-  group_by(COUNTRIES,SPECIES) %>% 
+ group_by(COUNTRIES,SPECIES) %>% 
   summarise(TAC=sum(TAC,na.rm=TRUE)) %>% # Sum stocks by country and species
   ungroup() %>%
   mutate(TAC_norm=normalize_negative(TAC)) %>% # Normalize negative
-  mutate(QUOTAS=TAC_norm) # QUOTAS factor is the normalized TAC
+  mutate(ABOVE.TAC=TAC_norm) # Above TAC factor is the normalized TAC
 
 # Prepare for word
 
-to.plot <- Table19 %>% select(SPECIES,COUNTRIES,QUOTAS) %>% 
+to.plot <- Table19 %>% select(SPECIES,COUNTRIES,ABOVE.TAC) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numbers to string
-  mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
-  spread(SPECIES,QUOTAS)
+  mutate(SPECIES=paste0("ABOVE.TAC\n",species_sort_name(SPECIES))) %>% 
+  spread(SPECIES,ABOVE.TAC)
 
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
@@ -795,7 +795,7 @@ to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 Ft<- format_table(to.plot)
 
 write_doc(Ft,
-          "Table 19. Factor Quota values per country.",
+          "Table 19. Factor ABOVE TAC values per country.",
           "Tables/Table19SI.docx")
 
 ##### 4.4 DEVELOPMENT (I4) #####
@@ -839,15 +839,15 @@ write_doc(Ft,
 
 Table21 <- reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
                        Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
-                       Table19 %>% select(SPECIES,COUNTRIES,QUOTAS),
+                       Table19 %>% select(SPECIES,COUNTRIES,ABOVE.TAC),
                        Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES")
 
 # Prepare for word
 
 to.plot <- Table21 %>% 
-  mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
-  spread(SPECIES,QUOTAS) %>% 
-  mutate_at(vars(starts_with("QUOTAS")),funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numeric to string
+  mutate(SPECIES=paste0("ABOVE.TAC\n",species_sort_name(SPECIES))) %>% 
+  spread(SPECIES,ABOVE.TAC) %>% 
+  mutate_at(vars(starts_with("ABOVE.TAC")),funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numeric to string
   mutate_at(vars(starts_with("CO.MANAG"),starts_with("PROPERTY")),funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>%  # Numeric to string
   mutate_at(vars(starts_with("DEVELOPMENT")),funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% data.frame  # Numeric to string
 
@@ -875,9 +875,9 @@ reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
-            Table19 %>% select(SPECIES, COUNTRIES,QUOTAS),
+            Table19 %>% select(SPECIES, COUNTRIES,ABOVE.TAC),
             Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,DEVELOPMENT,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+  select(SPECIES,COUNTRIES,DEVELOPMENT,ABOVE.TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
   write_excel_csv("data/institutional_factors_country.csv")
 
 
