@@ -680,6 +680,7 @@ ins_indicators <- fread("data/institutional_indicators.csv")
 Table16 <-ins_indicators %>% 
   select(COUNTRIES,Norganizations) %>%
   distinct %>%
+  filter(!is.na(Norganizations)) %>%
   mutate(Norganizations_norm=normalize_positive(Norganizations)) %>% # Normalization positive
   rowwise() %>%
   mutate(CO.MANAGEMENT=Norganizations_norm) %>% # CO.MANAGEMENT is Norganizations normalized
@@ -711,6 +712,7 @@ write_doc(Ft,
 Table17 <- ins_indicators %>% 
   select(COUNTRIES,Swaps) %>%
   distinct %>%
+  filter(!is.na(Swaps)) %>%
   mutate(Swaps_norm=normalize_positive(Swaps)) %>% # Normalization positive
   rowwise() %>%
   mutate(PROPERTY.RIGHTS=Swaps_norm) %>% # PROPERTY.RIGHTS factor equals Swaps normalized
@@ -805,6 +807,7 @@ write_doc(Ft,
 Table20 <-ins_indicators %>% 
   select(COUNTRIES,HDI) %>%
   distinct %>%
+  filter(!is.na(HDI)) %>%
   mutate(HDI_norm=normalize_positive(HDI)) %>% # Normalization positive
   rowwise() %>%
   mutate(DEVELOPMENT=HDI_norm) %>% # DEVELOPMENT factos is HDI normalized
