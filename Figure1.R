@@ -101,7 +101,8 @@ graphs <- c("COD","HAKE") %>% lapply(function(specie_name){
     theme(plot.subtitle=element_text(size=15, hjust=0, face="italic", color="black"),
           panel.grid.major = element_line(color="white"),
           legend.text = element_text(size=12,color = "black"),
-          legend.title = element_text(size=14,color="black"))
+          legend.title = element_text(size=14,color="black"),
+          legend.key.width=unit(2,"cm"))
   
   
 })
