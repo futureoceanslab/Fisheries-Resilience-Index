@@ -668,7 +668,7 @@ reduce( # Merge tables 11, 13 and 14
 
 ##### 4 INSTITUTIONAL INDICATORS #####
 
-ins_indicators <- fread("data/institutional_indicators.csv")
+ins_indicators <- fread("data/institutional_indicators 2.csv")
 
 
 ##### 4.1 CO.MANAGEMENT (I1) #####
@@ -777,7 +777,7 @@ Table19 <- Table19p %>%
   group_by(COUNTRIES,SPECIES) %>% 
   summarise(TAC=sum(TAC,na.rm=TRUE)) %>% # Sum stocks by country and species
   ungroup() %>%
-  mutate(TAC_norm=normalize_positive(TAC)) %>% # Normalize positive
+  mutate(TAC_norm=normalize_negative(TAC)) %>% # Normalize negative
   mutate(QUOTAS=TAC_norm) # QUOTAS factor is the normalized TAC
 
 # Prepare for word
@@ -790,7 +790,7 @@ to.plot <- Table19 %>% select(SPECIES,COUNTRIES,QUOTAS) %>%
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
-# Save to word
+# Save to wordf
 
 Ft<- format_table(to.plot)
 
