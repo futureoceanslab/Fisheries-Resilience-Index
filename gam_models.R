@@ -135,6 +135,7 @@ model2c <- glm(Resilience_Index~DIMENSION*LAT, family = "quasibinomial",data=joi
 model2c
 anova(model2c)
 
+
 ##### PLOTS #####
 
 lateco <-  ggplot (na.omit(joined[joined$DIMENSION=="ecological",]), aes(LAT, Resilience_Index, col = SPECIE, linetype = SPECIE)) +
