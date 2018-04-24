@@ -424,7 +424,7 @@ eco_countries %>%  mutate_if(is.numeric,funs(round(.,digits = 9))) %>%
 
 ##### 3. SOCIOECONOMIC INDICATORS #####
 
-soc_indicators <- fread("data/socioeconomic_indicators.csv")
+soc_indicators <- fread("data/socioeconomic_indicators 2.csv")
 
 ##### 3.1 GEAR.DIVERSITY #####
 
@@ -441,8 +441,8 @@ Table10 <- soc_indicators %>%
 # Prepare for word
 
 to.plot <- Table10 %>% mutate(SPECIES=tools::toTitleCase(species_sort_name(SPECIES))) %>%
-  data.frame %>%
-  set_names("","Gear Diversity","NormalizedGearDiv","GEAR.DIVERSITY")
+  data.frame #%>%
+  #set_names("","Gear Diversity","NormalizedGearDiv","GEAR.DIVERSITY")
 
 # Save to word
 
@@ -597,17 +597,48 @@ write_doc(Ft,
           "Tables/Table14SI.docx")
 
 
-##### 3.5 SOCIOECONOMIC FACTORS #####
+###### 3.5 TECH DEVELOP #####
 
-# See section 2.B in "SI 2. Indicators and Factors" for details.
+# See "TECHNICAL DEVELOPMENT (S5)" in 2.A in "SI 2. Indicators and Factors" for details.
 
 # Table 15
 
+Table15 <- soc_indicators %>% 
+  select(COUNTRIES,Tech.develop.2013) %>% 
+  distinct %>% 
+  mutate(Techdev_norm=normalize_positive(Tech.develop.2013), # Normalize positive
+         TECH.DEVELOP=Techdev_norm) # TECH DEVELOP factor is the Tech.develop.2013 normalized.
+
+# Prepare for word
+
+to.plot <- Table15 %>%
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
+  data.frame 
+
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
+  set_names(c("","Tech.develop.2013","NormalizedTech.Dev","TECH.DEVELOP"))
+
+# Save to word
+
+Ft<- format_table(to.plot)
+
+write_doc(Ft,
+          "Table 15. Values, normalization and Co-Management factor.",
+          "Tables/Table15SI.docx")
+
+
+##### 3.6 SOCIOECONOMIC FACTORS #####
+
+# See section 2.B in "SI 2. Indicators and Factors" for details.
+
+# Table 15.1
+
 # Merge tables 11, 13 and 14.
 
-Table15 <- reduce(
+Table15.1 <- reduce(
   list(
     Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
+    Table15 %>% select(COUNTRIES,TECH.DEVELOP),
     Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP) %>%
       mutate(SPECIES=paste0("CATCH.DEP\n",species_sort_name(SPECIES))) %>% # One column for each species
       spread(SPECIES,CATCH.DEP) ,
@@ -620,13 +651,13 @@ t10 <- Table10 %>% select(SPECIES,GEAR.DIVERSITY) %>%
   mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>% # One column for each species
   spread(SPECIES,GEAR.DIVERSITY)
 
-Table15 <- bind_cols(Table15,t10[rep(1,nrow(Table15)),])
+Table15.1 <- bind_cols(Table15.1,t10[rep(1,nrow(Table15.1)),])
 
 # Prepare for word
-to.plot <- Table15 %>% 
+to.plot <- Table15.1 %>% 
   mutate_at(vars(starts_with("CATCH")),funs(round(.,digits = 3))) %>%
-  mutate_at(vars(starts_with("ADAP"),starts_with("FLEET")),funs(round(.,digits = 2)))%>% 
-  select(COUNTRIES,starts_with("GEAR"),FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% 
+  mutate_at(vars(starts_with("ADAP"),starts_with("FLEET")),funs(round(.,digits = 3)))%>% 
+  select(COUNTRIES,starts_with("GEAR"),FLEET.MOBILITY, TECH.DEVELOP, starts_with("CATCH"),ADAPTIVE.MNG) %>%
   data.frame
 
 to.plot[is.na(to.plot)] <- "-"
@@ -638,19 +669,20 @@ to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 Ft<- format_table(to.plot)
 
 write_doc(Ft,
-          "Table 15. Socioeconomic Factors",
-          "Tables/Table15SI.docx")
+          "Table 15.1. Socioeconomic Factors",
+          "Tables/Table15.1SI.docx")
 
-# Merge tables 11, 12, 10 and 14 to produce socioeconomic factors per stock: socioeconomic_factors.csv
+# Merge tables 11, 12, 10, 14 and 15 to produce socioeconomic factors per stock: socioeconomic_factors.csv
 
-reduce( # Merge tables 11, 12 and 14
+reduce( # Merge tables 11, 12, 14 and 15
   list(
     Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
     Table12 %>% select(SPECIES,STOCK,COUNTRIES,CATCH.DEP),
-    Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
+    Table14 %>% select(COUNTRIES,ADAPTIVE.MNG),
+    Table15 %>% select(COUNTRIES,TECH.DEVELOP)
   ),full_join,by="COUNTRIES") %>%
   full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
-  select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
+  select("SPECIES","COUNTRIES","STOCK","TECH.DEVELOP", "ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors.csv") # Save to csv
 
 # Merge tables 11, 13, 10 and 14 to produce socioeconomic factors per country: socioeconomic_factors_country.csv
@@ -659,17 +691,18 @@ reduce( # Merge tables 11, 13 and 14
   list(
     Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
     Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP),
-    Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
+    Table14 %>% select(COUNTRIES,ADAPTIVE.MNG),
+    Table15 %>% select(COUNTRIES,TECH.DEVELOP)
   ),full_join,by="COUNTRIES") %>%
   full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
-  select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
+  select("SPECIES","COUNTRIES","TECH.DEVELOP","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors_country.csv") # Save to csv
 
 
 ##### 4 INSTITUTIONAL INDICATORS #####
 
-ins_indicators <- fread("data/institutional_indicators 2.csv")
-
+#ins_indicators <- fread("data/institutional_indicators 3.csv")
+ins_indicators <- read.csv("data/institutional_indicators 2.csv", header= T, sep= ";")
 
 ##### 4.1 CO.MANAGEMENT (I1) #####
 
@@ -778,13 +811,14 @@ Table19 <- Table19p %>%
   summarise(TAC=sum(TAC,na.rm=TRUE)) %>% # Sum stocks by country and species
   ungroup() %>%
   mutate(TAC_norm=normalize_negative(TAC)) %>% # Normalize negative
-  mutate(ABOVE.TAC=TAC_norm) # Above TAC factor is the normalized TAC
+  mutate(ABOVE.TAC=TAC_norm) # Above TAC factor is the normalized TAC above advice
+
 
 # Prepare for word
 
 to.plot <- Table19 %>% select(SPECIES,COUNTRIES,ABOVE.TAC) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numbers to string
-  mutate(SPECIES=paste0("ABOVE.TAC\n",species_sort_name(SPECIES))) %>% 
+  mutate(SPECIES=paste0("ABOVE.TAC\n",species_sort_name(as.character(SPECIES)))) %>% 
   spread(SPECIES,ABOVE.TAC)
 
 
@@ -831,25 +865,61 @@ write_doc(Ft,
           "Tables/Table20SI.docx")
 
 
-##### 4.5 INSTITUTIONAL FACTORS #####
+##### 4.5 COMPILANCE (I5) #####
 
-# See section 3.B in "SI 2. Indicators and Factors" for details
+# See "COMPILANCE (I5)" in 3.A in "SI 2. Indicators and Factors" for details
 
-# Table 21. Merge tables 16, 17, 19 and 20
+# Table 21
 
-Table21 <- reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
-                       Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
-                       Table19 %>% select(SPECIES,COUNTRIES,ABOVE.TAC),
-                       Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES")
+Table21 <-ins_indicators %>% 
+  select(COUNTRIES,Compilance.2010) %>%
+  distinct %>%
+  filter(!is.na(Compilance.2010)) %>%
+  mutate(Compilance_norm=normalize_positive(Compilance.2010)) %>% # Normalization positive
+  rowwise() %>%
+  mutate(COMPILANCE=Compilance_norm) %>% # DEVELOPMENT factos is HDI normalized
+  ungroup()
 
 # Prepare for word
 
 to.plot <- Table21 %>% 
-  mutate(SPECIES=paste0("ABOVE.TAC\n",species_sort_name(SPECIES))) %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
+  data.frame
+
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
+  set_names(c("COUNTRIES","Compilance.2010","COMPILANCE'\n(normalized)","COMPILANCE"))
+
+# Save to word
+
+Ft<- format_table(to.plot)
+
+write_doc(Ft,
+          "Table 21. Inclusion of requirements 2010.",
+          "Tables/Table21SI.docx")
+
+
+##### 4.6 INSTITUTIONAL FACTORS #####
+
+# See section 3.B in "SI 2. Indicators and Factors" for details
+
+# Table 22. Merge tables 16, 17, 19, 20 and 21
+
+Table22 <- reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
+                       Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
+                       Table19 %>% select(SPECIES,COUNTRIES,ABOVE.TAC),
+                       Table21 %>% select(COUNTRIES,COUNTRIES,COMPILANCE),
+                       Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES")
+
+# Prepare for word
+
+to.plot <- Table22 %>% 
+  mutate(SPECIES=paste0("ABOVE.TAC\n",species_sort_name(as.character(SPECIES)))) %>% 
   spread(SPECIES,ABOVE.TAC) %>% 
   mutate_at(vars(starts_with("ABOVE.TAC")),funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numeric to string
   mutate_at(vars(starts_with("CO.MANAG"),starts_with("PROPERTY")),funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>%  # Numeric to string
-  mutate_at(vars(starts_with("DEVELOPMENT")),funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% data.frame  # Numeric to string
+  mutate_at(vars(starts_with("DEVELOPMENT")), funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>%
+  mutate_at(vars(starts_with("COMPILANCE")), funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% 
+  data.frame  # Numeric to string
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
@@ -858,26 +928,28 @@ to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 Ft<- format_table(to.plot)
 
 write_doc(Ft,
-          "Table 21. List of Institutional factors.",
-          "Tables/Table21SI.docx")
+          "Table 22. List of Institutional factors.",
+          "Tables/Table22SI.docx")
 
 
-# Merge tables 16, 17, 19 not normalized and 20 to produce institutional factors per stock: institutional_factors.csv
+# Merge tables 16, 17, 19 and 21 not normalized and 20 to produce institutional factors per stock: institutional_factors.csv
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
+            Table21 %>% select(COUNTRIES,COMPILANCE),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
             Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
             Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,STOCK,DEVELOPMENT,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+  select(SPECIES,COUNTRIES,STOCK,DEVELOPMENT,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT, COMPILANCE) %>%
   write_excel_csv("data/institutional_factors.csv")
 
-# Merge tables 16, 17, 19 and 20 to produce institutional factors per country: institutional_factors_country.csv
+# Merge tables 16, 17, 19, 21 and 20 to produce institutional factors per country: institutional_factors_country.csv
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
+            Table21 %>% select(COUNTRIES,COMPILANCE),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
             Table19 %>% select(SPECIES, COUNTRIES,ABOVE.TAC),
             Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,DEVELOPMENT,ABOVE.TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+  select(SPECIES,COUNTRIES,DEVELOPMENT,ABOVE.TAC,PROPERTY.RIGHTS,CO.MANAGEMENT, COMPILANCE) %>%
   write_excel_csv("data/institutional_factors_country.csv")
 
 
