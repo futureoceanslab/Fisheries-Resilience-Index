@@ -65,6 +65,8 @@ final_index_above <- read_csv("data/final_index_above_TAC.csv")
 
 wilcox.test(final_index_1$Resilience_Index, final_index_2$Resilience_Index, paired=TRUE)
 
+wilcox.test(final_index_1$Resilience_Index, final_index_1$Resilience_Index, paired=TRUE)
+
 wilcox.test(final_index_1$Resilience_Index, final_index_above$Resilience_Index, paired=TRUE)
 
 
