@@ -74,9 +74,9 @@ source("aux_functions.R")
 
 eco_factors <- fread("data/ecological_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY")))
 
-soc_factors <- fread("data/socioeconomic_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ADAPTIVE MNG","CATCH DEP","FLEET MOBILITY")))
+soc_factors <- fread("data/socioeconomic_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ADAPTIVE MNG","CATCH DEP","FLEET MOBILITY", "TECH DEVELOP")))
 
-ins_factors <- fread("data/institutional_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("DEVELOPMENT","ABOVE TAC","PROPERTY RIGHTS","CO MANAGEMENT")))
+ins_factors <- fread("data/institutional_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("DEVELOPMENT","ABOVE TAC","PROPERTY RIGHTS","CO MANAGEMENT", "COMPILANCE")))
 
 ##### 3. PLOT #####
 

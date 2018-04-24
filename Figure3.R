@@ -53,8 +53,6 @@ final_index <- read_csv("data/final_index.csv")
 x_labels <- c(GDP.2016="GDP 2016",
               OHI.2016="OHI 2016",
               OHI.eco="OHI economic 2016",
-              Tech..develop..2013="Technical Development (number per country)",
-              Inclusion.of.Requirements.2010="Compilance (scores)",
               Readiness="Readiness",
               Vulnerability="Vulnerability")
 
