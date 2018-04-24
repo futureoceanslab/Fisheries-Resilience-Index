@@ -85,31 +85,31 @@ joined <- merge(a, final_index, by="COUNTRIES", all.x=T)
 ##### 4. RUN MODELS (SPECIE) #####
 
 model0e<- glm(Resilience_Index~LAT, family = "quasibinomial", data = joined[joined$DIMENSION=="ecological",])
-model0e
+summary(model0e)
 anova(model0e)
 model0s<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="socioeconomic",])
-model0s
+summary(model0s)
 anova(model0s)
 model0i<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="institutional",])
-model0i
+summary(model0i)
 anova(model0i)
 model1e <- glm(Resilience_Index~SPECIE+LAT,family = "quasibinomial", data=joined[joined$DIMENSION=="ecological",])
-model1e
+summary(model1e)
 anova(model1e)
 model1s <- glm(Resilience_Index~SPECIE+LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
-model1s
+summary(model1s)
 anova(model1s)
 model1i <- glm(Resilience_Index~SPECIE+LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
-model1i
+summary(model1i)
 anova(model1i)
 model2e <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="ecological",])
-model2e
+summary(model2e)
 anova(model2e)
 model2s <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
-model2s
+summary(model2s)
 anova(model2s)
 model2i <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
-model2i
+summary(model2i)
 anova(model2i)
 
 anova(model0e, model1e, model2e)
@@ -117,24 +117,97 @@ anova(model0e, model1e, model2e)
 ##### RUN MODELS (DIMENSION) #####
 
 model0h<- glm(Resilience_Index~LAT, family = "quasibinomial", data = joined[joined$SPECIE=="Hake",])
-model0h
+summary(model0h)
 anova(model0h)
 model0c<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$SPECIE=="Cod",])
-model0c
+summary(model0c)
 anova(model0c)
 model1h <- glm(Resilience_Index~DIMENSION+LAT,family = "quasibinomial", data=joined[joined$SPECIE=="Hake",])
-model1h
+summary(model1h)
 anova(model1h)
 model1c <- glm(Resilience_Index~DIMENSION+LAT,family = "quasibinomial", data=joined[joined$SPECIE=="Cod",])
-model1c
+summary(model1c)
 anova(model1c)
 model2h <- glm(Resilience_Index~DIMENSION*LAT, family = "quasibinomial",data=joined[joined$SPECIE=="Hake",])
-model2h
+summary(model2h)
 anova(model2h)
 model2c <- glm(Resilience_Index~DIMENSION*LAT, family = "quasibinomial",data=joined[joined$SPECIE=="Cod",])
-model2c
+summary(model2c)
 anova(model2c)
 
+##### RUN MODELS (OTHER INDEX - SPECIE) #####
+
+#Hake
+model0Gh<- glm(Resilience_Index~GDP.2016, family = "quasibinomial", data = joined[joined$SPECIE=="Hake",])
+summary(model0Gh)
+model1GhD <- glm(Resilience_Index~DIMENSION+GDP.2016,family = "quasibinomial", data=joined[joined$SPECIE=="Hake",])
+summary(model1GhD)
+model2Ghd <- glm(Resilience_Index~DIMENSION*GDP.2016, family = "quasibinomial",data=joined[joined$SPECIE=="Hake",])
+summary(model2Ghd)
+
+model0Oh<- glm(Resilience_Index~OHI.2016, family = "quasibinomial", data = joined[joined$SPECIE=="Hake",])
+summary(model0Oh)
+model1OhD <- glm(Resilience_Index~DIMENSION+OHI.2016,family = "quasibinomial", data=joined[joined$SPECIE=="Hake",])
+summary(model1OhD)
+model2Ohd <- glm(Resilience_Index~DIMENSION*OHI.2016, family = "quasibinomial",data=joined[joined$SPECIE=="Hake",])
+summary(model2Ohd)
+
+model0oh<- glm(Resilience_Index~OHI.eco, family = "quasibinomial", data = joined[joined$SPECIE=="Hake",])
+summary(model0oh)
+model1ohD <- glm(Resilience_Index~DIMENSION+OHI.eco,family = "quasibinomial", data=joined[joined$SPECIE=="Hake",])
+summary(model1ohD)
+model2ohd <- glm(Resilience_Index~DIMENSION*OHI.eco, family = "quasibinomial",data=joined[joined$SPECIE=="Hake",])
+summary(model2ohd)
+
+model0Rh<- glm(Resilience_Index~Readiness, family = "quasibinomial", data = joined[joined$SPECIE=="Hake",])
+summary(model0Rh)
+model1RhD <- glm(Resilience_Index~DIMENSION+Readiness,family = "quasibinomial", data=joined[joined$SPECIE=="Hake",])
+summary(model1RhD)
+model2Rhd <- glm(Resilience_Index~DIMENSION*Readiness, family = "quasibinomial",data=joined[joined$SPECIE=="Hake",])
+summary(model2Rhd)
+
+model0Vh<- glm(Resilience_Index~Vulnerability, family = "quasibinomial", data = joined[joined$SPECIE=="Hake",])
+summary(model0Vh)
+model1VhD <- glm(Resilience_Index~DIMENSION+Vulnerability,family = "quasibinomial", data=joined[joined$SPECIE=="Hake",])
+summary(model1VhD)
+model2Vhd <- glm(Resilience_Index~DIMENSION*Vulnerability, family = "quasibinomial",data=joined[joined$SPECIE=="Hake",])
+summary(model2Vhd)
+
+#Cod
+model0Gc<- glm(Resilience_Index~GDP.2016, family = "quasibinomial", data = joined[joined$SPECIE=="Cod",])
+summary(model0Gc)
+model1GcD <- glm(Resilience_Index~DIMENSION+GDP.2016,family = "quasibinomial", data=joined[joined$SPECIE=="Cod",])
+summary(model1GcD)
+model2Gcd <- glm(Resilience_Index~DIMENSION*GDP.2016, family = "quasibinomial",data=joined[joined$SPECIE=="Cod",])
+summary(model2Gcd)
+
+model0Oc<- glm(Resilience_Index~OHI.2016, family = "quasibinomial", data = joined[joined$SPECIE=="Cod",])
+summary(model0Oc)
+model1OcD <- glm(Resilience_Index~DIMENSION+OHI.2016,family = "quasibinomial", data=joined[joined$SPECIE=="Cod",])
+summary(model1OcD)
+model2Ocd <- glm(Resilience_Index~DIMENSION*OHI.2016, family = "quasibinomial",data=joined[joined$SPECIE=="Cod",])
+summary(model2Ocd)
+
+model0oc<- glm(Resilience_Index~OHI.eco, family = "quasibinomial", data = joined[joined$SPECIE=="Cod",])
+summary(model0oc)
+model1ocD <- glm(Resilience_Index~DIMENSION+OHI.eco,family = "quasibinomial", data=joined[joined$SPECIE=="Cod",])
+summary(model1ocD)
+model2ocd <- glm(Resilience_Index~DIMENSION*OHI.eco, family = "quasibinomial",data=joined[joined$SPECIE=="Cod",])
+summary(model2ocd)
+
+model0Rc<- glm(Resilience_Index~Readiness, family = "quasibinomial", data = joined[joined$SPECIE=="Cod",])
+summary(model0Rc)
+model1RcD <- glm(Resilience_Index~DIMENSION+Readiness,family = "quasibinomial", data=joined[joined$SPECIE=="Cod",])
+summary(model1RcD)
+model2Rcd <- glm(Resilience_Index~DIMENSION*Readiness, family = "quasibinomial",data=joined[joined$SPECIE=="Cod",])
+summary(model2Rcd)
+
+model0Vc<- glm(Resilience_Index~Vulnerability, family = "quasibinomial", data = joined[joined$SPECIE=="Cod",])
+summary(model0Vc)
+model1VcD <- glm(Resilience_Index~DIMENSION+Vulnerability,family = "quasibinomial", data=joined[joined$SPECIE=="Cod",])
+summary(model1VcD)
+model2Vcd <- glm(Resilience_Index~DIMENSION*Vulnerability, family = "quasibinomial",data=joined[joined$SPECIE=="Cod",])
+summary(model2Vcd)
 
 ##### PLOTS #####
 
@@ -173,11 +246,6 @@ latdimc
 
 
 
-#sjp.glm para plotear. sjPlot paquete
+#table(joined$GDP.2016)
 
-
-
-
-table(joined$GDP.2016)
-
-data$INdesin<- apply(data [ ,3:10], 1, mean) #media por fila para o indice 
+#data$INdesin<- apply(data [ ,3:10], 1, mean) #media por fila para o indice 
