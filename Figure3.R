@@ -95,7 +95,7 @@ graphs <- 1:length(x_labels) %>% lapply(function(i){
   # Plot
   g <- ggplot(to.plot, aes_string(column_name, "Resilience_Index", col = "SPECIE", linetype = "SPECIE",fill="SPECIE")) +
     geom_point(aes(shape=SPECIE)) +
-    geom_smooth(data = hake.data,method = lm, se = TRUE, linetype = "dotted")+
+    geom_smooth(data = hake.data,method = glm, se = TRUE, linetype = "dotted")+
     geom_smooth(data = cod.data,method = lm, se = TRUE)+
     scale_shape_manual(values=c(16,1))+
     scale_color_manual(values=c("steelblue","steelblue"))+
