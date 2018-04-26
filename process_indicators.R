@@ -668,7 +668,7 @@ reduce( # Merge tables 11, 13 and 14
 
 ##### 4 INSTITUTIONAL INDICATORS #####
 
-ins_indicators <- fread("data/institutional_indicators.csv")
+ins_indicators <- fread("data/institutional_indicators 2.csv")
 
 
 ##### 4.1 CO.MANAGEMENT (I1) #####
@@ -739,6 +739,32 @@ write_doc(Ft,
 ##### 4.3 CATCH QUOTAS (I3) #####
 
 # See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+Table18 <- ins_indicators %>% 
+  select(COUNTRIES,STOCK, Above_advice, TAC) %>%
+  distinct %>%
+  mutate(TAC_norm=normalize_positive(TAC), # Normalization positive
+         Above_advice_norm=normalize_positive(ABOVE_ADVICE) # Normalization negative
+  ) %>%
+  rowwise() %>% # ADAPTIVE.MNG factor is the mean of the normalized indicators above for each country (row)
+  mutate(ADAPTIVE.MNG=mean(c(Research_norm,Management_norm),na.rm=TRUE)) %>% 
+  ungroup()
+
+# Prepare for word
+
+to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame %>%
+  set_names(c("COUNTRIES","Research","Management","normalizedResearch","normalizedMng","ADAPTIVE.MNG"))
+
+to.plot[is.na(to.plot)] <- "-"
+
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
+
+# Save to word
+
+Ft<- format_table(to.plot)
+
+write_doc(Ft,
+          "Table 14. Adaptive Management indicator values and normalization.",
+          "Tables/Table14SI.docx")
 
 # Table 18
 
