@@ -53,10 +53,28 @@ final_index <- read_csv("data/final_index.csv")
 x_labels <- c(GDP.2016="GDP 2016",
               OHI.2016="OHI 2016",
               OHI.eco="OHI economic 2016",
-              Tech..develop..2013="Technical Development (number per country)",
-              Inclusion.of.Requirements.2010="Compilance (scores)",
+              #Tech..develop..2013="Technical Development (number per country)",
+              #Inclusion.of.Requirements.2010="Compilance (scores)",
               Readiness="Readiness",
               Vulnerability="Vulnerability")
+
+aggdata <- final_index %>% 
+  group_by(COUNTRIES,SPECIE) %>% 
+  summarise(Resilience_Index=mean(Resilience_Index,na.rm=TRUE)) %>% 
+  ungroup()
+
+# Read other indexes and merge with aggdata
+
+
+other_index <- fread("data/Other_index.csv",check.names = TRUE) %>% rename(OHI.2016=OHI.wild.caught)
+
+# merge with aggdata
+
+final_index <- other_index %>% 
+  left_join(aggdata,by=c("COUNTRIES")) %<>% 
+  #mutate(SPECIES=c(`Atlantic cod`="Cod",`European hake`="Hake")[SPECIES]) %>% rename(SPECIE=SPECIES) %>% 
+  arrange(SPECIE,COUNTRIES) %>% select(SPECIE,COUNTRIES,everything())
+
 
 ##### 3. p-values #####
 
@@ -64,16 +82,12 @@ x_labels <- c(GDP.2016="GDP 2016",
 p_values <- p_values_for_columns_and_classes_in_column(final_index,names(x_labels),"SPECIE")
 
 
-
 ##### 4. PLOT ######
-
-
-
-
 
 # Plot the graphs and save each graph in a list for later
 
-graphs <- 1:length(x_labels) %>% lapply(function(i){
+
+  graphs <- 1:length(x_labels) %>% lapply(function(i){
   # i <-1
   # Get the column name to plot
   column_name <- names(x_labels)[i]
@@ -91,14 +105,17 @@ graphs <- 1:length(x_labels) %>% lapply(function(i){
   
   # subset data for trend lines.
   
-  cod.data <- to.plot %>% filter(SPECIE=="Cod")
-  hake.data <- to.plot %>% filter(SPECIE=="Hake")
+  cod.data <- to.plot %>%
+filter(SPECIE=="Cod")
+
+  hake.data <- to.plot %>% 
+filter(SPECIE=="Hake")
   
   # Plot
   g <- ggplot(to.plot, aes_string(column_name, "Resilience_Index", col = "SPECIE", linetype = "SPECIE",fill="SPECIE")) +
     geom_point(aes(shape=SPECIE)) +
-    geom_smooth(data = hake.data,method = lm, se = TRUE, linetype = "dotted")+
-    geom_smooth(data = cod.data,method = lm, se = TRUE)+
+    geom_smooth(data = hake.data,method = glm, se = TRUE, linetype = "dotted")+
+    geom_smooth(data = cod.data,method = glm, se = TRUE)+
     scale_shape_manual(values=c(16,1))+
     scale_color_manual(values=c("steelblue","steelblue"))+
     scale_fill_manual(values=c("gray30","gray60"))+
@@ -116,7 +133,7 @@ graphs <- 1:length(x_labels) %>% lapply(function(i){
   x_center <- to.plot[,column_name] %>% min(na.rm=TRUE)
   y_center <- to.plot[,"Resilience_Index"] %>% max(na.rm=TRUE) %>% add(0.1)
   
-  
+
   # get the p-values
   p <-  p_values %>% filter(Var==column_name) %>% select(-Var) %>% gather(var,p) %>% filter(p<0.05) %>% mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% mutate(x=x_center,y=y_center,hjust=c(-2,-3.2)[1:nrow(.)])
   
