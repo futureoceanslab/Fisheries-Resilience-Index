@@ -739,20 +739,23 @@ write_doc(Ft,
 ##### 4.3 CATCH QUOTAS (I3) #####
 
 # See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+
+#Table 18
+
 Table18 <- ins_indicators %>% 
-  select(COUNTRIES,STOCK, Above_advice, TAC) %>%
+  select(COUNTRIES,TAC, Above_advice) %>%
   distinct %>%
   mutate(TAC_norm=normalize_positive(TAC), # Normalization positive
-         Above_advice_norm=normalize_positive(ABOVE_ADVICE) # Normalization negative
+         Above_advice_norm=normalize_positive(Above_advice) # Normalization negative
   ) %>%
-  rowwise() %>% # ADAPTIVE.MNG factor is the mean of the normalized indicators above for each country (row)
-  mutate(ADAPTIVE.MNG=mean(c(Research_norm,Management_norm),na.rm=TRUE)) %>% 
+  rowwise() %>% # QUOTAS factor is the mean of the normalized indicators above for each country (row)
+  mutate(QUOTAS=mean(c(TAC_norm,Above_advice_norm),na.rm=TRUE)) %>% 
   ungroup()
 
 # Prepare for word
 
-to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame %>%
-  set_names(c("COUNTRIES","Research","Management","normalizedResearch","normalizedMng","ADAPTIVE.MNG"))
+to.plot <- Table18 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame %>%
+  set_names(c("COUNTRIES","TAC","Avobe_advice","normalizedTAC","normalizedAbove_advice", "QUOTAS"))
 
 to.plot[is.na(to.plot)] <- "-"
 
@@ -763,66 +766,9 @@ to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 Ft<- format_table(to.plot)
 
 write_doc(Ft,
-          "Table 14. Adaptive Management indicator values and normalization.",
-          "Tables/Table14SI.docx")
+          "Table 18. Factor Quota values per country.",
+          "Tables/Table18SI.docx")
 
-# Table 18
-
-Table18 <- ins_indicators  %>% 
-  select(COUNTRIES,STOCK,TAC) %>% 
-  spread(COUNTRIES,TAC)
-
-# Prepare for word
-
-to.plot <- Table18 %>% data.frame
-
-to.plot[is.na(to.plot)] <- "-"
-
-to.plot <- to.plot[,match(c("STOCK",countries_order),names(to.plot))]
-
-to.plot$STOCK <- gsub("_","/\n",to.plot$STOCK)
-
-# Save to word
-
-Ft<- format_table(to.plot)
-
-Ft[,1] <- textProperties(font.size = 10,font.style = "italic")
-
-write_doc(Ft,
-          "Table 18. TAC (million tons) per stock and country (2015)",
-          
-          "Tables/Table18SI.docx",landscape = TRUE)
-
-
-# Table 19
-
-Table19p <- ins_indicators %>% 
-  select(SPECIES,STOCK,COUNTRIES,TAC)
-
-Table19 <- Table19p %>%
-  group_by(COUNTRIES,SPECIES) %>% 
-  summarise(TAC=sum(TAC,na.rm=TRUE)) %>% # Sum stocks by country and species
-  ungroup() %>%
-  mutate(TAC_norm=normalize_positive(TAC)) %>% # Normalize positive
-  mutate(QUOTAS=TAC_norm) # QUOTAS factor is the normalized TAC
-
-# Prepare for word
-
-to.plot <- Table19 %>% select(SPECIES,COUNTRIES,QUOTAS) %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numbers to string
-  mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
-  spread(SPECIES,QUOTAS)
-
-
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
-
-# Save to word
-
-Ft<- format_table(to.plot)
-
-write_doc(Ft,
-          "Table 19. Factor Quota values per country.",
-          "Tables/Table19SI.docx")
 
 ##### 4.4 DEVELOPMENT (I4) #####
 
@@ -865,7 +811,7 @@ write_doc(Ft,
 
 Table21 <- reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
                        Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
-                       Table19 %>% select(SPECIES,COUNTRIES,QUOTAS),
+                       Table18 %>% select(SPECIES,COUNTRIES,QUOTAS),
                        Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES")
 
 # Prepare for word
@@ -892,7 +838,7 @@ write_doc(Ft,
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
-            Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
+            Table18 %>% select(SPECIES, STOCK,COUNTRIES,QUOTAS),
             Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
   select(SPECIES,COUNTRIES,STOCK,DEVELOPMENT,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
   write_excel_csv("data/institutional_factors.csv")
@@ -901,7 +847,7 @@ reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
-            Table19 %>% select(SPECIES, COUNTRIES,QUOTAS),
+            Table18 %>% select(SPECIES, COUNTRIES,QUOTAS),
             Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
   select(SPECIES,COUNTRIES,DEVELOPMENT,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
   write_excel_csv("data/institutional_factors_country.csv")
