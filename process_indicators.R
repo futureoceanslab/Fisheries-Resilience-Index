@@ -774,14 +774,17 @@ Table19p <- ins_indicators %>%
 
 Table19 <- Table19p %>%
   group_by(COUNTRIES,SPECIES) %>% 
+  #ungroup () %>% 
   mutate(TAC_norm=normalize_positive(TAC), # Normalize positive
          Above_advice_norm=normalize_positive(Above_advice) # Normalization negative
          ) %>% 
-  mutate(QUOTAS=mean(c(TAC_norm,Above_advice_norm),na.rm=TRUE)) # QUOTAS factor is the normalized TAC and Above advice
+   mutate(QUOTAS=mean(c(TAC_norm,Above_advice_norm),na.rm=TRUE)) # QUOTAS factor is the normalized TAC and Above advice
+   
+  
 
 
 # Prepare for word
-#problem in mutate
+
 to.plot <- Table19 %>% select(SPECIES,COUNTRIES,QUOTAS) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numbers to string
   mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
