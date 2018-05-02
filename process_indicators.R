@@ -668,8 +668,8 @@ reduce( # Merge tables 11, 13 and 14
 
 ##### 4 INSTITUTIONAL INDICATORS #####
 
-ins_indicators <- fread("data/institutional_indicators 2.csv")
-
+#ins_indicators <- fread("data/institutional_indicators 2.csv")
+ins_indicators <- read.csv("data/institutional_indicators 2.csv", header= T, sep= ";")
 
 ##### 4.1 CO.MANAGEMENT (I1) #####
 
@@ -811,19 +811,20 @@ write_doc(Ft,
           "Tables/Table19SI.docx")
 
 
-##### 4.4 DEVELOPMENT (I4) #####
+##### 4.4 INSTITUTIONAL STRENGTH (I4) #####
 
-# See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details
+# See " INSTITUTIONAL STRENGTH (I4)" in 3.A in "SI 2. Indicators and Factors" for details
 
 # Table 20
 
 Table20 <-ins_indicators %>% 
-  select(COUNTRIES,HDI) %>%
+  select(COUNTRIES,HDI, Compilance.2010) %>%
   distinct %>%
   filter(!is.na(HDI)) %>%
-  mutate(HDI_norm=normalize_positive(HDI)) %>% # Normalization positive
+  mutate(HDI_norm=normalize_positive(HDI),
+         Compilance_norm=normalize_positive(Compilance.2010)) %>% # Normalization positive
   rowwise() %>%
-  mutate(DEVELOPMENT=HDI_norm) %>% # DEVELOPMENT factos is HDI normalized
+  mutate(STRENGTH=mean(c(HDI_norm,Compilance_norm),na.rm=TRUE)) %>% # DEVELOPMENT factos is HDI normalized
   ungroup()
 
 # Prepare for word
@@ -833,7 +834,7 @@ to.plot <- Table20 %>%
   data.frame
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
-  set_names(c("COUNTRIES","HDI","HDI'\n(normalized)","DEVELOPMENT"))
+  set_names(c("COUNTRIES","HDI","Compilance", "HDI'\n(normalized)","Compilance'\n(normalized)", "STRENGTH"))
 
 # Save to word
 
@@ -853,7 +854,7 @@ write_doc(Ft,
 Table21 <- reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
                        Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
                        Table19 %>% select(SPECIES,COUNTRIES,QUOTAS),
-                       Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES")
+                       Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES")
 
 # Prepare for word
 
@@ -862,7 +863,7 @@ to.plot <- Table21 %>%
   spread(SPECIES,QUOTAS) %>% 
   mutate_at(vars(starts_with("QUOTAS")),funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numeric to string
   mutate_at(vars(starts_with("CO.MANAG"),starts_with("PROPERTY")),funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>%  # Numeric to string
-  mutate_at(vars(starts_with("DEVELOPMENT")),funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% data.frame  # Numeric to string
+  mutate_at(vars(starts_with("STRENGTH")),funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% data.frame  # Numeric to string
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
@@ -880,8 +881,8 @@ write_doc(Ft,
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
             Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
-            Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,STOCK,DEVELOPMENT,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+            Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
+  select(SPECIES,COUNTRIES,STOCK,STRENGTH,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
   write_excel_csv("data/institutional_factors.csv")
 
 # Merge tables 16, 17, 19 and 20 to produce institutional factors per country: institutional_factors_country.csv
@@ -889,8 +890,8 @@ reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
             Table19 %>% select(SPECIES, COUNTRIES,QUOTAS),
-            Table20 %>% select(COUNTRIES,DEVELOPMENT)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,DEVELOPMENT,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+            Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
+  select(SPECIES,COUNTRIES,STRENGTH,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
   write_excel_csv("data/institutional_factors_country.csv")
 
 
