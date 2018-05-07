@@ -106,21 +106,26 @@ sjt.glm(model0e, model0s, model0i, p.numeric = FALSE, string.est = "Estimate",
 
 #model 1 --> the RI depends on LAT by dimension, classify by sp? 
 
-model1e <- glm(Resilience_Index~SPECIE+LAT,family = "quasibinomial", data=joined[joined$DIMENSION=="ecological",])
+model1e <- glm(Resilience_Index~SPECIE+LAT,family = quasibinomial(link="logit"), data=joined[joined$DIMENSION=="ecological",])
 summary(model1e)
-sjp.glm(model1e)
-model1s <- glm(Resilience_Index~SPECIE+LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
-model1s
-anova(model1s)
+#plot.gam(model1e)
+model1s <- glm(Resilience_Index~SPECIE+LAT,family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
+summary(model1s)
+#plot.Gam(model1s)
 model1i <- glm(Resilience_Index~SPECIE+LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
-model1i
-anova(model1i)
+summary(model1i)
+#anova(model1i)
+sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 eco", "Model1 soci", "Model1 ins"), string.est = "Estimate",
+        p.numeric = FALSE, show.chi2 = TRUE, show.se = TRUE, show.dev = TRUE)
+
+sjt.glm(model1e)
+
 sjt.glm(model1e, model1s, model1i, p.numeric = FALSE, separate.ci.col = FALSE,
         show.aic = F, show.family = TRUE, show.r2 = TRUE)
 
-#model 1 --> the RI depends on LAT by dimension, classify by sp? 
+#model 2 --> the RI depends on LAT by dimension, classify by sp? 
 
-model2e <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="ecological",])
+model2e <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial" ,data=joined[joined$DIMENSION=="ecological",])
 model2e
 anova(model2e)
 model2s <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
@@ -128,22 +133,46 @@ model2s
 anova(model2s)
 model2i <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
 model2i
-anova(model2i)
+summary(model2i)
 sjt.glm(model2e, model2s, model2i, p.numeric = FALSE, separate.ci.col = FALSE,
         show.aic = F, show.family = TRUE, show.r2 = TRUE)
 
 
 
-sjt.glm(model0e, model1e, model2e, depvar.labels = c("Model0 eco", "Model1 eco", "Model2 eco"),  p.numeric = FALSE, group.pred = FALSE)
-sjt.glm(model0s, model1s, model2s, depvar.labels = c("Model0 socio", "Model1 socio", "Model2 socio"), p.numeric = FALSE, group.pred = FALSE)
-sjt.glm(model0i, model1i, model2i, depvar.labels = c("Model0 ins", "Model1 ins", "Model2 ins"), p.numeric = F, group.pred = FALSE)
-sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 eco", "Model1 soci", "Model1 ins"), string.est = "Estimate",
-        show.dev = TRUE, p.numeric = FALSE, group.pred = FALSE, show.chi2 = TRUE, show.se = TRUE)
+sjt.glm(model0e, model1e, model2e, depvar.labels = c("Model0 eco", "Model1 eco", "Model2 eco"), 
+        string.est = "Estimate", p.numeric = FALSE, group.pred = FALSE)
+sjt.glm(model0s, model1s, model2s, depvar.labels = c("Model0 socio", "Model1 socio", "Model2 socio"),  
+        string.est = "Estimate", p.numeric = FALSE, group.pred = FALSE)
+sjt.glm(model0i, model1i, model2i, depvar.labels = c("Model0 ins", "Model1 ins", "Model2 ins"),  
+        string.est = "Estimate", p.numeric = F, group.pred = FALSE)
+sjt.glm(model1e, model1s, model1i, ci.hyphen = "to")
 
+
+, CSS = list
+(css.table = "border: 2px solid;", css.tdata = "border: 1px solid;",
+  css.firsttablecol = "color:#003399; font-weight:bold;")
+
+sjt.glm(model1e, model1s, model1i, pred.labels = NULL,depvar.labels = c("Model1 eco", "Model1 soci", "Model1 ins"),
+        remove.estimates = NULL, group.pred = TRUE, exp.coef = TRUE,
+        p.numeric = TRUE, emph.p = FALSE, p.zero = FALSE, robust = FALSE,
+        separate.ci.col = TRUE, newline.ci = TRUE, show.ci = TRUE,
+        show.se = FALSE, show.header = FALSE, show.col.header = TRUE,
+        show.r2 = FALSE, show.icc = FALSE, show.re.var = FALSE,
+        show.loglik = FALSE, show.aic = FALSE, show.aicc = FALSE,
+        show.dev = FALSE, show.hoslem = FALSE, show.family = FALSE,
+        show.chi2 = FALSE, string.pred = "Predictors",
+        string.dv = "Dependent Variables", string.interc = "(Intercept)",
+        string.obs = "Observations", string.est = "Estimate", string.ci = "CI",
+        string.se = "std. Error", string.p = "p",
+        ci.hyphen = "&nbsp;&ndash;&nbsp;", digits.est = 2, digits.p = 3,
+        digits.ci = 2, digits.se = 2, digits.summary = 3, cell.spacing = 0.2,
+        cell.gpr.indent = 0.6, sep.column = TRUE, CSS = NULL, encoding = NULL,
+        file = NULL, use.viewer = TRUE, no.output = FALSE,
+        remove.spaces = TRUE, exp.coef=FALSE)
 
 LatDim <- ggplot (na.omit(joined), aes(LAT,Resilience_Index, col = DIMENSION)) +
   geom_point(aes(shape=DIMENSION)) +
-  geom_smooth(se = TRUE, method = "lm", size= 1,alpha=0.2)+
+  geom_smooth(se = TRUE, method = "gam",formula = y ~ s(x, bs = "cs"),size= 1,alpha=0.2)+
   scale_color_manual(values=c("seagreen4","cornsilk3","yellow3"))+
   xlab("Latitude (º)")+
   ylab("R.I") +
