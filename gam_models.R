@@ -82,6 +82,11 @@ final_index <- read_csv("data/final_index.csv")
 
 joined <- merge(a, final_index, by="COUNTRIES", all.x=T)
 
+
+
+
+
+
 ##### 4. RUN MODELS (SPECIE) #####
 
 #model 0 --> the RI depends on LAT by dimensions? 
@@ -96,7 +101,7 @@ model0s
 model0i<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="institutional",])
 model0i
 #anova(model0i)
-sjt.glm(model0e, model0s, model0i, string.est = "Estimate",
+sjt.glm(model0e, model0s, model0i, p.numeric = FALSE, string.est = "Estimate",
         show.aic = F, show.family = TRUE)
 
 #model 1 --> the RI depends on LAT by dimension, classify by sp? 
@@ -110,8 +115,8 @@ anova(model1s)
 model1i <- glm(Resilience_Index~SPECIE+LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
 model1i
 anova(model1i)
-sjt.glm(model1e, model1s, model1i, string.est = "Estimate",
-        show.aic = F, show.family = TRUE)
+sjt.glm(model1e, model1s, model1i, p.numeric = FALSE, separate.ci.col = FALSE,
+        show.aic = F, show.family = TRUE, show.r2 = TRUE)
 
 #model 1 --> the RI depends on LAT by dimension, classify by sp? 
 
@@ -124,9 +129,45 @@ anova(model2s)
 model2i <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
 model2i
 anova(model2i)
-sjt.glm(model2e, model2s, model2i, string.est = "Estimate",
-        show.aic = F, show.family = TRUE)
+sjt.glm(model2e, model2s, model2i, p.numeric = FALSE, separate.ci.col = FALSE,
+        show.aic = F, show.family = TRUE, show.r2 = TRUE)
 
+
+
+sjt.glm(model0e, model1e, model2e, depvar.labels = c("Model0 eco", "Model1 eco", "Model2 eco"),  p.numeric = FALSE, group.pred = FALSE)
+sjt.glm(model0s, model1s, model2s, depvar.labels = c("Model0 socio", "Model1 socio", "Model2 socio"), p.numeric = FALSE, group.pred = FALSE)
+sjt.glm(model0i, model1i, model2i, depvar.labels = c("Model0 ins", "Model1 ins", "Model2 ins"), p.numeric = F, group.pred = FALSE)
+sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 eco", "Model1 soci", "Model1 ins"), 
+        show.dev = TRUE, p.numeric = FALSE, group.pred = FALSE, show.chi2 = TRUE, show.se = TRUE)
+
+
+LatDim <- ggplot (na.omit(joined), aes(LAT,Resilience_Index, col = DIMENSION)) +
+  geom_point(aes(shape=DIMENSION)) +
+  geom_smooth(se = TRUE, method = "lm", size= 1,alpha=0.2)+
+  scale_color_manual(values=c("seagreen4","cornsilk3","yellow3"))+
+  xlab("Latitude (º)")+
+  ylab("R.I") +
+  theme_classic() + 
+  theme(axis.text = element_text(size=16, color="black"),
+        axis.title = element_text(size=20, color="black"),
+        legend.text = element_text(size=12,color = "black"),
+        legend.title = element_text(size=14,color="black")) 
+LatDim
+
+
+LatSp <- ggplot (na.omit(joined), aes(LAT, Resilience_Index, col = SPECIE, linetype = SPECIE)) +
+  geom_point(aes(shape=SPECIE)) +
+  geom_smooth(se = TRUE, method = "lm", size= 1,alpha=0.2)+
+  scale_shape_manual(values=c(16,1))+
+  scale_color_manual(values=c("steelblue","steelblue4"))+
+  xlab("Latitude (º)")+
+  ylab("R.I") +
+  theme_classic() + 
+  theme(axis.text = element_text(size=16, color="black"),
+        axis.title = element_text(size=20, color="black"),
+        legend.text = element_text(size=12,color = "black"),
+        legend.title = element_text(size=14,color="black"))
+LatSp
 
 
 ##### RUN MODELS (DIMENSION) #####

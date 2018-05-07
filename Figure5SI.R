@@ -131,7 +131,7 @@ plot_p_values <- function(g,data,p_values,column_name){
 
 # By dimension
 
-LatDim <- ggplot (na.omit(to.plot), aes(LAT,Resilience_Index, col = DIMENSION)) +
+LatDim <- ggplot (na.omit(to.plot), aes(LAT, Resilience_Index, col = DIMENSION)) +
   geom_point(aes(shape=DIMENSION)) +
   geom_smooth(se = TRUE, method = "lm", size= 1,alpha=0.2)+
   scale_color_manual(values=c("seagreen4","cornsilk3","yellow3"))+
@@ -143,7 +143,7 @@ LatDim <- ggplot (na.omit(to.plot), aes(LAT,Resilience_Index, col = DIMENSION)) 
         legend.text = element_text(size=12,color = "black"),
         legend.title = element_text(size=14,color="black")) 
 
-LatDim <- plot_p_values(LatDim, na.omit(to.plot),p_values_dimensions,"DIMENSION") # plot p-values
+#LatDim <- plot_p_values(LatDim, na.omit(to.plot),p_values_dimensions,"DIMENSION") # plot p-values
 LatDim
 
 
