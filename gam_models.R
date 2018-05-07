@@ -137,7 +137,7 @@ sjt.glm(model2e, model2s, model2i, p.numeric = FALSE, separate.ci.col = FALSE,
 sjt.glm(model0e, model1e, model2e, depvar.labels = c("Model0 eco", "Model1 eco", "Model2 eco"),  p.numeric = FALSE, group.pred = FALSE)
 sjt.glm(model0s, model1s, model2s, depvar.labels = c("Model0 socio", "Model1 socio", "Model2 socio"), p.numeric = FALSE, group.pred = FALSE)
 sjt.glm(model0i, model1i, model2i, depvar.labels = c("Model0 ins", "Model1 ins", "Model2 ins"), p.numeric = F, group.pred = FALSE)
-sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 eco", "Model1 soci", "Model1 ins"), 
+sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 eco", "Model1 soci", "Model1 ins"), string.est = "Estimate",
         show.dev = TRUE, p.numeric = FALSE, group.pred = FALSE, show.chi2 = TRUE, show.se = TRUE)
 
 
