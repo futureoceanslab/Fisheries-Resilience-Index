@@ -53,11 +53,19 @@ packageVersion("tidyverse")
 
 source("aux_functions.R")
 
-install.packages("sjPlot")
+install.packages("sjPlot",repos='http://cran.us.r-project.org')
+install.packages("MASS",repos='http://cran.us.r-project.org')
+install.packages("gamlss",repos='http://cran.us.r-project.org')
+install.packages("sjmisc",repos='http://cran.us.r-project.org')
+install.packages("sjlabelled",repos='http://cran.us.r-project.org')
+library(gamlss)
+library(MASS)
 library(mgcv)
 library(gam)
 library(sjPlot)
 library(ggplot2)
+library(sjmisc)
+library(sjlabelled)
 
 
 ##### 2. PREPARE lAT #####
@@ -99,14 +107,17 @@ model0s<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joine
 model0s
 #sjp.glm (model0s)
 model0i<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="institutional",])
-model0i
+summary(model0i)
 #anova(model0i)
 sjt.glm(model0e, model0s, model0i, p.numeric = FALSE, string.est = "Estimate",
         show.aic = F, show.family = TRUE)
 
 #model 1 --> the RI depends on LAT by dimension, classify by sp? 
-
-model1e <- glm(Resilience_Index~SPECIE+LAT,family = quasibinomial(link="logit"), data=joined[joined$DIMENSION=="ecological",])
+model1e <- gamlss(Resilience_Index~SPECIE+LAT, data=na.omit(joined[joined$DIMENSION=="ecological",]))
+model1s <- glm.nb(Resilience_Index~SPECIE+LAT,  data=na.omit(joined[joined$DIMENSION=="socioeconomic",]))
+model1i <- glm.nb(Resilience_Index~SPECIE+LAT,  data=na.omit(joined[joined$DIMENSION=="institutional",]))
+coef(model1e)
+model1e <- glm(Resilience_Index~SPECIE+LAT,family = "quasibinomial", data=joined[joined$DIMENSION=="ecological",])
 summary(model1e)
 #plot.gam(model1e)
 model1s <- glm(Resilience_Index~SPECIE+LAT,family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
@@ -118,7 +129,7 @@ summary(model1i)
 sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 eco", "Model1 soci", "Model1 ins"), string.est = "Estimate",
         p.numeric = FALSE, show.chi2 = TRUE, show.se = TRUE, show.dev = TRUE)
 
-sjt.glm(model1e)
+sjt.xtab(model1e)
 
 sjt.glm(model1e, model1s, model1i, p.numeric = FALSE, separate.ci.col = FALSE,
         show.aic = F, show.family = TRUE, show.r2 = TRUE)
