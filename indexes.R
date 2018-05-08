@@ -78,7 +78,7 @@ resilience_index <- bind_rows(eco_factors,ins_factors,soc_factors) %>%
 # Read other indexes and merge with the resilience index
 
 
-other_index <- fread("data/Other_index.csv",check.names = TRUE) %>% rename(OHI.2016=OHI.wild.caught)
+other_index <- fread("data/Other_index.csv",check.names = TRUE) %>% rename(OHI.fisheries=OHI.wild.caught)
 
 # merge with resilience index
 
