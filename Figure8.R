@@ -66,10 +66,8 @@ species_to_plot <- c(COD="Cod",HAKE="Hake")
 # Columns to plot and their x label
 
 x_labels <- c(GDP.2016="GDP 2016",
-              OHI.2016="OHI 2016",
-              OHI.eco="OHI economic 2016",
-              #Tech..develop..2013="Technical Development (number per country)",
-              #Inclusion.of.Requirements.2010="Compilance (scores)",
+              OHI.fisheries="OHI fisheries",
+              OHI.economic="OHI economic",
               Readiness="Readiness",
               Vulnerability="Vulnerability")
 

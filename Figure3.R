@@ -51,10 +51,8 @@ final_index <- read_csv("data/final_index.csv")
 # Columns to plot and their x label
 
 x_labels <- c(GDP.2016="GDP 2016",
-              OHI.2016="OHI 2016",
-              OHI.eco="OHI economic 2016",
-              #Tech..develop..2013="Technical Development (number per country)",
-              #Inclusion.of.Requirements.2010="Compilance (scores)",
+              OHI.fisheries="OHI fisheries",
+              OHI.economic="OHI economic",
               Readiness="Readiness",
               Vulnerability="Vulnerability")
 
@@ -66,7 +64,7 @@ aggdata <- final_index %>%
 # Read other indexes and merge with aggdata
 
 
-other_index <- fread("data/Other_index.csv",check.names = TRUE) %>% rename(OHI.2016=OHI.wild.caught)
+other_index <- fread("data/Other_index.csv",check.names = TRUE) %>% rename(OHI.fisheries=OHI.wild.caught)
 
 # merge with aggdata
 
@@ -158,7 +156,7 @@ filter(SPECIE=="Hake")
 
 png("Figures/Figure 3.png",width=9.38,height=7.99,units="in",res=300)
 
-do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 4, ncol = 2)))
+do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 3, ncol = 2)))
 
 dev.off()
 
