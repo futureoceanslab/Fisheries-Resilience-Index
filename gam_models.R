@@ -100,25 +100,40 @@ joined <- merge(a, final_index, by="COUNTRIES", all.x=T)
 #model 0 --> the RI depends on LAT by dimensions? 
 
 model0e<- glm(Resilience_Index~LAT, family = "quasibinomial", data = joined[joined$DIMENSION=="ecological",])
-model0e
-plot (model0e)
+summary(model0e)
+#plot (model0e)
 #sjp.glm(model0e)
 model0s<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="socioeconomic",])
-model0s
+summary(model0s)
 #sjp.glm (model0s)
 model0i<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="institutional",])
 summary(model0i)
 #anova(model0i)
-sjt.glm(model0e, model0s, model0i, p.numeric = FALSE, string.est = "Estimate",
+sjt.glm(model0e, model0s, model0i, p.numeric = FALSE, 
         show.aic = F, show.family = TRUE)
 
 #model 1 --> the RI depends on LAT by dimension, classify by sp? 
-model1e <- gamlss(Resilience_Index~SPECIE+LAT, data=na.omit(joined[joined$DIMENSION=="ecological",]))
-model1s <- glm.nb(Resilience_Index~SPECIE+LAT,  data=na.omit(joined[joined$DIMENSION=="socioeconomic",]))
-model1i <- glm.nb(Resilience_Index~SPECIE+LAT,  data=na.omit(joined[joined$DIMENSION=="institutional",]))
-coef(model1e)
+fit1 <- glm.nb(Resilience_Index~SPECIE+LAT, data=na.omit(joined[joined$DIMENSION=="ecological",]))
+fit2 <- glm.nb(Resilience_Index~SPECIE+LAT,  data=na.omit(joined[joined$DIMENSION=="socioeconomic",]))
+fit3 <- glm.nb(Resilience_Index~SPECIE+LAT,  data=na.omit(joined[joined$DIMENSION=="institutional",]))
+
+fit1 <-glm(Resilience_Index~SPECIE+LAT, 
+              data=na.omit(joined[joined$DIMENSION=="ecological",]),
+              family = quasibinomial(link = "logit"))
+fit2 <- glm(Resilience_Index~SPECIE+LAT,
+            data=na.omit(joined[joined$DIMENSION=="socioeconomic",]),
+            family = quasibinomial(link = "logit"))
+fit3 <- glm(Resilience_Index~SPECIE+LAT,
+            data=na.omit(joined[joined$DIMENSION=="institutional",]),
+                         family = quasibinomial(link = "logit"))
+# compare models
+sjt.glm(fit1, fit2, fit3, string.est = "Estimate",
+        p.numeric = FALSE, show.family = TRUE)
+
+sjt.glm(fit1)
+
 model1e <- glm(Resilience_Index~SPECIE+LAT,family = "quasibinomial", data=joined[joined$DIMENSION=="ecological",])
-summary(model1e)
+a<- summary(model1e)
 #plot.gam(model1e)
 model1s <- glm(Resilience_Index~SPECIE+LAT,family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
 summary(model1s)
@@ -126,6 +141,12 @@ summary(model1s)
 model1i <- glm(Resilience_Index~SPECIE+LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
 summary(model1i)
 #anova(model1i)
+install.packages("ResourceSelection")
+library(ResourceSelection)
+
+
+
+
 sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 eco", "Model1 soci", "Model1 ins"), string.est = "Estimate",
         p.numeric = FALSE, show.chi2 = TRUE, show.se = TRUE, show.dev = TRUE)
 
@@ -137,10 +158,10 @@ sjt.glm(model1e, model1s, model1i, p.numeric = FALSE, separate.ci.col = FALSE,
 #model 2 --> the RI depends on LAT by dimension, classify by sp? 
 
 model2e <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial" ,data=joined[joined$DIMENSION=="ecological",])
-model2e
+summary(model2e)
 anova(model2e)
 model2s <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
-model2s
+summary(model2s)
 anova(model2s)
 model2i <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
 model2i
