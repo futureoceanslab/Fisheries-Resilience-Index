@@ -59,15 +59,11 @@ library(MASS)
 
 final_index_1 <- read_csv("data/final_index_1.csv")
 final_index_2 <- read_csv("data/final_index_2.csv")
-final_index_above <- read_csv("data/final_index_above_TAC.csv")
+
 
 ##### 3. WILCOXON TEST #####
 
 wilcox.test(final_index_1$Resilience_Index, final_index_2$Resilience_Index, paired=TRUE)
-
-wilcox.test(final_index_1$Resilience_Index, final_index_1$Resilience_Index, paired=TRUE)
-
-wilcox.test(final_index_1$Resilience_Index, final_index_above$Resilience_Index, paired=TRUE)
 
 
 
