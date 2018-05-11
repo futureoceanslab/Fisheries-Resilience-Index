@@ -65,9 +65,13 @@ Columns:
 
 - **STOCK** (character): Stock
 
-- **HDI** (numeric): Development indicator. Human Development Index. UNDP. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details
+- **HDI** (numeric): Development indicator. Human Development Index. UNDP. See "INSTITUTIONAL STRENGTH (I4)" in 3.A in "SI 2. Indicators and Factors" for details
+
+-- **Compliance** (integer): Compliance scores by country 2010. Inclusion of requirements by country. See "INSTITUTIONAL STRENGTH (I4)" in 3.A in "SI 2. Indicators and Factors" for details
 
 - **TAC** (integer): Catch quotas indicator. Totall allowable catch per country and stock. europa.eu. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+
+- **Above_TAC** (integer): Catches above advised TAC. Country catches above TAC. SSMM Carpenter et al.. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
 
 - **Swaps** (numeric): Property rights indicator. Monetary exchange of quota in a country. Total ITQ per country and stock 2000-2006. Andersen et al., 2009. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details
 

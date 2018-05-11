@@ -37,12 +37,17 @@ Ecological, socieconomic and institutional resilience to shifting fish stocks
 
 - **process_indicators.R**: this script produces ecological, socioeconomic and institutional factors from `data/ecological_indicators.csv`, `data/socioeconomic_indicators.csv` and `data/institutional_indicators.csv`. Also, creates tables for "SI 2. INDICATORS AND FACTORS"
 
+- **Wilcoxon_test.R**: this script reads the Resilience Index from `data/final_index.csv` with and without the indicators: `Above_TAC` and `Compliance` to compare the robustness of the index. 
+
+- **glm_models.R**: this script run three different models to compare the Resilience Index with LAT and observe significative relationship with species and dimensions. Produces the Summary with the LAT-Index relationship. 
+
+
 ## Instructions
 
 `run_all.R` runs all the scripts needed to reproduce the results. First run `process_indicators.R` to compute factors from indicators and get tables for "SI 2. INDICATORS AND FACTORS", then run `indexes.R` to compute `data/final_index.csv`. Then run all the figure scripts to generate the figures in Figures and some tables in Tables. 
 
 ## Notes
 
- `Figure1.R`, `Figure2.R` and `Fig5SI.R` require an Internet connection to download the map files.
+ `Figure1.R`, `Figure2.R` and `glm_models.R` require an Internet connection to download the map files.
  
  Since some of the packages used in this repository make use of the library rJava, please check that your Java version is updated and that you have installed the right version (32-bit or 64-bit) for your R distribution.

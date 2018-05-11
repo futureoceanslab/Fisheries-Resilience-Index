@@ -819,13 +819,13 @@ write_doc(Ft,
 
 
 Table20 <-ins_indicators %>% 
-  select(COUNTRIES,HDI, Compilance) %>%
+  select(COUNTRIES,HDI, Compliance) %>%
   distinct %>%
   filter(!is.na(HDI)) %>%
   mutate(HDI_norm=normalize_positive(HDI),
-         Compilance_norm=normalize_positive(Compilance)) %>% # Normalization positive
+         Compliance_norm=normalize_positive(Compliance)) %>% # Normalization positive
   rowwise() %>%
-  mutate(STRENGTH=mean(c(HDI_norm, Compilance_norm), na.rm = TRUE)) %>% # DEVELOPMENT factos is HDI normalized
+  mutate(STRENGTH=mean(c(HDI_norm, Compliance_norm), na.rm = TRUE)) %>% # DEVELOPMENT factos is HDI normalized
   ungroup()
 
 # Prepare for word
@@ -835,7 +835,7 @@ to.plot <- Table20 %>%
   data.frame
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
-  set_names(c("COUNTRIES","HDI","Compilance", "HDI'\n(normalized)","Compilance'\n(normalized)", "STRENGTH"))
+  set_names(c("COUNTRIES","HDI","Compliance", "HDI'\n(normalized)","Compliance'\n(normalized)", "STRENGTH"))
 
 # Save to word
 
