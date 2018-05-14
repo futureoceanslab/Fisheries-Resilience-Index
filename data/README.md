@@ -71,7 +71,7 @@ Columns:
 
 - **TAC** (integer): Catch quotas indicator. Totall allowable catch per country and stock. europa.eu. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
 
-- **Above_TAC** (integer): Catches above advised TAC. Country catches above TAC. SSMM Carpenter et al.. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
+- **Above_TAC** (integer): Catches above advised TAC. Country catches above TAC. SSMM Carpenter et al., 2016 See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
 
 - **Swaps** (numeric): Property rights indicator. Monetary exchange of quota in a country. Total ITQ per country and stock 2000-2006. Andersen et al., 2009. See "PROPERTY.RIGHTS (I2)" in 3.A in "SI 2. Indicators and Factors" for details
 
