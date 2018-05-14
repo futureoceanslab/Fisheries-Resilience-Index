@@ -103,7 +103,7 @@ summary(model0s)
 model0i<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="institutional",])
 summary(model0i)
 
-sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model0 ecological", "Model0 socioeconomic", "Model0 institutional"), string.est = "Estimate",
+sjt.glm(model0e, model0s, model0i, depvar.labels = c("Model0 ecological", "Model0 socioeconomic", "Model0 institutional"), 
         p.numeric = FALSE, show.chi2 = TRUE, show.se = TRUE, show.dev = TRUE)
 
 
@@ -118,8 +118,10 @@ summary(model1s)
 model1i <- glm(Resilience_Index~SPECIE+LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
 summary(model1i)
 
-sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 ecological", "Model1 socioeconomic", "Model1 institutional"), string.est = "Estimate",
+sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 ecological", "Model1 socioeconomic", "Model1 institutional"), 
         p.numeric = FALSE, show.chi2 = TRUE, show.se = TRUE, show.dev = TRUE)
+
+
 
 
 #model 2 --> the RI depends on LAT by dimension, classify by sp? 
