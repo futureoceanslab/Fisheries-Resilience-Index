@@ -67,7 +67,7 @@ Columns:
 
 - **HDI** (numeric): Development indicator. Human Development Index. UNDP. See "INSTITUTIONAL STRENGTH (I4)" in 3.A in "SI 2. Indicators and Factors" for details
 
--- **Compliance** (integer): Compliance scores by country 2010. Inclusion of requirements by country. See "INSTITUTIONAL STRENGTH (I4)" in 3.A in "SI 2. Indicators and Factors" for details
+- **Compliance** (integer): Compliance scores by country 2010. Inclusion of requirements by country. See "INSTITUTIONAL STRENGTH (I4)" in 3.A in "SI 2. Indicators and Factors" for details
 
 - **TAC** (integer): Catch quotas indicator. Totall allowable catch per country and stock. europa.eu. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details
 
@@ -85,13 +85,9 @@ Columns:
 
 - **GDP.2016** (numeric): GDP 2016. International Monetary Bank
 
-- **OHI.wild.caught** (numeric): OHI 2016. OHI webpage wild caught fisheries
+- **OHI.fisheries** (numeric): OHI 2016. OHI webpage wild caught fisheries
 
-- **OHI.eco** (numeric): OHI eco 2016. Coastal Livelihoods and Economies
-
-- **Tech..develop..2013** (numeric): Tech Develop 2013. number of inventions OECD.stat
-
-- **Inclusion.of.Requirements.2010** (numeric): Inclusion of Requirements 2010. Member state for inclusion of required elements in annual reports. 
+- **OHI.economic** (numeric): OHI eco 2016. Coastal Livelihoods and Economies
 
 - **Readiness** (numeric): ND-Gain Index: Readiness. 2016
 
@@ -208,7 +204,7 @@ Columns:
 
 - **STOCK** (character): Stock
 
-- **DEVELOPMENT** (numeric): Development factor. See "DEVELOPMENT (I4)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
+- **INSTITUTIONAL STRENGHT** (numeric): Development factor. See "INSTITUTIONAL STRENGHT (I4)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
 
 - **QUOTAS** (numeric): Catch quotas factor. See "CATCH QUOTAS (I3)" in 3.A in "SI 2. Indicators and Factors" for details on computation.
 
@@ -233,13 +229,9 @@ Columns:
 
 - **GDP.2016** (numeric): GDP 2016. International Monetary Bank
 
-- **OHI.2016** (numeric): OHI 2016. OHI webpage wild caught fisheries
+- **OHI.fisheries** (numeric): OHI 2016. OHI webpage wild caught fisheries
 
-- **OHI.eco** (numeric): OHI eco 2016. Coastal Livelihoods and Economies
-
-- **Tech..develop..2013** (numeric): Tech Develop 2013. number of inventions OECD.stat
-
-- **Inclusion.of.Requirements.2010** (numeric): Inclusion of Requirements 2010. Member state for inclusion of required elements in annual reports. 
+- **OHI.economic** (numeric): OHI eco 2016. Coastal Livelihoods and Economies
 
 - **Readiness** (numeric): ND-Gain Index: Readiness. 2016
 
