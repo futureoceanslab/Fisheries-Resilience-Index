@@ -91,10 +91,9 @@ source("aux_functions.R")
 scipen <- getOption("scipen")
 options(scipen=999)
 
-##### COUNTRY DEPENDENCE #####
+##### 1.1 DEFINE COUNTRY DEPENDENCE #####
 
-# Table 8
-
+# Define which species are captured in each stock
 
 stock_by_species <- list(`Atlantic cod`=c("CODCOASTNOR","CODNEAR","CODCOASTNOR_CODNEAR","CODFAPL","CODICE","CODBA2532","CODKAT","CODIS","CODVIa","CODNS"),
                          `European hake`=c("HAKENRTN","HAKESOTH")) 
@@ -114,6 +113,7 @@ countries_fishing <- list(HAKENRTN=c("BE","DK","DE","ES","FR","NL","PT","SE"),
                           CODVIa=c("DE","IE","FR"),
                           CODNS=c("FR"))
 
+# Define country dependence for each species
 
 countries_dependence <- suppressWarnings(c(countries_fishing,list(CODCOASTNOR_CODNEAR=countries_fishing$CODCOASTNOR)) %>%
                                            lapply(`length<-`, max(lengths(countries_fishing))) %>% 
@@ -124,6 +124,8 @@ countries_dependence <- suppressWarnings(c(countries_fishing,list(CODCOASTNOR_CO
                                            select(-STOCK) %>% distinct %>%
                                            mutate(dependence=TRUE))
 
+
+# Table 8
 
 # Prepare for word
 
@@ -450,7 +452,7 @@ eco_countries %>%  mutate_if(is.numeric,funs(round(.,digits = 9))) %>%
 
 soc_indicators <- fread("data/socioeconomic_indicators.csv")
 
-# Remove countries that don't fish each species
+# Remove countries that do not depend on a given species.
 
 soc_indicators %<>% 
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% 
@@ -686,7 +688,7 @@ reduce( # Merge tables 11, 12 and 14
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
   full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
-  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on this catch
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors.csv") # Save to csv
@@ -700,7 +702,7 @@ reduce( # Merge tables 11, 13 and 14
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
   full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
-  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on this catch
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors_country.csv") # Save to csv
@@ -709,6 +711,8 @@ reduce( # Merge tables 11, 13 and 14
 ##### 4 INSTITUTIONAL INDICATORS #####
 
 ins_indicators <- fread("data/institutional_indicators 2.csv")
+
+# Remove countries that do not depend on a given species.
 
 ins_indicators %<>% 
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% 
@@ -927,7 +931,7 @@ reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
             Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
   select(SPECIES,COUNTRIES,STOCK,STRENGTH,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
-  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on this catch
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/institutional_factors.csv")
 
@@ -938,7 +942,7 @@ reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table19 %>% select(SPECIES, COUNTRIES,QUOTAS),
             Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
   select(SPECIES,COUNTRIES,STRENGTH,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
-  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on this catch
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/institutional_factors_country.csv")
 
