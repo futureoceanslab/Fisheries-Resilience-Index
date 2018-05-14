@@ -58,12 +58,23 @@ library(MASS)
 ##### 2. READ DATA #####
 
 final_index_1 <- read_csv("data/final_index_1.csv")
+
 final_index_2 <- read_csv("data/final_index_2.csv")
 
+final_index <- read_csv("data/final_index_14_5.csv")
 
+final_index_1 <- final_index_1[, c(1,2,3,4,5,6,9,10,11)]
+colnames(final_index_1)[5]<- "OHI.fisheries"
+colnames(final_index_1)[6]<- "OHI.economic"
+final_index_2 <-final_index_2[, c(1,2,3,4,5,6,9,10,11)]
+colnames(final_index_2)[5]<- "OHI.fisheries"
+colnames(final_index_2)[6]<- "OHI.economic"
 ##### 3. WILCOXON TEST #####
 
 wilcox.test(final_index_1$Resilience_Index, final_index_2$Resilience_Index, paired=TRUE)
+
+
+
 
 
 
