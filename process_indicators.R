@@ -90,6 +90,63 @@ source("aux_functions.R")
 # Disable scientific notation
 scipen <- getOption("scipen")
 options(scipen=999)
+
+##### 1.1 DEFINE COUNTRY DEPENDENCY #####
+
+# Define which species are captured in each stock
+
+stock_by_species <- list(`Atlantic cod`=c("CODCOASTNOR","CODNEAR","CODCOASTNOR_CODNEAR","CODFAPL","CODICE","CODBA2532","CODKAT","CODIS","CODVIa","CODNS"),
+                         `European hake`=c("HAKENRTN","HAKESOTH")) 
+
+suppressWarnings(stock_by_species %<>% lapply(`length<-`, max(lengths(stock_by_species))) %>% data.frame(check.names = FALSE) %>% gather(SPECIES,STOCK) %>% filter(complete.cases(.)))
+
+# Which countries fish  each stock
+countries_fishing <- list(HAKENRTN=c("BE","DK","DE","ES","FR","NL","PT","SE"),
+                          HAKESOTH=c("ES","FR","PT"),
+                          CODCOASTNOR=c("DK","DE","EE","IE","ES","FR","PL","PT"),
+                          CODNEAR=c("DK","DE","EE","IE","ES","FR","PL","PT"),
+                          CODFAPL=c("DE"),
+                          CODICE=c("DE"),
+                          CODBA2532=c("DK","DE","EE","LV","LT","PL","FI","SE"),
+                          CODKAT=c("DK","DE","FR","NL","PT","SE"),
+                          CODIS=c("BE","IE","FR"),
+                          CODVIa=c("DE","IE","FR"),
+                          CODNS=c("FR"))
+
+# Define country dependence for each species
+
+countries_dependence <- suppressWarnings(c(countries_fishing,list(CODCOASTNOR_CODNEAR=countries_fishing$CODCOASTNOR)) %>%
+                                           lapply(`length<-`, max(lengths(countries_fishing))) %>% 
+                                           as.data.frame() %>% 
+                                           gather(STOCK,COUNTRIES) %>% 
+                                           filter(complete.cases(.)) %>%
+                                           full_join(stock_by_species,by="STOCK") %>%
+                                           select(-STOCK) %>% distinct %>%
+                                           mutate(dependence=TRUE))
+
+
+# Table 8
+
+# Prepare for word
+
+stocks_fished <-  lapply(countries_fishing, function(x) countries_order %in% x) %>% 
+  data.frame() %>% t %>% data.frame()  %>% 
+  set_names(countries_order) %>% mutate(STOCK=rownames(.)) %>% 
+  select(STOCK,one_of(names(.)))
+
+Table8 <- stocks_fished %>% mutate_if(is.logical,funs(ifelse(.,"yes","-")))
+
+
+to.plot <- Table8 %>% data.frame
+
+# Save to word
+
+Ft<- format_table(to.plot)
+write_doc(Ft,
+          "Table 8. Stocks that are being fished by EU countries (2006-2010).",
+          "Tables/Table8SI.docx")
+
+
 ##### 2. ECOLOGICAL INDICATORS #####
 
 eco_indicators <- fread("data/ecological_indicators.csv",check.names = TRUE)
@@ -334,40 +391,7 @@ Table7 %>%
   write_excel_csv("data/ecological_factors.csv")
 
 
-# Table 8
 
-# Which countries fish  each stock
-countries_fishing <- list(HAKENRTN=c("BE","DK","DE","ES","FR","NL","PT","SE"),
-                          HAKESOTH=c("ES","FR","PT"),
-                          CODCOASTNOR=c("DK","DE","EE","EI","ES","FR","PL","PT"),
-                          CODNEAR=c("DK","DE","EE","EI","ES","FR","PL","PT"),
-                          CODFAPL=c("DE"),
-                          CODICE=c("DE"),
-                          CODBA2532=c("DK","DE","EE","LV","LT","PL","FI","SE"),
-                          CODKAT=c("DK","DE","FR","NL","PT","SE"),
-                          CODIS=c("BE","IE","FR"),
-                          CODVIa=c("DE","IE","FR"),
-                          CODNS=c("FR"))
-
-
-# Prepare for word
-
-stocks_fished <-  lapply(countries_fishing, function(x) countries_order %in% x) %>% 
-  data.frame() %>% t %>% data.frame()  %>% 
-  set_names(countries_order) %>% mutate(STOCK=rownames(.)) %>% 
-  select(STOCK,one_of(names(.)))
-
-Table8 <- stocks_fished %>% mutate_if(is.logical,funs(ifelse(.,"yes","-")))
-
-
-to.plot <- Table8 %>% data.frame
-
-# Save to word
-
-Ft<- format_table(to.plot)
-write_doc(Ft,
-          "Table 8. Stocks that are being fished by EU countries (2006-2010).",
-          "Tables/Table8SI.docx")
 
 
 # Table 9
@@ -420,11 +444,20 @@ write_doc(Ft,
 
 eco_countries %>%  mutate_if(is.numeric,funs(round(.,digits = 9))) %>% 
   select(SPECIES,COUNTRIES,"ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY") %>%
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on this catch
+  filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/ecological_factors_country.csv")
 
 ##### 3. SOCIOECONOMIC INDICATORS #####
 
 soc_indicators <- fread("data/socioeconomic_indicators.csv")
+
+# Remove countries that do not depend on a given species.
+
+soc_indicators %<>% 
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% 
+  filter(dependence) %>% select(-dependence)
+
 
 ##### 3.1 GEAR.DIVERSITY #####
 
@@ -504,6 +537,10 @@ Table12 <- soc_indicators %>%
   mutate(CATCH.DEP=mean(c(Stockdep.sp_norm,Stockdep.total_norm),na.rm=TRUE)) %>% 
   ungroup() %>% arrange_table()
 
+
+
+
+
 # Prepare for word
 
 to.plot <- Table12 %>% 
@@ -531,6 +568,7 @@ for(country_row in country_rows){
   Ft[country_row,3:ncol(to.plot)] <- cellProperties(background.color = ifelse(country_row%%2==0,"white","gray90"),border.bottom.style = "solid",border.right.style =  "none",border.top.style = "none",border.left.style = "none")
     
 }
+
 
 
 write_doc(Ft,
@@ -650,6 +688,8 @@ reduce( # Merge tables 11, 12 and 14
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
   full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
+  filter(dependence) %>% select(-dependence) %>%
   select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors.csv") # Save to csv
 
@@ -662,6 +702,8 @@ reduce( # Merge tables 11, 13 and 14
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
   full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
+  filter(dependence) %>% select(-dependence) %>%
   select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors_country.csv") # Save to csv
 
@@ -670,6 +712,11 @@ reduce( # Merge tables 11, 13 and 14
 
 ins_indicators <- fread("data/institutional_indicators 2.csv")
 
+# Remove countries that do not depend on a given species.
+
+ins_indicators %<>% 
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% 
+  filter(dependence) %>% select(-dependence)
 
 ##### 4.1 CO.MANAGEMENT (I1) #####
 
@@ -884,6 +931,8 @@ reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
             Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
   select(SPECIES,COUNTRIES,STOCK,STRENGTH,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
+  filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/institutional_factors.csv")
 
 # Merge tables 16, 17, 19 and 20 to produce institutional factors per country: institutional_factors_country.csv
@@ -893,6 +942,8 @@ reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table19 %>% select(SPECIES, COUNTRIES,QUOTAS),
             Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
   select(SPECIES,COUNTRIES,STRENGTH,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
+  filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/institutional_factors_country.csv")
 
 
