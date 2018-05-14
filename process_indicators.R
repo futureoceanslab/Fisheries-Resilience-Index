@@ -91,7 +91,7 @@ source("aux_functions.R")
 scipen <- getOption("scipen")
 options(scipen=999)
 
-##### 1.1 DEFINE COUNTRY DEPENDENCE #####
+##### 1.1 DEFINE COUNTRY DEPENDENCY #####
 
 # Define which species are captured in each stock
 
