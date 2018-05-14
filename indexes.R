@@ -68,6 +68,7 @@ soc_factors <- fread("data/socioeconomic_factors_country.csv")  %>% mutate(DIMEN
 
 resilience_index <- bind_rows(eco_factors,ins_factors,soc_factors) %>% 
   gather(FACTOR,VALUE,-COUNTRIES,-SPECIES,-DIMENSION,factor_key = TRUE) %>%
+  filter(complete.cases(.)) %>%
   group_by(SPECIES,DIMENSION,COUNTRIES) %>% 
   summarise(Resilience_Index=mean(VALUE,na.rm=TRUE)) %>%
   ungroup()
