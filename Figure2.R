@@ -1,9 +1,5 @@
 #' This script reads data/final_index.csv and plots
 #' Figure 2 in the paper.
-#' 
-#' NOTE: As of 2018-03-21, CRAN version of ggplot2 does not include geom_sf.
-#' If you run the script and get an error that says that geom_sf is not found, then you
-#' need the dev version in github. See bellow to see how to install the github version.
 
 
 ##### 1. LOAD PACKAGES AND DISPLAY VERSIONS #####
@@ -24,24 +20,43 @@ version
 # version.string R version 3.3.0 (2016-05-03)
 # nickname       Supposedly Educational          
 
-if(!require(sf)){
-  install.packages("sf",dependencies = TRUE,repos='http://cran.us.r-project.org')
+
+if(!require(broom)){
+  install.packages("broom",dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
-require(sf)
-packageVersion("sf")
-# [1] ‘0.6.0’
+require(broom)
+packageVersion("broom")
+# [1] ‘0.4.2’
 
-# NOTE: As of 2018-03-21, CRAN version of ggplot2 does not include geom_sf.
-# If you run the script and get an error that says that geom_sf is not found. Then uncomment and run
-# the next lines
+if(!require(ggmap)){
+  install.packages("ggmap",dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(ggmap)
+packageVersion("ggmap")
+# [1] ‘2.6.1’
 
-# if(!require(devtools)){
-#   install.packages("devtools",dependencies = TRUE,repos='http://cran.us.r-project.org')
-# }
-# require(devtools)
-# install_github("tidyverse/ggplot2") 
+if(!require(sp)){
+  install.packages("sp",dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(sp)
+packageVersion("sp")
+# [1] ‘1.2.7’
 
 
+if(!require(rgdal)){
+  install.packages("rgdal",dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(rgdal)
+packageVersion("rgdal")
+# [1] ‘1.2.20’
+
+
+if(!require(rnaturalearthdata)){
+  install.packages("rnaturalearthdata",dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(rnaturalearthdata)
+packageVersion("rnaturalearthdata")
+# [1] ‘0.1.0’
 
 if(!require(tidyverse)){
   install.packages("tidyverse",dependencies = TRUE,repos='http://cran.us.r-project.org')
@@ -56,18 +71,19 @@ source("aux_functions.R")
 
 ##### 2. PREPARE MAP #####
 
-download.file(url = "http://thematicmapping.org/downloads/TM_WORLD_BORDERS_SIMPL-0.3.zip",
-              destfile = "data/world.zip", mode = "wb")
+# Get country borders and select contries
 
-unzip("data/world.zip", exdir = "data")
+countries_to_plot <- c("EG","AL","AD","AT","BY","BE","BA","BG","HR","CY","CZ","DK","EE","FO","FI","FR","DE","GI","GR","HU","IS","IE","IM","IT","RS","LV","LI","LT","LU","MK","MT","MD","MC","ME","NL","NO","PL","PT","RO","SM","RS","SK","SI","ES","SE","CH","UA","GB","VA","RS","MA","TN","DZ","LY","EH")
 
-world_area <- sf::st_read("data/TM_WORLD_BORDERS_SIMPL-0.3.dbf", quiet = TRUE) ## sf:: es para que sepa que la funcion es del package sf, sino sale masked como error.
-class(world_area)        
+world <- rnaturalearthdata::countries50
 
-file.remove(c("data/Readme.txt","data/world.zip",list.files("data",pattern = "TM_WORLD.*",full.names = TRUE)))
+# Transform to use with ggmap
 
-a<-filter(world_area, grepl('EG|AL|AD|AT|BY|BE|BA|BG|HR|CY|CZ|DK|EE|FO|FI|FR|DE|GI|GR|HU|IS|IE|IM|IT|RS|LV|LI|LT|LU|MK|MT|MD|MC|ME|NL|NO|PL|PT|RO|SM|RS|SK|SI|ES|SE|CH|UA|GB|VA|RS|MA|TN|DZ|LY|EH', ISO2)) %>% #get the dat with your 3 cuntries per caracter variable with a name
-  mutate(value = AREA*SUBREGION) %>% rename(COUNTRIES=ISO2)  ## add a column called "value" multipliying area*region
+europe <- world[world$iso_a2 %in% countries_to_plot,]
+
+europe@data$id <- rownames(europe@data)
+
+europe <- spTransform(europe, CRS("+proj=longlat"))
 
 ##### 3. READ DATA #####
 
@@ -84,7 +100,7 @@ plot_definition <- data.frame(DIMENSION=c("institutional","institutional","socio
 
 # Plot each panel
 graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
-  
+  # i <- 6
   # Get dimension and species for this panel
   dimension <- plot_definition$DIMENSION[i]
   specie <- plot_definition$SPECIES[i]
@@ -92,23 +108,59 @@ graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
   # Filter data for that dimension and specie.
   
   to.plot <-   final_index  %>% 
-    filter(DIMENSION==dimension,SPECIE==specie) %>% 
-    data.frame() %>% 
-    merge(a,.,by="COUNTRIES",all.x=T) # IMPORTANT!!!!: Cannot use full_join because sf structure is lost and map is not correlctly rendered
+    filter(DIMENSION==dimension,SPECIE==specie)# %>%
+    # data.frame() %>% 
+    # merge(a,.,by="COUNTRIES",all.x=T) # IMPORTANT!!!!: Cannot use full_join because sf structure is lost and map is not correlctly rendered
   
   
   # Plot
-  ggplot(to.plot) +
-    geom_sf(aes(fill = Resilience_Index)) +
+  longitude_formatter <- function(l) {
+    
+    
+      ifelse(l<0,paste0(as.character(abs(l)),intToUtf8(176),"W"),ifelse(l>0,paste0(as.character(abs(l)),intToUtf8(176),"E"),paste0("0",intToUtf8(176))))
+    
+  }
+  
+  latitude_formatter <- function(l) {
+    
+    
+    ifelse(l<0,paste0(as.character(abs(l)),intToUtf8(176),"S"),ifelse(l>0,paste0(as.character(abs(l)),intToUtf8(176),"N"),paste0("0",intToUtf8(176))))
+    
+  }
+  
+  # Join map with index and get ready to plot
+  
+  map_a <- europe
+  
+  map_a@data <- left_join(map_a@data,to.plot,by=c(iso_a2="COUNTRIES"))
+  
+  map <- tidy(map_a)
+  
+  map <- left_join(map,map_a@data,by="id")
+  
+  #Plot
+  
+  ggplot() + 
+    geom_map(data=map, map=map,
+                      aes(x=long,y=lat, map_id=id, group=group),
+                      fill="gray50", color="black")+
+  geom_map(data=map, map=map, color="black", size=0.15,
+           aes(fill=Resilience_Index, group=id, map_id=id)) +
     scale_colour_brewer() +
-    coord_sf(xlim = c(-30,30), ylim = c(29,70)) +
-    scale_fill_distiller(type = "seq", direction = 1,name="Resilence Index")+
+    coord_equal(xlim = c(-30,30), ylim = c(29,70),ratio=1.5) +
+    scale_x_continuous(labels =longitude_formatter )+
+    scale_y_continuous(labels =latitude_formatter )+
+    scale_fill_distiller(type = "seq", direction = 1,name="Resilence Index",limits=range(final_index$Resilience_Index))+
     labs(subtitle = LETTERS[i])+
     theme(plot.subtitle=element_text(size=15, hjust=0, face="italic", color="black"),
           panel.grid.major = element_line(color="white"),
           legend.text = element_text(size=12,color = "black"),
           legend.title = element_text(size=14,color="black"),
-          legend.key.width=unit(2,"cm"))
+          legend.key.width=unit(2,"cm"),
+          legend.position = "bottom",
+          axis.title = element_blank())
+    
+
   
     
 })
