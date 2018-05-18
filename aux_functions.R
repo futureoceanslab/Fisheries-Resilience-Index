@@ -71,6 +71,34 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 3, 
   
 }
 
+#' Formats longitud values to be used as labels in a graph.
+#' 
+#' The format is X ºW for negative longitude values and X ºE por positive longitude values.
+#' 0 longitude is formatted as 0º
+#' 
+#' @param l (integer) longitude
+#' @return (character) longitude formatted
+longitude_formatter <- function(l) {
+  
+  
+  ifelse(l<0,paste0(as.character(abs(l)),intToUtf8(176),"W"),ifelse(l>0,paste0(as.character(abs(l)),intToUtf8(176),"E"),paste0("0",intToUtf8(176))))
+  
+}
+
+#' Formats latitude values to be used as labels in a graph.
+#' 
+#' The format is X ºS for negative latitude values and X ºN por positive latitude values.
+#' 0 latitude is formatted as 0º
+#' 
+#' @param l (integer) latitude
+#' @return (character) latitude formatted
+latitude_formatter <- function(l) {
+  
+  
+  ifelse(l<0,paste0(as.character(abs(l)),intToUtf8(176),"S"),ifelse(l>0,paste0(as.character(abs(l)),intToUtf8(176),"N"),paste0("0",intToUtf8(176))))
+  
+}
+
 ##### P-VALUES #####
 
 #' Extracts p-value from a model

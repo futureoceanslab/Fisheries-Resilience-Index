@@ -100,7 +100,7 @@ plot_definition <- data.frame(DIMENSION=c("institutional","institutional","socio
 
 # Plot each panel
 graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
-  # i <- 6
+  
   # Get dimension and species for this panel
   dimension <- plot_definition$DIMENSION[i]
   specie <- plot_definition$SPECIES[i]
@@ -108,25 +108,10 @@ graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
   # Filter data for that dimension and specie.
   
   to.plot <-   final_index  %>% 
-    filter(DIMENSION==dimension,SPECIE==specie)# %>%
-    # data.frame() %>% 
-    # merge(a,.,by="COUNTRIES",all.x=T) # IMPORTANT!!!!: Cannot use full_join because sf structure is lost and map is not correlctly rendered
-  
+    filter(DIMENSION==dimension,SPECIE==specie)
   
   # Plot
-  longitude_formatter <- function(l) {
-    
-    
-      ifelse(l<0,paste0(as.character(abs(l)),intToUtf8(176),"W"),ifelse(l>0,paste0(as.character(abs(l)),intToUtf8(176),"E"),paste0("0",intToUtf8(176))))
-    
-  }
-  
-  latitude_formatter <- function(l) {
-    
-    
-    ifelse(l<0,paste0(as.character(abs(l)),intToUtf8(176),"S"),ifelse(l>0,paste0(as.character(abs(l)),intToUtf8(176),"N"),paste0("0",intToUtf8(176))))
-    
-  }
+
   
   # Join map with index and get ready to plot
   
