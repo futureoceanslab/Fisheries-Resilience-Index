@@ -1,5 +1,21 @@
 #' Contains auxiliary functions used in other scripts
 
+
+if(!require(flextable)){
+  install.packages('flextable',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(flextable)
+packageVersion("flextable")
+# [1] ‘0.4.4’
+
+
+if(!require(officer)){
+  install.packages('officer',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(officer)
+packageVersion("officer")
+# [1] ‘0.3.0’
+
 if(!require(gridExtra)){
   install.packages("gridExtra",dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
@@ -205,37 +221,56 @@ format_table <- function(data){
   # Prepare the table
   
   # Convert data into a flex table, no rownames
-  Ft <- FlexTable(data,add.rownames = FALSE)
+  Ft <- flextable(data) %>% border_remove() %>%
+    hline_bottom(border=fp_border(),part="header") %>%
+    vline(border=fp_border(),j=1) %>%
+    hline_bottom(border=fp_border())
   
   # Table header format: font size 10, italic, center alignment. Only bottom border.
-  Ft[to="header"] <- textProperties(font.size = 10,font.style = "italic")
   
-  Ft[to="header"] <- parProperties(text.align = "center")
+  Ft %<>% italic(part="header") %>% 
+    fontsize(size=10,part="header") %>%
+    align(align="center",part="header") 
   
-  Ft[to="header"] <- cellProperties(border.right.style =  "none",border.top.style = "none",border.left.style = "none")
+  #Ft[to="header"] <- textProperties(font.size = 10,font.style = "italic")
+  
+  # Ft[to="header"] <- parProperties(text.align = "center")
+  
+  #Ft[to="header"] <- cellProperties(border.right.style =  "none",border.top.style = "none",border.left.style = "none")
   
   # General table format: font size 10, center alignment
-  Ft[] <- textProperties(font.size = 10)
   
-  Ft[] <- parProperties(text.align = "center")
+  Ft %<>% 
+    fontsize(size=10,part="all") %>%
+    align(align="center",part="all") 
+  
+  #Ft[] <- textProperties(font.size = 10)
+  
+  #Ft[] <- parProperties(text.align = "center")
   
   # First column format: font size 10, italic, left alignment. No left border, bottom border only in last column
   
-  Ft[,1] <- textProperties(font.size = 10,font.style   = "italic")
+  # Ft[,1] <- textProperties(font.size = 10,font.style   = "italic")
   
-  Ft[,1] <- parProperties(text.align = "right")
+  Ft %<>% 
+    italic(j=1) %>%
+    align(align="right",j=1) 
   
-  Ft[1:(nrow(data)),1] <- cellProperties(border.bottom.style =  "none",border.top.style = "none",border.left.style = "none")
+  #Ft[,1] <- parProperties(text.align = "right")
   
-  Ft[nrow(data),1] <- cellProperties(border.bottom.style =  "solid",border.top.style = "none",border.left.style = "none")
+  #Ft[1:(nrow(data)),1] <- cellProperties(border.bottom.style =  "none",border.top.style = "none",border.left.style = "none")
+  
+  #Ft[nrow(data),1] <- cellProperties(border.bottom.style =  "solid",border.top.style = "none",border.left.style = "none")
   
   # Table body format: No borders, odd rows background is grey
   
-  Ft[,2:ncol(data)] <- cellProperties(border.style="none")
+  #Ft[,2:ncol(data)] <- cellProperties(border.style="none")
   
-  Ft[seq(1,nrow(data),2),2:ncol(data)] <- cellProperties(background.color = "gray90",border.style="none")
+  Ft %<>% bg(i=seq(1,nrow(data),2),bg="gray90",j=2:ncol(data))
   
-  Ft[nrow(data),2:ncol(data)] <- cellProperties(background.color = ifelse(nrow(data)%%2==0,"white","gray90"),border.bottom.style = "solid",border.right.style =  "none",border.top.style = "none",border.left.style = "none")
+  #Ft[seq(1,nrow(data),2),2:ncol(data)] <- cellProperties(background.color = "gray90",border.style="none")
+  
+  #Ft[nrow(data),2:ncol(data)] <- cellProperties(background.color = ifelse(nrow(data)%%2==0,"white","gray90"),border.bottom.style = "solid",border.right.style =  "none",border.top.style = "none",border.left.style = "none")
   
   
   Ft
@@ -251,31 +286,27 @@ format_table <- function(data){
 write_doc <- function(Ft,title,outfile,landscape=FALSE){
   
   # New document
-  doc <- docx()
+  doc <- read_docx()
   
-  # If the table is printed landscape, add a landscape section
-  if(landscape){
-    doc %<>% addSection(landscape=TRUE)
-  }
   
   # Empty line
-  doc %<>% addParagraph("")
+  doc %<>% body_add_par("")
   
   # Table title
   
-  doc %<>% addParagraph(title,stylename = "En-tte")
+  doc %<>% body_add_par(title,style = "table title")
   
   # Add table  
   
-  doc %<>% addFlexTable(Ft)
+  doc %<>% body_add_flextable(autofit(Ft,add_w = 0))
   
   # Close landscape section if the table is printed landscape
   if(landscape){
-    doc %<>% addSection()
+    doc %<>% body_end_section_landscape()
   }
   
   # Save the document
-  writeDoc(doc,file=outfile)
+  print(doc,target=outfile)
   
   NULL
 }

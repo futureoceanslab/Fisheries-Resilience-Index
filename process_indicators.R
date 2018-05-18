@@ -57,12 +57,20 @@ version
 # version.string R version 3.3.0 (2016-05-03)
 # nickname       Supposedly Educational          
 
-if(!require(ReporteRs)){
-  install.packages('ReporteRs',dependencies = TRUE,repos='http://cran.us.r-project.org')
+if(!require(flextable)){
+  install.packages('flextable',dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
-require(ReporteRs)
-packageVersion("ReporteRs")
-# [1] ‘0.8.10’
+require(flextable)
+packageVersion("flextable")
+# [1] ‘0.4.4’
+
+
+if(!require(officer)){
+  install.packages('officer',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(officer)
+packageVersion("officer")
+# [1] ‘0.3.0’
 
 if(!require(magrittr)){
   install.packages('magrittr',dependencies = TRUE,repos='http://cran.us.r-project.org')
@@ -175,8 +183,8 @@ Table1 <- eco_indicators  %>%
 # Prepare for word
 to.plot <- Table1 %>% 
   data.frame %>% 
-  select(SPECIES,area2006,area2100,area_2,area_98,area2006_norm,area2100_norm,AREA) %>%
-  set_names(c("SPECIES","Area2006\n(km^2)","Area2100\n(km^2)","area 2%\n(km^2)","area 98%\n(km^2)","Area06'\nNormalized","Area100\nNormalized","AREA"))
+  select(SPECIES,area2006,area2100,area_2,area_98,area2006_norm,area2100_norm,AREA)
+
 
 to.plot[is.na(to.plot)] <- "-"
 
@@ -184,9 +192,12 @@ to.plot[is.na(to.plot)] <- "-"
 # Save to word
 
 Ft<- format_table(to.plot)
+
+Ft %<>% set_header_labels(SPECIES="SPECIES",area2006="Area2006\n(km^2)",area2100="Area2100\n(km^2)",area_2="area 2%\n(km^2)",area_98="area 98%\n(km^2)",area2006_norm="Area06'\nNormalized",area2100_norm="Area100\nNormalized",AREA="AREA")
+
 write_doc(Ft,
           "Table1. Area indicators and factor.",
-          "Tables/Table1SI.docx")
+          "Tables/Table1SI.docx",landscape = TRUE)
 
 
 
@@ -273,17 +284,20 @@ Table4 <- eco_indicators  %>%
 
 # Prepare for word
 to.plot <- Table4 %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
+  mutate_at(vars(c("Trange_norm","T50_norm","TEMPERATURE")),funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
+  mutate_at(vars(c("T50","Trange","Trange_2","Trange_98","T50_2","T50_98")),funs(ifelse(is.na(.),"-",sprintf("%d",as.integer(.))))) %>% # Numbers to string
   data.frame %>% 
-  select(SPECIES,Trange,T50,Trange_2,Trange_98,T50_2,T50_98,Trange_norm,T50_norm,TEMPERATURE) %>%
-  set_names(c("SPECIES","temperature\nrange\n(ºC)","mean\ntemp\n(ºC)","Trang\ne2%\n(ºC)","Trang\ne98%\n(ºC)","T50\ne2%\n(ºC)","T50\ne98%\n(ºC)","Trange'\normalized","T50'\nnormalized","TEMPERATURE"))
-
+  select(SPECIES,Trange,T50,Trange_2,Trange_98,T50_2,T50_98,Trange_norm,T50_norm,TEMPERATURE)
+  
 
 
 
 # Save to word
 
 Ft<- format_table(to.plot)
+
+Ft %<>% set_header_labels(SPECIES="SPECIES",Trange="temperature\nrange\n(ºC)",T50="mean\ntemp\n(ºC)",Trange_2="Trang\ne2%\n(ºC)",Trange_98="Trang\ne98%\n(ºC)",T50_2="T50\ne2%\n(ºC)",T50_98="T50\ne98%\n(ºC)",Trange_norm="Trange'\normalized",T50_norm="T50'\nnormalized",TEMPERATURE="TEMPERAT.")
+
 write_doc(Ft,
           "Table 4. Temperature indicators, normalization and factor.",
           "Tables/Table4SI.docx",landscape = TRUE)
@@ -310,13 +324,15 @@ to.plot <- Table5 %>%
   select(-SPECIES) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   select(STOCK,OverMSY,Status,OverMSY_norm,Status_norm,OVEREXPLOITATION) %>%
-  data.frame %>% 
-  set_names(c("STOCK","OverMSY","Status","OverMSY'\normalized","Status'\nnormalized","OVEREXPLOITATION"))
+  data.frame
+  
 
 
 
 # Save to word
 Ft<- format_table(to.plot)
+
+Ft %<>% set_header_labels(STOCK="STOCK",OverMSY="OverMSY",Status="Status",OverMSY_norm="OverMSY'\normalized",Status_norm="Status'\nnormalized",OVEREXPLOITATION="OVEREXPLOITATION")
 
 write_doc(Ft,
           "Table 5. Overexploitation indicators, normalization and factor.",
@@ -344,13 +360,14 @@ to.plot <- Table6 %>%
   select(-SPECIES) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
   select(STOCK,Recovery,recovery_2,recovery_98,Recovery_norm,RECOVERY) %>%
-  data.frame %>%
-  set_names(c("STOCK","recovery","recovery 2%","recovery 98%","Recovery'\nnormalized","RECOVERY"))
+  data.frame
 
 
 # Save to word
 
 Ft<- format_table(to.plot)
+
+Ft %<>% set_header_labels(STOCK="STOCK",Recovery="recovery",recovery_2="recovery 2%",recovery_98="recovery 98%",Recovery_norm="Recovery'\nnormalized",RECOVERY="RECOVERY")
 
 write_doc(Ft,
           "Table 6. Recovery indicator, normalization and factor.",
@@ -422,18 +439,36 @@ Table9 <- eco_countries %>%
   gather(FACTOR,VALUE,-SPECIES,-COUNTRIES) %>% 
   unite(SP_FACTOR,SPECIES,FACTOR) %>% 
   spread(SP_FACTOR,VALUE) %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
-  set_names(gsub("Atlantic cod_|European hake_","",names(.)))
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) # Numbers to string
+  
+
 
 to.plot <- Table9[match(countries_order,Table9$COUNTRIES),]
+
+names(to.plot) <- make.names(names(to.plot))
 
 
 # Save to word
 
 Ft<- format_table(to.plot)
 
+header_labels <- names(to.plot) %>% gsub("Atlantic.cod_|European.hake_","",.) %>% as.list()
+
+names(header_labels)<- names(to.plot)
+
+Ft <- do.call(set_header_labels,c(list(x=Ft),header_labels))
+
+
+
 # Extra header
-Ft<- addHeaderRow(Ft,c("","COD","HAKE"),c(1,4,4),first = TRUE, cell.properties = cellProperties(border.top.style = "none",border.left.style = "none",border.right.style = "none"),par.properties = parProperties(text.align = "center"))
+
+extra_header <- c("",rep(c("COD","HAKE"),each=4)) %>% as.list
+
+names(extra_header)<- names(to.plot)
+
+Ft <- do.call(add_header,c(list(x=Ft,top=TRUE),extra_header)) %>% merge_h(part="header") %>% vline(i=1:2,j=1:ncol(to.plot),fp_border(width=0),part="header")
+
+
 
 write_doc(Ft,
           "Table 9. Ecological Factors per fishing country and species.",
@@ -474,12 +509,12 @@ Table10 <- soc_indicators %>%
 # Prepare for word
 
 to.plot <- Table10 %>% mutate(SPECIES=tools::toTitleCase(species_sort_name(SPECIES))) %>%
-  data.frame %>%
-  set_names("","Gear Diversity","NormalizedGearDiv","GEAR.DIVERSITY")
+  data.frame
 
 # Save to word
 
 Ft <- format_table(to.plot)
+Ft %<>% set_header_labels(SPECIES="",SPgear="Gear Diversity",SPgear_norm="NormalizedGearDiv",GEAR.DIVERSITY="GEAR DIVERSITY")
 
 write_doc(Ft,
           "Table 10. Values and normalization of Gear Diversity.",
@@ -505,8 +540,7 @@ Table11 <- soc_indicators %>%
 
 to.plot <- Table11 %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
-  data.frame %>%
-  set_names(c("COUNTRIES","ICESareas5","ICESareasEU","Normalized\nICESareas5","Normalized\nICESareasEU","FLEET.MOBILITY"))
+  data.frame
 
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
@@ -514,6 +548,8 @@ to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 # Save to word
 
 Ft<- format_table(to.plot)
+
+Ft %<>% set_header_labels(COUNTRIES="COUNTRIES",ICESareas5="ICESareas5",ICESareasEU="ICESareasEU",ICESareas5_norm="Normalized\nICESareas5",ICESareasEU_norm="Normalized\nICESareasEU",FLEET.MOBILITY="FLEET MOBILITY")
 
 write_doc(Ft,
           "Table 11. Indicators and normalization of Fleet Mobility factor.",
@@ -546,34 +582,26 @@ Table12 <- soc_indicators %>%
 to.plot <- Table12 %>% 
   select(-SPECIES) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.4f",.)))) %>% # Numbers to string
-  data.frame %>%
-  set_names(c("COUNTRIES","STOCK","Sockdep.sp","Stockdep.total","normalized\nspecie","normalized\ntotal","CATCH.DEP"))
-
+  data.frame
 
 # Save to word
 
 Ft<- format_table(to.plot)
 
-Ft <- spanFlexTableRows(Ft,1,runs = to.plot[,1])
 
-Ft[,2] <- parProperties(text.align = "left")
+Ft %<>%  set_header_labels(COUNTRIES="COUNTRIES",STOCK="STOCK",Stockdep.sp="Sockdep.sp",Stockdep.total="Stockdep.total",Stockdep.sp_norm="normalized\nspecie",Stockdep.total_norm="normalized\ntotal","CATCH.DEP")
 
 country_rows <- rle(to.plot$COUNTRIES)$lengths %>% cumsum()
 
-Ft[,2] <- cellProperties(border.bottom.style = "none",border.top.style = "none",border.left.style = "solid",border.right.style = "solid")
-
-Ft[country_rows,1:2] <- cellProperties(border.bottom.style = "solid",border.top.style = "none",border.left.style = "none")
-for(country_row in country_rows){
-
-  Ft[country_row,3:ncol(to.plot)] <- cellProperties(background.color = ifelse(country_row%%2==0,"white","gray90"),border.bottom.style = "solid",border.right.style =  "none",border.top.style = "none",border.left.style = "none")
-    
-}
-
+Ft %<>% merge_v(j = 1) %>% vline(j=2,border = fp_border()) %>% 
+  align(align = "left",j=2,part="body") %>% 
+  bg(bg="white",j=2) %>%
+  hline(country_rows,border=fp_border())
 
 
 write_doc(Ft,
           "Table 12. Catch dependency of countries on stocks.",
-          "Tables/Table12SI.docx")
+          "Tables/Table12SI.docx",landscape = TRUE)
 
 # Table 13
 
@@ -584,9 +612,8 @@ Table13 <- Table12 %>%
 
 # Prepare for word
 
-to.plot <- Table13 %>%
-  mutate(SPECIES=paste0("CATCH.DEP\n",tools::toTitleCase(species_sort_name(SPECIES)))) %>%
-  spread(SPECIES,CATCH.DEP) %>% mutate_if(is.numeric,funs(round(.,digits = 3)))
+to.plot <- Table13  %>%
+  spread(SPECIES,CATCH.DEP) %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame(check.names = TRUE)
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
@@ -595,6 +622,13 @@ to.plot[is.na(to.plot)] <- "-"
 # Save to word
 
 Ft<- format_table(to.plot)
+
+header_labels <- paste0("CATCH.DEP\n",tools::toTitleCase(species_sort_name(names(to.plot) %>% gsub("\\."," ",.)))) %>% as.list
+
+names(header_labels) <- names(to.plot)
+
+Ft <- do.call(set_header_labels,c(list(x=Ft),header_labels))
+
 
 write_doc(Ft,
           "Table 13. Catch dependency factors per country.",
@@ -739,12 +773,13 @@ to.plot <- Table16 %>%
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
   data.frame 
 
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
-  set_names(c("","Norganizations\n2017","Norganizations'\n(normalized)","CO.MANAGEMENT"))
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
 # Save to word
 
 Ft<- format_table(to.plot)
+
+Ft %<>% set_header_labels(COUNTRIES="",Norganizations="Norganizations\n2017",Norganizations_norm="Norganizations'\n(normalized)",CO.MANAGEMENT="CO MANAGEMENT")
 
 write_doc(Ft,
           "Table 16. Values, normalization and Co-Management factor.",
@@ -771,12 +806,17 @@ to.plot <- Table17 %>%
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
   data.frame
 
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
-  set_names(c("COUNTRIES","Swaps\n(million € 2000 - 2006)","Swaps'\n(normalized)","PROPERTY.RIGHTS"))
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
 # Save to word
 
 Ft<- format_table(to.plot)
+
+header_labels <- c("COUNTRIES","Swaps\n(million € 2000 - 2006)","Swaps'\n(normalized)","PROPERTY RIGHTS")
+
+names(header_labels) <- names(to.plot)
+
+Ft <- do.call(set_header_labels,c(list(x=Ft),header_labels))
 
 write_doc(Ft,
           "Table 17. Indicators and normalization of Property Rights.",
@@ -807,7 +847,8 @@ to.plot$STOCK <- gsub("_","/\n",to.plot$STOCK)
 
 Ft<- format_table(to.plot)
 
-Ft[,1] <- textProperties(font.size = 10,font.style = "italic")
+Ft %<>% fontsize(j=1,size=10) %>% italic(j=1)
+
 
 write_doc(Ft,
           "Table 18. TAC (million tons) per stock and country (2015)",
@@ -843,8 +884,7 @@ Table19 <- Table19p %>%
 
 to.plot <- Table19 %>% select(SPECIES,COUNTRIES,QUOTAS) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numbers to string
-  mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>%
-  spread(SPECIES,QUOTAS)
+  spread(SPECIES,QUOTAS) %>% data.frame(check.names = TRUE)
 
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
@@ -852,6 +892,12 @@ to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 # Save to word
 
 Ft<- format_table(to.plot)
+
+header_labels <- c("COUNTRIES",paste0("QUOTAS\n",names(to.plot)[2:3] %>% gsub("\\."," ",.) %>% species_sort_name %>% toupper))
+
+names(header_labels) <- names(to.plot)
+
+Ft <- do.call(set_header_labels,c(list(x=Ft),header_labels))
 
 write_doc(Ft,
           "Table 19. Factor Quota values per country.",
@@ -881,12 +927,17 @@ to.plot <- Table20 %>%
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
 
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] %>%
-  set_names(c("COUNTRIES","HDI","Compliance", "HDI'\n(normalized)","Compliance'\n(normalized)", "STRENGTH"))
+to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),] 
 
 # Save to word
 
 Ft<- format_table(to.plot)
+
+header_labels <- c("COUNTRIES","HDI","Compliance", "HDI'\n(normalized)","Compliance'\n(normalized)", "STRENGTH")
+
+names(header_labels) <- names(to.plot)
+
+Ft <- do.call(set_header_labels,c(list(x=Ft),header_labels))
 
 write_doc(Ft,
           "Table 20. Development indicator and factor.",

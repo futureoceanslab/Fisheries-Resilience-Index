@@ -28,12 +28,20 @@ require(magrittr)
 packageVersion("magrittr")
 # [1] ‘1.5’
 
-if(!require(ReporteRs)){
-  install.packages('ReporteRs',dependencies = TRUE,repos='http://cran.us.r-project.org')
+if(!require(flextable)){
+  install.packages('flextable',dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
-require(ReporteRs)
-packageVersion("ReporteRs")
-# [1] ‘0.8.8’
+require(flextable)
+packageVersion("flextable")
+# [1] ‘0.4.4’
+
+
+if(!require(officer)){
+  install.packages('officer',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(officer)
+packageVersion("officer")
+# [1] ‘0.3.0’
 
 if(!require(tidyverse)){
   install.packages("tidyverse",dependencies = TRUE,repos='http://cran.us.r-project.org')
@@ -206,61 +214,42 @@ dev.off()
 
 ##### 5. TABLES #####
 
-
-# New document
-
-doc <- docx()
+doc <- read_docx()
 
 for(species_name in names(species_to_plot)){
-  # species_name <- "HAKE"
+  
   # Species
   
   species <- species_to_plot[species_name]
   
+  title <-  paste0(species,": p-values for trend lines in Fig 8")
 
-
+  
+  # Empty line
+  doc %<>% body_add_par("")
+  
+  # Table title
+  
+  doc %<>% body_add_par(title,style = "table title")
+  
   # Get the p-values
   
  
   table_for_specie <-  p_values_species[[species_name]] %>% gather(DIMENSION,p,-Var) %>% 
     mutate(p=ifelse(p<0.01,"<0.01",sprintf("%0.2f",p))) %>% 
     spread(DIMENSION,p)
-  
-  # Empty line
-  doc %<>% addParagraph("")
-  
-  # Table title
 
-  title <-  paste0(species,": p-values for trend lines in Fig 8")
+  Ft <- format_table(table_for_specie)
   
-  doc %<>% addParagraph(title,stylename = "En-tte")
-  
-
-  # Prepare the table
-  
-  Ft <- FlexTable(table_for_specie,add.rownames = FALSE)
-  
-  # Table header format
-  Ft[to="header"] <- textProperties(font.size = 12,font.weight = "bold")
-  Ft[to="header"] <- parProperties(text.align = "center")
-  
-  # General table format
-  Ft[] <- textProperties(font.size = 12)
-  
-  Ft[] <- parProperties(text.align = "center")
-  
-  # First column format
-  Ft[,1] <- textProperties(font.size = 12,font.weight = "bold")
-
-  Ft[,1] <- parProperties(text.align = "left")
-
   # Add table  
   
-  doc %<>% addFlexTable(Ft,offx=-1)
+  doc %<>% body_add_flextable(autofit(Ft,add_w = 0))
+  
   
   
 }
 
 # Write document
 
-writeDoc(doc,file=paste0("Tables/Fig8_p_values.docx"))
+print(doc,target="Tables/Fig8_p_values.docx")
+

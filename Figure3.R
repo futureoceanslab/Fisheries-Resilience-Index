@@ -26,11 +26,19 @@ require(magrittr)
 packageVersion("magrittr")
 # [1] ‘1.5’
 
-if(!require(ReporteRs)){
-  install.packages('ReporteRs',dependencies = TRUE,repos='http://cran.us.r-project.org')
+if(!require(flextable)){
+  install.packages('flextable',dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
-require(ReporteRs)
-packageVersion("ReporteRs")
+require(flextable)
+packageVersion("flextable")
+# [1] ‘0.4.4’
+
+
+if(!require(officer)){
+  install.packages('officer',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(officer)
+packageVersion("officer")
 # [1] ‘0.8.8’
 
 if(!require(tidyverse)){
@@ -164,52 +172,28 @@ dev.off()
 ##### 5. TABLES #####
 
 
-# New document
-
-doc <- docx()
-
 # Get the p-values
 
 
 doc.table <-  p_values  %>% 
   mutate_if(is.numeric,funs(ifelse(.<0.01,"<0.01",sprintf("%0.2f",.)))) %>% # Format the p-values
-  mutate(Var=x_labels[Var]) %>% rename(` `=Var) # First colum header empty
+  mutate(Var=x_labels[Var]) # First colum header empty
 
-# Empty line
-doc %<>% addParagraph("")
+Ft<- format_table(doc.table)
 
-# Table title
+header_labels <- c("","Cod","Hake")
 
-title <-  "p-values for trend lines in Fig 3"
+names(header_labels) <- names(doc.table)
 
-doc %<>% addParagraph(title,stylename = "En-tte")
+Ft <- do.call(set_header_labels,c(list(x=Ft),header_labels))
 
 
-# Prepare the table
-
-Ft <- FlexTable(doc.table,add.rownames = FALSE)
-
-# Table header format
-Ft[to="header"] <- textProperties(font.size = 12,font.weight = "bold")
-Ft[to="header"] <- parProperties(text.align = "center")
-
-# General table format
-Ft[] <- textProperties(font.size = 12)
-
-Ft[] <- parProperties(text.align = "center")
-
-# First column format
-Ft[,1] <- textProperties(font.size = 12,font.weight = "bold")
-
-Ft[,1] <- parProperties(text.align = "left")
-
-# Add table  
-
-doc %<>% addFlexTable(Ft,offx=-1)
+write_doc(Ft,
+          "p-values for trend lines in Fig 3",
+          "Tables/Fig3_p_values.docx")
 
 
 
 
-# Write document
 
-writeDoc(doc,file=paste0("Tables/Fig3_p_values.docx"))
+
