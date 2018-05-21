@@ -136,7 +136,7 @@ graphs <- c("COD","HAKE") %>% lapply(function(specie_name){
     scale_x_continuous(labels =longitude_formatter )+
     scale_y_continuous(labels =latitude_formatter )+
     labs(subtitle = specie_name)+
-    scale_fill_distiller(type = "seq", direction = 1,name="Resilence Index",limits=range(species_average$Resilience_Index))+
+    scale_fill_distiller(type = "seq", direction = 1,name="Resilence Index",limits=range(final_index$Resilience_Index))+
     theme(plot.subtitle=element_text(size=15, hjust=0, face="italic", color="black"),
           panel.grid.major = element_line(color="white"),
           legend.text = element_text(size=12,color = "black"),
