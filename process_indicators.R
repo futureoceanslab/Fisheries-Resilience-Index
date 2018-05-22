@@ -685,10 +685,10 @@ Table15 <- reduce(
   ),full_join,by="COUNTRIES")
 
 
-# Merge table 10 with all the others
-#t10 <- Table10 %>% select(SPECIES,GEAR.DIVERSITY) %>% 
- # mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>% # One column for each species
-  #spread(SPECIES,GEAR.DIVERSITY)
+#Merge table 10 with all the others
+t10 <- Table10 %>% select(SPECIES,GEAR.DIVERSITY) %>% 
+  mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>% # One column for each species
+  spread(SPECIES,GEAR.DIVERSITY)
 
 #Table15 <- bind_cols(Table15,t10[rep(1,nrow(Table15)),])
 
@@ -697,6 +697,7 @@ to.plot <- Table15 %>%
   mutate_at(vars(starts_with("CATCH")),funs(round(.,digits = 3))) %>%
   mutate_at(vars(starts_with("ADAP"),starts_with("FLEET")),funs(round(.,digits = 2)))%>% 
   select(COUNTRIES,FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% 
+  select(COUNTRIES,starts_with("GEAR"),FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% 
   data.frame
 
 to.plot[is.na(to.plot)] <- "-"
@@ -719,10 +720,10 @@ reduce( # Merge tables 11, 12 and 14
     Table12 %>% select(SPECIES,STOCK,COUNTRIES,CATCH.DEP),
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
-  #full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
+  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
-  select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY") %>% # Organize columns
+  select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY", "GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors.csv") # Save to csv
 
 # Merge tables 11, 13, 10 and 14 to produce socioeconomic factors per country: socioeconomic_factors_country.csv
@@ -733,10 +734,10 @@ reduce( # Merge tables 11, 13 and 14
     Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP),
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
-  #full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
+  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
-  select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY") %>% # Organize columns
+  select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY", "GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors_country.csv") # Save to csv
 
 
