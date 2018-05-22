@@ -225,21 +225,19 @@ write_doc(Ft,
           "Table 2. Value of the coefficients (ß) from the linear models of SSB historic (1950- 2010), SSB recent (1980-2010), R and F in ICES data series. Significance at the 0.001 (***), 0.01 (**) and 0.05 (*) levels.",
           "Tables/Table2SI.docx",landscape=TRUE)
 
-# Table 3
+# Table 3  we drop SSB_hostric because it's correlated
 
 Table3 <- eco_indicators  %>% 
-  select(SPECIES,STOCK,B_SSBrecent,B_SSBhistoric,B_Ftrend,B_Rtrend,SSB.average,F.average,R.average)%>%
+  select(SPECIES,STOCK,B_SSBrecent,B_Ftrend,B_Rtrend,SSB.average,F.average,R.average)%>%
   mutate(SSBrecent=B_SSBrecent/SSB.average, # Divide slopes by average
-         SSBhistoric=B_SSBhistoric/SSB.average,
          Ftrend=B_Ftrend/F.average,
          Rtrend=B_Rtrend/R.average) %>%
   mutate(SSBrecent_norm=normalize_positive(SSBrecent), # Normalize positive
-         SSBhistoric_norm=normalize_positive(SSBhistoric), # Positive
          Ftrend_norm=normalize_negative(Ftrend), # Negative
          Rtrend_norm=normalize_positive(Rtrend) # Positive
   ) %>%
   rowwise %>% # ABUNDANCE factor is the mean of the normalized indicators above for each stock (row)
-  mutate(ABUNDANCE=mean(SSBhistoric_norm,SSBrecent_norm,Ftrend_norm,Rtrend_norm,na.rm=TRUE)) %>% 
+  mutate(ABUNDANCE=mean(SSBrecent_norm,Ftrend_norm,Rtrend_norm,na.rm=TRUE)) %>% 
   ungroup() %>% 
   select(-starts_with("B_"),-ends_with(".average")) # Remove slopes and averages from the table
 
@@ -311,19 +309,19 @@ write_doc(Ft,
 # Table5
 
 Table5 <- eco_indicators  %>% 
-  select(SPECIES,STOCK,OverMSY,Status) %>% 
-  mutate(OverMSY_norm=normalize_negative(OverMSY), # Normalize negative
-         Status_norm=normalize_positive(Status) # Normalize positive
+  select(SPECIES,STOCK,OverMSY) %>% 
+  mutate(OverMSY_norm=normalize_negative(OverMSY) # Normalize negative
+
   ) %>% 
   rowwise() %>% # OVEREXPLOITATION factor is the mean of the normalized indicators above for each stock (row)
-  mutate(OVEREXPLOITATION=mean(c(OverMSY_norm,Status_norm),na.rm=TRUE)) %>%
+  mutate(OVEREXPLOITATION=OverMSY_norm,na.rm=TRUE) %>%
   ungroup()
 
 # Prepare for word
 to.plot <- Table5 %>% 
   select(-SPECIES) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
-  select(STOCK,OverMSY,Status,OverMSY_norm,Status_norm,OVEREXPLOITATION) %>%
+  select(STOCK,OverMSY,OverMSY_norm,OVEREXPLOITATION) %>%
   data.frame
   
 
@@ -332,7 +330,7 @@ to.plot <- Table5 %>%
 # Save to word
 Ft<- format_table(to.plot)
 
-Ft %<>% set_header_labels(STOCK="STOCK",OverMSY="OverMSY",Status="Status",OverMSY_norm="OverMSY'\normalized",Status_norm="Status'\nnormalized",OVEREXPLOITATION="OVEREXPLOITATION")
+Ft %<>% set_header_labels(STOCK="STOCK",OverMSY="OverMSY",OverMSY_norm="OverMSY'\normalized",OVEREXPLOITATION="OVEREXPLOITATION")
 
 write_doc(Ft,
           "Table 5. Overexploitation indicators, normalization and factor.",
@@ -688,17 +686,17 @@ Table15 <- reduce(
 
 
 # Merge table 10 with all the others
-t10 <- Table10 %>% select(SPECIES,GEAR.DIVERSITY) %>% 
-  mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>% # One column for each species
-  spread(SPECIES,GEAR.DIVERSITY)
+#t10 <- Table10 %>% select(SPECIES,GEAR.DIVERSITY) %>% 
+ # mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>% # One column for each species
+  #spread(SPECIES,GEAR.DIVERSITY)
 
-Table15 <- bind_cols(Table15,t10[rep(1,nrow(Table15)),])
+#Table15 <- bind_cols(Table15,t10[rep(1,nrow(Table15)),])
 
 # Prepare for word
 to.plot <- Table15 %>% 
   mutate_at(vars(starts_with("CATCH")),funs(round(.,digits = 3))) %>%
   mutate_at(vars(starts_with("ADAP"),starts_with("FLEET")),funs(round(.,digits = 2)))%>% 
-  select(COUNTRIES,starts_with("GEAR"),FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% 
+  select(COUNTRIES,FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% 
   data.frame
 
 to.plot[is.na(to.plot)] <- "-"
@@ -721,10 +719,10 @@ reduce( # Merge tables 11, 12 and 14
     Table12 %>% select(SPECIES,STOCK,COUNTRIES,CATCH.DEP),
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
-  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
+  #full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
-  select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
+  select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors.csv") # Save to csv
 
 # Merge tables 11, 13, 10 and 14 to produce socioeconomic factors per country: socioeconomic_factors_country.csv
@@ -735,10 +733,10 @@ reduce( # Merge tables 11, 13 and 14
     Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP),
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
-  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
+  #full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
-  select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
+  select("SPECIES","COUNTRIES","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors_country.csv") # Save to csv
 
 
