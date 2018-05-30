@@ -898,7 +898,7 @@ Table20 <-ins_indicators %>%
   mutate(HDI_norm=normalize_positive(HDI),
          Compliance_norm=normalize_positive(Compliance)) %>% # Normalization positive
   rowwise() %>%
-  mutate(STRENGTH=mean(c(HDI_norm, Compliance_norm), na.rm = TRUE)) %>% # DEVELOPMENT factos is HDI normalized
+  mutate(STRENGTH=Compliance_norm) %>% # DEVELOPMENT factos is HDI normalized
   ungroup()
 
 # Prepare for word
