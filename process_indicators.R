@@ -854,29 +854,20 @@ write_doc(Ft,
           
           "Tables/Table18SI.docx",landscape = TRUE)
 
-# Prepare for word
-
-to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame %>%
-  set_names(c("COUNTRIES","Research","Management","normalizedResearch","normalizedMng","ADAPTIVE.MNG"))
-
-to.plot[is.na(to.plot)] <- "-"
-
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
 # Table 19
 
 Table19p <- ins_indicators %>% 
-  select(SPECIES,STOCK,COUNTRIES,TAC, Above_advice)
+  select(SPECIES,STOCK,COUNTRIES,Above_advice)
 
 Table19 <- Table19p %>%
   group_by(COUNTRIES,SPECIES) %>% 
-  summarise(TAC=sum(TAC,na.rm=TRUE), Above_advice=sum(Above_advice, na.rm = TRUE)) %>% # Sum stocks by country and species
+  summarise(Above_advice=sum(Above_advice, na.rm = TRUE)) %>% # Sum stocks by country and species
   ungroup()%>%
-  mutate(TAC_norm=normalize_positive(TAC), # Normalize positive
-         Above_advice_norm=normalize_negative(Above_advice) # Normalization negative
+  mutate(Above_advice_norm=normalize_negative(Above_advice) # Normalization negative
          ) %>% 
   rowwise() %>%
-  mutate(QUOTAS=mean(c(TAC_norm,Above_advice_norm),na.rm=TRUE))
+  mutate(QUOTAS=Above_advice_norm,na.rm=TRUE)
   
 
 # Prepare for word
@@ -978,9 +969,9 @@ write_doc(Ft,
 
 reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
-            Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
+            Table19p %>% select(SPECIES, STOCK,COUNTRIES,Above_advice),
             Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,STOCK,STRENGTH,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+  select(SPECIES,COUNTRIES,STOCK,STRENGTH,Above_advice,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/institutional_factors.csv")
