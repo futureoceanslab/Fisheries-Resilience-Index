@@ -302,70 +302,70 @@ write_doc(Ft,
 
 
 
-###### 2.4 OVEREXPLOITATION (E4) #####
-
-# See section "Overexploitation (E4)"" in 1.A in "SI 2. Indicators and Factors" for details
-
-# Table5
-
-Table5 <- eco_indicators  %>% 
-  select(SPECIES,STOCK,OverMSY,Status) %>% 
-  mutate(OverMSY_norm=normalize_negative(OverMSY), # Normalize negative
-         Status_norm=normalize_positive(Status) # Normalize positive
-  ) %>% 
-  rowwise() %>% # OVEREXPLOITATION factor is the mean of the normalized indicators above for each stock (row)
-  mutate(OVEREXPLOITATION=mean(c(OverMSY_norm,Status_norm))) %>%
-  ungroup()
-
-# Prepare for word
-to.plot <- Table5 %>% 
-  select(-SPECIES) %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
-  select(STOCK,OverMSY,Status,OverMSY_norm,Status_norm,OVEREXPLOITATION) %>%
-  data.frame 
-
-
-# Save to word
-Ft<- format_table(to.plot)
-Ft %<>% set_header_labels(STOCK="STOCK",OverMSY="OverMSY",Status="Status",OverMSY_norm="Normalized\nOverMSY",Status_norm="Normalized\nStatus",OVEREXPLOITATION="OVEREXPLOITATION")
-
-write_doc(Ft,
-          "Table 5. Overexploitation indicators, normalization and factor.",
-          "Tables/Table5SI.docx")
-
-
-# ##### 2.5 RECOVERY (E5) #####
+# ###### 2.4 OVEREXPLOITATION (E4) #####
 # 
-# # See section "Recovery (E5)"" in 1.A in "SI 2. Indicators and Factors" for details
+# # See section "Overexploitation (E4)"" in 1.A in "SI 2. Indicators and Factors" for details
 # 
-# # Table 6
+# # Table5
 # 
-# recovery_2 <- 1 # 2% recovery time of sample on Neubawer et al., 2013
-# recovery_98 <- 43.34 # 98% recovery time of sample on Neubawer et al., 2013
-# 
-# Table6 <- eco_indicators  %>%
-#   select(SPECIES,STOCK,Recovery) %>%
-#   mutate(Recovery_norm=(recovery_98-Recovery)/(recovery_98-recovery_2)) %>% # Normalization
-#   mutate(RECOVERY=Recovery_norm,recovery_2=recovery_2,recovery_98=recovery_98)  # RECOVERY factor is the normalized recovery
+# Table5 <- eco_indicators  %>% 
+#   select(SPECIES,STOCK,OverMSY,Status) %>% 
+#   mutate(OverMSY_norm=normalize_negative(OverMSY), # Normalize negative
+#          Status_norm=normalize_positive(Status) # Normalize positive
+#   ) %>% 
+#   rowwise() %>% # OVEREXPLOITATION factor is the mean of the normalized indicators above for each stock (row)
+#   mutate(OVEREXPLOITATION=mean(c(OverMSY_norm,Status_norm))) %>%
+#   ungroup()
 # 
 # # Prepare for word
-# 
-# to.plot <- Table6 %>%
-#   select(-SPECIES) %>%
-#   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
-#   select(STOCK,Recovery,recovery_2,recovery_98,Recovery_norm,RECOVERY) %>%
-#   data.frame
+# to.plot <- Table5 %>% 
+#   select(-SPECIES) %>% 
+#   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
+#   select(STOCK,OverMSY,Status,OverMSY_norm,Status_norm,OVEREXPLOITATION) %>%
+#   data.frame 
 # 
 # 
 # # Save to word
-# 
 # Ft<- format_table(to.plot)
-# 
-# Ft %<>% set_header_labels(STOCK="STOCK",Recovery="recovery",recovery_2="recovery 2%",recovery_98="recovery 98%",Recovery_norm="Recovery'\nnormalized",RECOVERY="RECOVERY")
+# Ft %<>% set_header_labels(STOCK="STOCK",OverMSY="OverMSY",Status="Status",OverMSY_norm="Normalized\nOverMSY",Status_norm="Normalized\nStatus",OVEREXPLOITATION="OVEREXPLOITATION")
 # 
 # write_doc(Ft,
-#           "Table 6. Recovery indicator, normalization and factor.",
-#           "Tables/Table6SI.docx")
+#           "Table 5. Overexploitation indicators, normalization and factor.",
+#           "Tables/Table5SI.docx")
+# 
+
+##### 2.5 RECOVERY (E5) #####
+
+# See section "Recovery (E5)"" in 1.A in "SI 2. Indicators and Factors" for details
+
+# Table 6
+
+recovery_2 <- 1 # 2% recovery time of sample on Neubawer et al., 2013
+recovery_98 <- 43.34 # 98% recovery time of sample on Neubawer et al., 2013
+
+Table6 <- eco_indicators  %>%
+  select(SPECIES,STOCK,Recovery) %>%
+  mutate(Recovery_norm=(recovery_98-Recovery)/(recovery_98-recovery_2)) %>% # Normalization
+  mutate(RECOVERY=Recovery_norm,recovery_2=recovery_2,recovery_98=recovery_98)  # RECOVERY factor is the normalized recovery
+
+# Prepare for word
+
+to.plot <- Table6 %>%
+  select(-SPECIES) %>%
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
+  select(STOCK,Recovery,recovery_2,recovery_98,Recovery_norm,RECOVERY) %>%
+  data.frame
+
+
+# Save to word
+
+Ft<- format_table(to.plot)
+
+Ft %<>% set_header_labels(STOCK="STOCK",Recovery="recovery",recovery_2="recovery 2%",recovery_98="recovery 98%",Recovery_norm="Recovery'\nnormalized",RECOVERY="RECOVERY")
+
+write_doc(Ft,
+          "Table 6. Recovery indicator, normalization and factor.",
+          "Tables/Table6SI.docx")
 
 
 ##### 2.6 ECOLOGICAL FACTORS #####
@@ -377,13 +377,13 @@ write_doc(Ft,
 # Merge all the factors in one table
 
 Table7 <- reduce(list(Table3 %>% select(SPECIES,STOCK,ABUNDANCE),
-                      Table5 %>% select(SPECIES,STOCK,OVEREXPLOITATION)),full_join,by=c("SPECIES","STOCK")) %>% 
+                      Table6 %>% select(SPECIES,STOCK,RECOVERY)),full_join,by=c("SPECIES","STOCK")) %>% 
   full_join(Table4 %>% select(SPECIES,TEMPERATURE),by="SPECIES")
 
 # Prepare for word
 
 to.plot <- Table7 %>% 
-  select(STOCK,ABUNDANCE,TEMPERATURE,OVEREXPLOITATION) %>% 
+  select(STOCK,ABUNDANCE,TEMPERATURE,RECOVERY) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.4f",.)))) %>% # Numbers to string
   data.frame
 
@@ -397,10 +397,8 @@ write_doc(Ft,
 # Save ecological_factors.csv
 
 Table7 %>% 
-  select(SPECIES,STOCK,ABUNDANCE,TEMPERATURE,OVEREXPLOITATION) %>%
+  select(SPECIES,STOCK,ABUNDANCE,TEMPERATURE,RECOVERY) %>%
   write_excel_csv("data/ecological_factors.csv")
-
-
 
 
 
@@ -471,7 +469,7 @@ write_doc(Ft,
 # Save factors by county to ecological_factors_country.csv
 
 eco_countries %>%  mutate_if(is.numeric,funs(round(.,digits = 9))) %>% 
-  select(SPECIES,COUNTRIES,"ABUNDANCE","TEMPERATURE","OVEREXPLOITATION") %>%
+  select(SPECIES,COUNTRIES,"ABUNDANCE","TEMPERATURE","RECOVERY") %>%
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on this catch
   filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/ecological_factors_country.csv")
