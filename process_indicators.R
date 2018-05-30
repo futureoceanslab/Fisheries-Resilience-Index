@@ -274,7 +274,7 @@ Table4 <- eco_indicators  %>%
   mutate(Trange_norm=(Trange-Trange_2)/(Trange_98-Trange_2), # Normalization
          T50_norm=(T50-T50_2)/(T50_98-T50_2) # Normalization
   ) %>% 
-  mutate(TEMPERATURE=T50_norm, # TEMPERATURE factor is normalized T50
+  mutate(TEMPERATURE=Trange_norm, # TEMPERATURE factor is normalized T50
          Trange_2=Trange_2,
          Trange_98=Trange_98,
          T50_2=T50_2,
