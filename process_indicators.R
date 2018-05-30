@@ -559,14 +559,11 @@ Table12 <- soc_indicators %>%
   complete(nesting(SPECIES,STOCK),COUNTRIES) %>%
   arrange(COUNTRIES,SPECIES,STOCK) %>% 
   select(SPECIES,COUNTRIES,STOCK,Stockdep.sp,Stockdep.total) %>%
-  mutate(Stockdep.sp_norm=normalize_negative(Stockdep.sp), # Normalization negative
-         Stockdep.total_norm=normalize_negative(Stockdep.total) # Normalization negative
+  mutate(Stockdep.total_norm=normalize_negative(Stockdep.total) # Normalization negative
   ) %>%
   rowwise() %>% # CATCH.DEP factor is the mean of the normalized indicators above for each stock (row)
-  mutate(CATCH.DEP=mean(c(Stockdep.sp_norm,Stockdep.total_norm),na.rm=TRUE)) %>% 
+  mutate(CATCH.DEP=Stockdep.total_norm) %>% 
   ungroup() %>% arrange_table()
-
-
 
 
 
