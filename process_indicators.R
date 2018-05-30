@@ -309,33 +309,29 @@ write_doc(Ft,
 # Table5
 
 Table5 <- eco_indicators  %>% 
-  select(SPECIES,STOCK,OverMSY) %>% 
-  mutate(OverMSY_norm=normalize_negative(OverMSY) # Normalize negative
-
+  select(SPECIES,STOCK,OverMSY,Status) %>% 
+  mutate(OverMSY_norm=normalize_negative(OverMSY), # Normalize negative
+         Status_norm=normalize_positive(Status) # Normalize positive
   ) %>% 
   rowwise() %>% # OVEREXPLOITATION factor is the mean of the normalized indicators above for each stock (row)
-  mutate(OVEREXPLOITATION=OverMSY_norm,na.rm=TRUE) %>%
+  mutate(OVEREXPLOITATION=mean(c(OverMSY_norm,Status_norm))) %>%
   ungroup()
 
 # Prepare for word
 to.plot <- Table5 %>% 
   select(-SPECIES) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
-  select(STOCK,OverMSY,OverMSY_norm,OVEREXPLOITATION) %>%
-  data.frame
-  
-
+  select(STOCK,OverMSY,Status,OverMSY_norm,Status_norm,OVEREXPLOITATION) %>%
+  data.frame 
 
 
 # Save to word
 Ft<- format_table(to.plot)
-
-Ft %<>% set_header_labels(STOCK="STOCK",OverMSY="OverMSY",OverMSY_norm="OverMSY'\normalized",OVEREXPLOITATION="OVEREXPLOITATION")
+Ft %<>% set_header_labels(STOCK="STOCK",OverMSY="OverMSY",Status="Status",OverMSY_norm="Normalized\nOverMSY",Status_norm="Normalized\nStatus",OVEREXPLOITATION="OVEREXPLOITATION")
 
 write_doc(Ft,
           "Table 5. Overexploitation indicators, normalization and factor.",
           "Tables/Table5SI.docx")
-
 
 
 # ##### 2.5 RECOVERY (E5) #####
