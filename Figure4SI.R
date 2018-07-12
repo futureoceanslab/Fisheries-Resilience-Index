@@ -75,7 +75,8 @@ p1 <- corrplot(soc_correlations, order ="AOE")
 
 # institutional correlations
 
-ins_to_correlate <- ins_indicators %>% select(-SPECIES,-COUNTRIES,-STOCK)
+ins_to_correlate <- ins_indicators [, c(1, 2, 3, 5, 6, 7, 9)]
+ins_to_correlate <- ins_to_correlate %>% select(-SPECIES,-COUNTRIES,-STOCK)
 ins_correlations <- cor(ins_to_correlate, use="pairwise.complete.obs")
 p2 <- corrplot(ins_correlations, order ="AOE")
 
