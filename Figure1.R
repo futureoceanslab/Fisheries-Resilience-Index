@@ -1,16 +1,16 @@
-Copyright Future Oceans Lab, Universidade de Vigo. 
+#Copyright Future Oceans Lab, Universidade de Vigo. 
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  #  http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
 
 #' This script reads data/final_index.csv and plots
 #' Figure 1 in the paper.
@@ -165,7 +165,7 @@ graphs <- c("COD","HAKE") %>% lapply(function(specie_name){
 
 # Arrange all the panels in one graph with a common legend
 
-png("Figures/Figure 1.png",width=9,height=7,units="in",res=300)
+tiff("Figures/Figure 1.tiff",width=9,height=7,units="in",res=300)
 
 do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 1, ncol = 2)))
 

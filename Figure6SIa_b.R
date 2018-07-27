@@ -123,7 +123,7 @@ ASSESSID_to_keep_HAKE <- c(`Hake North`="WGHMM-HAKENRTN-1977-2007-JENNINGS", `Ha
 
 plot_fig6si_species(data=SSBFHAKE,
                     ASSESSID_to_keep=ASSESSID_to_keep_HAKE,
-                    filename="Figures/Fig 6 SIa.png",
+                    filename="Figures/Fig 6 SIa.tiff",
                     xlim=c(0,3),
                     ylim=c(0.5,1.5),
                     fig.width = 13,
@@ -146,7 +146,7 @@ ASSESSID_to_keep_COD <- c(CODBA2532="WGBFAS-CODBA2532-1964-2007-JENNINGS",
 
 plot_fig6si_species(data=SSBFCOD,
                     ASSESSID_to_keep=ASSESSID_to_keep_COD,
-                    filename="Figures/Fig 6 SIb.png",
+                    filename="Figures/Fig 6 SIb.tiff",
                     xlim=c(0,8),
                     ylim=c(0.25,1.8),
                     fig.width = 14,
