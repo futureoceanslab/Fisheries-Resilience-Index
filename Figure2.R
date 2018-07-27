@@ -152,7 +152,7 @@ graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
 
 # Arrange all the panels in one graph with a common legend
 
-tiff("Figures/Figure 2.tiff",width=10,height=10,units="in",res=300)
+tiff("Figures/Figure 2.tiff", compression = "lzw")
 
 do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 3, ncol = 2)))
 
