@@ -162,7 +162,7 @@ filter(SPECIE=="Hake")
 
 # Arrange in grid with shared legend and save to file.
 
-tiff("Figures/Figure 3.tiff",width=9.38,height=7.99,units="in",res=300)
+tiff("Figures/Figure 3.tiff",width=9.38,height=7.99,units="in",res=300, compression = "lzw")
 
 do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 3, ncol = 2)))
 

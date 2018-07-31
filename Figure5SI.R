@@ -181,7 +181,7 @@ LatSp
 
 # Arrange both panels in one graph and save
 
-tiff("Figures/Fig 5 SI.tiff",width=9,height=9,units="in",res=300)
+tiff("Figures/Fig 5 SI.tiff",width=9,height=9,units="in",res=300, compression = "lzw")
 
 grid.arrange(ggplotGrob(LatDim), ggplotGrob(LatSp), layout_matrix = cbind(c(1,2)))
 

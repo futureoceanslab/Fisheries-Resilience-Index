@@ -62,7 +62,7 @@ soc_indicators <- fread("data/socioeconomic_indicators.csv")
 
 ##### 3. PLOT #####
 
-tiff("Figures/Fig 4 SI.tiff",width=12.5,height = 4.5,units = "in",res=300)
+tiff("Figures/Fig 4 SI.tiff",width=12.5,height = 4.5,units = "in",res=300, compression = "lzw")
 
 par(mfrow = c(1, 3))
 

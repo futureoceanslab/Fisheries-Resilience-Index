@@ -205,7 +205,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
 
 # Sae the two graphs in one file
 
-tiff("Figures/Figure 8.tiff",width=10,height=20,units="in",res=300)
+tiff("Figures/Figure 8.tiff",width=10,height=20,units="in",res=300, compression = "lzw")
 
 do.call(grid.arrange,c(graphs, list(ncol = 1)))
 

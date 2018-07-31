@@ -66,4 +66,4 @@ ggplot(to.plot, aes(x=COUNTRIES, y=Resilience_Index))+
 
 # Save
 
-ggsave("Figures/Fig 3 SI.tiff",width = 10,height = 8,units = "in")
+ggsave("Figures/Fig 3 SI.tiff",width = 10,height = 8,units = "in", compression = "lzw")
