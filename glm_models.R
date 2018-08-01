@@ -1,5 +1,5 @@
 #' This script reads data/final_index.csv and plots
-#' Figure X in the paper.
+#' Figure GLM (3) in the paper.
 #' 
 #' NOTE: As of 2018-03-21, CRAN version of ggplot2 does not include geom_sf.
 #' If you run the script and get an error that says that geom_sf is not found, then you
