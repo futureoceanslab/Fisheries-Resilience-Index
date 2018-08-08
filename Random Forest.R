@@ -16,7 +16,11 @@ if(!require(MASS)){
 if(!require(gbm)){
   install.packages('gbm',dependencies = TRUE,repos='http://cran.us.r-project.org')
 }
+if(!require(e1071)){
+  install.packages('e1071',dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
 
+library("e1071")
 library(MASS)
 library(randomForest)
 library("ggRandomForests") 
@@ -177,4 +181,32 @@ plot(gg_vimp(a))
 set.seed(1)
 boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4)
 summary(boost.boston)
+
+
+##### 4. SVM #####
+head(iris, 5)
+attach(iris)
+x<- subset(iris, select=-Species)
+y<- Species
+svm_model <- svm(Species ~ ., data=iris)
+summary(svm_model)
+pred <- predict(svm_model,x)
+system.time(pred <- predict(svm_model,x))
+table(pred, y)
+
+
+rf<- rf[,c(1,12)]
+
+attach(rf)
+x1<- subset(rf, select=-Resilience_Index)
+y1<- Resilience_Index
+na.pass(rf)
+svm_model1 <- svm(Resilience_Index ~ ., data=rf)
+summary(svm_model1)
+
+pred <- predict(svm_model1,x1)
+system.time(pred <- predict(svm_model1,x1))
+table(pred, y1)
+
+
 
