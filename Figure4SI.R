@@ -60,12 +60,16 @@ ins_indicators <- fread("data/institutional_indicators 2.csv")
                             
 soc_indicators <- fread("data/socioeconomic_indicators.csv")
 
-##### 3. PLOT #####
+##### 3. PLOT EPS #####
 
-tiff("Figures/Fig 4 SI.tiff",width=12.5,height = 4.5,units = "in",res=300, compression = "lzw")
-
+setEPS()
+postscript("Figures/Fig 4SI.eps", horizontal = FALSE, 
+           onefile = FALSE, paper = "special", colormodel = "rgb")
 par(mfrow = c(1, 3))
 
+#####3.1 plot jpeg#####
+jpeg("Figures/Fig 4 SI.jpeg",width = 10,height = 8,units = "in", res = 300)
+par(mfrow = c(1, 3))
 # socioeconomic correlations
 
 soc_to_correlate <- soc_indicators %>% select(-SPECIES,-COUNTRIES,-STOCK)
@@ -92,3 +96,4 @@ p3 <- corrplot(eco_correlations, order ="AOE")
 par(mfrow=c(1,1))
 
 dev.off()
+

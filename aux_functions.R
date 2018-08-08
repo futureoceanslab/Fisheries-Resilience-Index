@@ -29,7 +29,11 @@ if(!require(grid)){
 require(grid)
 packageVersion("grid")
 # [1] ‘3.3.0’
+if(!require(extrafont)){
+  install.packages("extrafont",dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
 
+library(extrafont)
 ##### PLOTS #####
 
 #' Arranges plots in a grid with a shared legend.

@@ -164,8 +164,9 @@ graphs <- c("COD","HAKE") %>% lapply(function(specie_name){
 })
 
 # Arrange all the panels in one graph with a common legend
-
-tiff("Figures/Figure 1.tiff",width=15,height=13,units="in",res=300, compression = "lzw")
+setEPS()
+postscript("Figures/Figure 1.eps", horizontal = FALSE, 
+           onefile = FALSE, paper = "special", colormodel = "rgb")
 
 do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 1, ncol = 2)))
 

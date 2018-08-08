@@ -160,7 +160,7 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
       xlab(x_label)+
       theme_classic()+
       labs(subtitle = subtitle_letter, color = paste0(species_name,"\n"), shape = paste0(species_name,"\n"))+
-      theme(plot.subtitle=element_text(size=12, hjust=0, face="italic", color="black"),
+      theme(plot.subtitle=element_text(size=12, hjust=0, face="italic", color="black", family = "Arial"),
             axis.text = element_text(size=12, color="black"),
             axis.title = element_text(size=14, color="black"),
             legend.text = element_text(size=12,color = "black"),
@@ -204,8 +204,9 @@ graphs <- names(species_to_plot) %>% lapply(function(species_name){
 
 
 # Sae the two graphs in one file
-
-tiff("Figures/Figure 8.tiff",width=10,height=20,units="in",res=300, compression = "lzw")
+setEPS()
+postscript("Figures/Fig 8.eps", horizontal = FALSE, 
+           onefile = FALSE, paper = "special", colormodel = "rgb")
 
 do.call(grid.arrange,c(graphs, list(ncol = 1)))
 
