@@ -83,18 +83,6 @@ joined <- merge(a, final_index, by="COUNTRIES", all.x=T)
 
 ##### 5. RUN MODELS GAM (SPECIE) #####
 
-#model 0 --> the RI depends on LAT by dimensions? 
-
-model0e<- gam(Resilience_Index~s(LAT), family = "quasibinomial", data = joined[joined$DIMENSION=="ecological",])
-summary(model0e)
-model0s<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="socioeconomic",])
-summary(model0s)
-model0i<- glm(Resilience_Index~LAT, family = "quasibinomial",data = joined[joined$DIMENSION=="institutional",])
-summary(model0i)
-
-sjt.glm(model0e, model0s, model0i, depvar.labels = c("Model0 ecological", "Model0 socioeconomic", "Model0 institutional"), 
-        p.numeric = FALSE, show.chi2 = TRUE, show.se = TRUE, show.dev = TRUE, exp.coef = FALSE)
-
 
 #model 1 --> the RI depends on LAT by dimension, classify by sp? 
 
@@ -113,35 +101,11 @@ summary(model1i)
 plot(model1i)
 abline(h=0,col=2, tly=2)
 
-sjt.glm(model1e, model1s, model1i, depvar.labels = c("Model1 ecological", "Model1 socioeconomic", "Model1 institutional"), 
-        p.numeric = FALSE, show.chi2 = TRUE, show.se = TRUE, show.dev = TRUE, exp.coef = FALSE)
+pred=predict(model1i, type="response")
+pred
+insmodel <- joined [c(7,8,18,19,25,26,30,35,36,42,46,49,56,64,67,77,79,83,86,91,95,98), ]
+plot(insmodel$LAT, pred)
 
-data(kyphosis)
-gam(Kyphosis ~ s(Age,4) + Number, family = binomial, data=kyphosis,
-    trace=TRUE)
-data(airquality)
-gam(Ozone^(1/3) ~ lo(Solar.R) + lo(Wind, Temp), data=airquality, na=na.gam.replace)
-gam(Kyphosis ~ poly(Age,2) + s(Start), data=kyphosis, family=binomial, subset=Number>2)
-data(gam.data)
-Gam.object <- gam(y ~ s(x,6) + z,data=gam.data)
-summary(Gam.object)
-plot(Gam.object,se=TRUE)
-data(gam.newdata)
-predict(Gam.object,type="terms",newdata=gam.newdata)
-
-#model 2 --> the RI depends on LAT by dimension, classify by sp? 
-
-model2e <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial" ,data=joined[joined$DIMENSION=="ecological",])
-summary(model2e)
-
-model2s <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="socioeconomic",])
-summary(model2s)
-
-model2i <- glm(Resilience_Index~SPECIE*LAT, family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
-summary(model2i)
-
-sjt.glm(model2e, model2s, model2i, depvar.labels = c("Model2 ecological", "Model2 socioeconomic", "Model2 institutional"), p.numeric = FALSE, separate.ci.col = FALSE,
-        show.aic = F, show.family = TRUE, show.r2 = TRUE, exp.coef = FALSE)
 
 
 
