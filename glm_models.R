@@ -98,8 +98,13 @@ abline(h=0,col=2, tly=2)
 
 model1i <- gam(Resilience_Index~SPECIE+s(LAT), family = "quasibinomial",data=joined[joined$DIMENSION=="institutional",])
 summary(model1i)
-plot(model1i)
+p <- plot(model1i)
 abline(h=0,col=2, tly=2)
+setEPS()
+postscript("Figures/Figure model.eps", horizontal = FALSE, 
+           onefile = FALSE, paper = "special", colormodel = "rgb")
+
+dev.off()
 
 pred=predict(model1i, type="response")
 pred
