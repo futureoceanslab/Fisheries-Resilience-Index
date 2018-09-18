@@ -123,7 +123,7 @@ do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 1, ncol = 3)))
 dev.off()
 ### to save in EPS####
 setEPS()
-postscript("Figures/Figure 2 SI.eps", horizontal = FALSE, 
+postscript("Figures/Figure 2 SI.eps", horizontal = TRUE, width=25,height=12,
            onefile = FALSE, paper = "special", colormodel = "rgb")
 do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 1, ncol = 3)))
 dev.off()
