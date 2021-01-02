@@ -1,14 +1,13 @@
-### SSB, F and R during years of a stock. RAM legacy database. 
-## 16 Mayo 2017
+## Jan2020
+##extracting the SSB, F and R indices from the RAM legacy database for cod
+#source file: HAKE_COD_RAM, from RAMLDB v4.491
 
-
-setwd("C:/Users/FOL/OneDrive/CLOCK_STUDENTS/Elena Fontan/Resilience Index Work/R scripts/RAM legacy data (SSB_F_R)")#install.packages("ggplot2", "dplyr", "tidyr")
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 
 #Read database
-timedata <- read.csv("time series values cod.csv", sep=";", na.strings ="")
+timedata <- read.csv("Data/time_series_values_cod.csv", sep=";", na.strings ="")
 str(timedata)
 timedata$SSB<- as.numeric(as.character(timedata$SSB, na.omit=TRUE))    #omit NA col SSB. and change FACTOR per num.
 timedata$R<- as.numeric(as.character(timedata$R, na.omit=TRUE))
@@ -17,8 +16,8 @@ timedata$TSYEAR <- as.numeric(as.character(timedata$TSYEAR))
 str(timedata)
 
 
-A <- c("AFWG-CODCOASTNOR-1982-2006-MINTO", "AFWG-CODNEAR-1943-2006-MINTO", "NWWG-CODFAPL-1959-2006-MINTO", "NWWG-CODICE-1952-2006-MINTO", "WGBFAS-CODBA2224-1969-2007-JENNINGS", "WGBFAS-CODKAT-1970-2006-MINTO", "WGNSDS-CODIS-1968-2006-MINTO", "WGNSDS-CODVIa-1977-2006-MINTO", "WGNSSK-CODNS-1962-2007-MINTO")
-B <- c("AFWG-CODCOASTNOR-1982-2006-MINTO", "AFWG-CODNEAR-1943-2006-MINTO", "NWWG-CODFAPL-1959-2006-MINTO", "NWWG-CODICE-1952-2006-MINTO", "WGBFAS-CODBA2224-1969-2007-JENNINGS", "WGBFAS-CODKAT-1970-2006-MINTO", "WGNSDS-CODIS-1968-2006-MINTO", "WGNSDS-CODVIa-1977-2006-MINTO", "WGNSSK-CODNS-1962-2007-MINTO")
+A <- c("AFWG-CODNEAR-1943-2018-ICESIMP2018", "AFWG-CODNEARNCW-1984-2017-ICESIMP2018", "NWWG-CODFAPL-1958-2018-ICESIMP2018", "NWWG-CODICE-1952-2018-ICESIMP2018", "WGBFAS-CODBA2532-1965-2017-ICESIMP2018", "WGBFAS-CODKAT-1996-2018-ICESIMP2018", "WGCSE-CODIS-1968-2017-ICESIMP2018", "WGCSE-CODVIa-1980-2017-ICESIMP2018", "WGNSSK-CODIIIaW-IV-VIId-1962-2018-ICESIMP2018")
+B <- c("AFWG-CODNEAR-1943-2018-ICESIMP2018", "AFWG-CODNEARNCW-1984-2017-ICESIMP2018", "NWWG-CODFAPL-1958-2018-ICESIMP2018", "NWWG-CODICE-1952-2018-ICESIMP2018", "WGBFAS-CODBA2532-1965-2017-ICESIMP2018", "WGBFAS-CODKAT-1996-2018-ICESIMP2018", "WGCSE-CODIS-1968-2017-ICESIMP2018", "WGCSE-CODVIa-1980-2017-ICESIMP2018", "WGNSSK-CODIIIaW-IV-VIId-1962-2018-ICESIMP2018")
 Na <- length(A)
 AreaMatrix <- list()
 
@@ -35,20 +34,20 @@ for (i in 1:Na)
   AreaMatrix[[i]] <- ASSESSID
 }
 
-CODCOASTNOR <- AreaMatrix[[1]]
-CODNEAR <- AreaMatrix[[2]]
+CODNEAR <- AreaMatrix[[1]]
+CODNEARNCW <- AreaMatrix[[2]]
 CODFAPL <- AreaMatrix[[3]]
 CODICE <- AreaMatrix [[4]]
 CODBA2532 <- AreaMatrix [[5]]
 CODKAT <- AreaMatrix [[6]]
 CODIS <- AreaMatrix [[7]]
-CODVIa <- AreaMatrix [[8]]      #No data
-CODNS <- AreaMatrix [[9]]
+CODVIa <- AreaMatrix [[8]]     
+CODIIIaW <- AreaMatrix [[9]]
 
 #all stocks SSB
-allstock <- rbind(CODCOASTNOR, CODNEAR, CODFAPL, CODICE, CODBA2532, CODKAT, CODIS, CODNS)  #sum all dataframe
+allstock <- rbind(CODNEAR, CODNEARNCW, CODFAPL, CODICE, CODBA2532, CODKAT, CODIS, CODVIa, CODIIIaW)  #sum all dataframe
 
-ggplot(data=allstock, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=allstock, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
   geom_smooth(data=subset(allstock, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -59,24 +58,19 @@ ggplot(data=allstock, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(
 abnallstock <- lm(formula = SSB ~TSYEAR, data=allstock)
 summary(abnallstock)
 
+##all stocks SSB average 1980-most recent year
+
+allstock1980 <- subset(allstock, TSYEAR>=1980)
+
+SSBmean <- allstock1980 %>%
+  group_by(STOCKID) %>%
+  summarise(mean=mean(SSB, na.rm = T), sd=sd(SSB, na.rm = T))
 
 #Abundance trend calculation for each stock SSB
+
+
 #1SSB
-ggplot(data=CODCOASTNOR, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
-  geom_line()+
-  geom_smooth(data=subset(CODCOASTNOR, TSYEAR >= 1980), method=lm) +
-  #scale_color_manual(values=c("#CC6666", "#9999CC"))+
-  xlab(NULL) +
-  ylab("Spawing Stock Biomass MT")+
-  theme(axis.text.x = element_text(angle = 90, size = 8))
-
-abnCODCOASTNOR1<- lm(formula = SSB ~TSYEAR, data=CODCOASTNOR)
-abnCODCOASTNOR <- lm(formula = SSB ~TSYEAR, data=subset(CODCOASTNOR, TSYEAR >= 1980))
-summary(abnCODCOASTNOR)
-summary(abnCODCOASTNOR1)
-
-#2 SSB
-ggplot(data=CODNEAR, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODNEAR, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
   geom_smooth(data=subset(CODNEAR, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -84,13 +78,27 @@ ggplot(data=CODNEAR, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(A
   ylab("Spawing Stock Biomass MT")+
   theme(axis.text.x = element_text(angle = 90, size = 8))
 
-abnCODNEAR1 <- lm(formula = SSB ~TSYEAR, data=CODNEAR)
+abnCODNEAR1<- lm(formula = SSB ~TSYEAR, data=CODNEAR)
 abnCODNEAR <- lm(formula = SSB ~TSYEAR, data=subset(CODNEAR, TSYEAR >= 1980))
 summary(abnCODNEAR)
-summary(abnCODNEAR1 )
+summary(abnCODNEAR1)
+
+#2 SSB
+ggplot(data=CODNEARNCW, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
+  geom_line()+
+  geom_smooth(data=subset(CODNEARNCW, TSYEAR >= 1980), method=lm) +
+  #scale_color_manual(values=c("#CC6666", "#9999CC"))+
+  xlab(NULL) +
+  ylab("Spawing Stock Biomass MT")+
+  theme(axis.text.x = element_text(angle = 90, size = 8))
+
+abnCODNEARNCW1 <- lm(formula = SSB ~TSYEAR, data=CODNEARNCW)
+abnCODNEARNCW <- lm(formula = SSB ~TSYEAR, data=subset(CODNEARNCW, TSYEAR >= 1980))
+summary(abnCODNEARNCW)
+summary(abnCODNEARNCW1 )
 
 #3 SSB
-ggplot(data=CODFAPL, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODFAPL, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
   geom_smooth(data=subset(CODFAPL, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -104,7 +112,7 @@ summary(abnCODFAPL)
 summary(abnCODFAP1)
 
 #4 SSB
-ggplot(data=CODICE, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODICE, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
   geom_smooth(data=subset(CODICE, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -118,7 +126,7 @@ summary(abnCODICE)
 summary(abnCODICE1)
 
 #5 SSB
-ggplot(data=CODBA2532, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODBA2532, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
   geom_smooth(data=subset(CODBA2532, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -132,7 +140,7 @@ summary(abnCODBA2532)
 summary(abnCODBA25321)
 
 #6 SSB
-ggplot(data=CODKAT, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODKAT, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
   geom_smooth(data=subset(CODKAT, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -146,7 +154,7 @@ summary(abnCODKAT)
 summary(abnCODKAT1)
 
 #7 SSB
-ggplot(data=CODIS, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODIS, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
   geom_smooth(data=subset(CODIS, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -160,7 +168,7 @@ summary(abnCODIS)
 summary(abnCODIS1)
 
 #8 SSB
-ggplot(data=CODVIa, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODVIa, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
   geom_smooth(data=subset(CODVIa, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -174,22 +182,27 @@ summary(abnCODVIa)
 summary(abnCODVIa1)
 
 #9 SSB
-ggplot(data=CODNS, aes(x=TSYEAR, y=SSB, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODIIIaW, aes(x=TSYEAR, y=SSB, group=factor(STOCKID), color=factor(STOCKID))) +
   geom_line()+
-  geom_smooth(data=subset(CODNS, TSYEAR >= 1980), method=lm) +
+  geom_smooth(data=subset(CODIIIaW, TSYEAR >= 1980), method=lm) +
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
   xlab(NULL) +
   ylab("Spawing Stock Biomass MT")+
   theme(axis.text.x = element_text(angle = 90, size = 8))
 
-abnCODNS1 <- lm(formula = SSB ~TSYEAR, data=CODNS)
-abnCODNS <- lm(formula = SSB ~TSYEAR, data=subset(CODNS, TSYEAR >= 1980))
-summary(abnCODNS)
-summary(abnCODNS1)
+abnCODIIIaW1 <- lm(formula = SSB ~TSYEAR, data=CODIIIaW)
+abnCODIIIaW <- lm(formula = SSB ~TSYEAR, data=subset(CODIIIaW, TSYEAR >= 1980))
+summary(abnCODIIIaW)
+summary(abnCODIIIaW1)
 
 #Abundance trend calculation for each stock F
+#fishing mortality average 1980 - present
+
+F_mean <- allstock1980 %>%
+  group_by(STOCKID) %>%
+  summarise(mean=mean(F, na.rm = T), sd=sd(F, na.rm = T))
+
 #all stocks F
-allstock <- rbind(CODCOASTNOR, CODNEAR, CODFAPL, CODICE, CODBA2532, CODKAT, CODIS, CODNS)  #sum all dataframe
 
 ggplot(data=allstock, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(ASSESSID))) +
   geom_line()+
@@ -201,18 +214,10 @@ ggplot(data=allstock, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(AS
 abnallstock <- lm(formula = F ~TSYEAR, data=allstock)
 summary(abnallstock)
 
+
+
+
 #1F
-ggplot(data=CODCOASTNOR, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(ASSESSID))) +
-  geom_line()+
-  #scale_color_manual(values=c("#CC6666", "#9999CC"))+
-  xlab(NULL) +
-  ylab("F 1/yr")+
-  theme(axis.text.x = element_text(angle = 90, size = 8))
-
-abnCODCOASTNOR <- lm(formula = F ~TSYEAR, data=CODCOASTNOR)
-summary(abnCODCOASTNOR)
-
-#2 F
 ggplot(data=CODNEAR, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(ASSESSID))) +
   geom_line()+
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -222,6 +227,17 @@ ggplot(data=CODNEAR, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(ASS
 
 abnCODNEAR <- lm(formula = F ~TSYEAR, data=CODNEAR)
 summary(abnCODNEAR)
+
+#2 F
+ggplot(data=CODNEARNCW, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(ASSESSID))) +
+  geom_line()+
+  #scale_color_manual(values=c("#CC6666", "#9999CC"))+
+  xlab(NULL) +
+  ylab("F 1/yr")+
+  theme(axis.text.x = element_text(angle = 90, size = 8))
+
+abnCODNEARNCW <- lm(formula = F ~TSYEAR, data=CODNEARNCW)
+summary(abnCODNEARNCW)
 
 #3 F
 ggplot(data=CODFAPL, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(ASSESSID))) +
@@ -290,19 +306,24 @@ abnCODVIa <- lm(formula = F ~TSYEAR, data=CODVIa)
 summary(abnCODVIa)
 
 #9 F
-ggplot(data=CODNS, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODIIIaW, aes(x=TSYEAR, y=F, group=factor(ASSESSID), color=factor(ASSESSID))) +
   geom_line()+
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
   xlab(NULL) +
   ylab("F 1/yr")+
   theme(axis.text.x = element_text(angle = 90, size = 8))
 
-abnCODNS <- lm(formula = F ~TSYEAR, data=CODNS)
-summary(abnCODNS)
+abnCODIIIaW <- lm(formula = F ~TSYEAR, data=CODIIIaW)
+summary(abnCODIIIaW)
 
-#Abundance trend calculation for each stock R
+#Recruitment trend calculation for each stock R
+#recruitment average 1980 - present
+
+R_mean <- allstock1980 %>%
+  group_by(STOCKID) %>%
+  summarise(mean=mean(R, na.rm = T), sd=sd(R, na.rm = T))
+
 #all stocks R
-allstock <- rbind(CODCOASTNOR, CODNEAR, CODFAPL, CODICE, CODBA2532, CODKAT, CODIS, CODNS)  #sum all dataframe
 
 ggplot(data=allstock, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASSESSID))) +
   geom_line()+
@@ -315,17 +336,6 @@ abnallstock <- lm(formula = R ~TSYEAR, data=allstock)
 summary(abnallstock)
 
 #1R
-ggplot(data=CODCOASTNOR, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASSESSID))) +
-  geom_line()+
-  #scale_color_manual(values=c("#CC6666", "#9999CC"))+
-  xlab(NULL) +
-  ylab("R E03")+
-  theme(axis.text.x = element_text(angle = 90, size = 8))
-
-abnCODCOASTNOR <- lm(formula = R ~TSYEAR, data=CODCOASTNOR)
-summary(abnCODCOASTNOR)
-
-#2 R
 ggplot(data=CODNEAR, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASSESSID))) +
   geom_line()+
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
@@ -335,6 +345,17 @@ ggplot(data=CODNEAR, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASS
 
 abnCODNEAR <- lm(formula = R ~TSYEAR, data=CODNEAR)
 summary(abnCODNEAR)
+
+#2 R
+ggplot(data=CODNEARNCW, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASSESSID))) +
+  geom_line()+
+  #scale_color_manual(values=c("#CC6666", "#9999CC"))+
+  xlab(NULL) +
+  ylab("R E03")+
+  theme(axis.text.x = element_text(angle = 90, size = 8))
+
+abnCODNEARNCW <- lm(formula = R ~TSYEAR, data=CODNEARNCW)
+summary(abnCODNEARNCW)
 
 #3 R
 ggplot(data=CODFAPL, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASSESSID))) +
@@ -403,15 +424,15 @@ abnCODVIa <- lm(formula = R ~TSYEAR, data=CODVIa)
 summary(abnCODVIa)
 
 #9 R
-ggplot(data=CODNS, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASSESSID))) +
+ggplot(data=CODIIIaW, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASSESSID))) +
   geom_line()+
   #scale_color_manual(values=c("#CC6666", "#9999CC"))+
   xlab(NULL) +
   ylab("R E03")+
   theme(axis.text.x = element_text(angle = 90, size = 8))
 
-abnCODNS <- lm(formula = R ~TSYEAR, data=CODNS)
-summary(abnCODNS)
+abnCODIIIaW <- lm(formula = R ~TSYEAR, data=CODIIIaW)
+summary(abnCODIIIaW)
 
 
 
@@ -420,7 +441,7 @@ summary(abnCODNS)
 
 
 
-##get the recovery time CODCOASTNOR, CODNEAR, CODFAPL, CODICE, CODBA2532, CODKAT, CODIS, CODNS
+##get the recovery time CODNEAR, CODNEAR CODFAPL, CODICE, CODBA2532, CODKAT, CODIS, CODNS
 
 #stock CODCOASTNOR
 #SSBlimit1 <- 100000

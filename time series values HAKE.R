@@ -1,14 +1,13 @@
-### SSB, F and R during years of a stock. RAM legacy database. 
-## 16 Mayo 2017
+## Jan2020
+##extracting the SSB, F and R indices from the RAM legacy database for hake
+#source file: HAKE_COD_RAM, from RAMLDB v4.491
 
-
-setwd("C:/Users/FOL/OneDrive/CLOCK_STUDENTS/Elena Fontan/Resilience Index Work/R scripts/RAM legacy data (SSB_F_R)")#install.packages("ggplot2", "dplyr", "tidyr")
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 
 #Read database
-timedata <- read.csv("time series values hake.csv", sep=";", na.strings ="")
+timedata <- read.csv("Data/time_series_values_hake.csv", sep=";", na.strings ="")
 str(timedata)
 timedata$SSB<- as.numeric(as.character(timedata$SSB, na.omit=TRUE))    #omit NA col SSB. and change FACTOR per num.
 timedata$R<- as.numeric(as.character(timedata$R, na.omit=TRUE))
@@ -17,8 +16,8 @@ timedata$TSYEAR <- as.numeric(as.character(timedata$TSYEAR))
 str(timedata)
 
 
-A <- c("WGHMM-HAKENRTN-1977-2007-JENNINGS", "WGHMM-HAKESOTH-1982-2007-JENNINGS")
-B <- c("WGHMM-HAKENRTN-1977-2007-JENNINGS", "WGHMM-HAKESOTH-1982-2007-JENNINGS")
+A <- c("WGBIE-HAKENRTN-1978-2018-ICESIMP2018", "WGBIE-HAKESOTH-1982-2018-ICESIMP2018")
+B <- c("WGBIE-HAKENRTN-1978-2018-ICESIMP2018", "WGBIE-HAKESOTH-1982-2018-ICESIMP2018")
 Na <- length(A)
 AreaMatrix <- list()
 
@@ -53,6 +52,15 @@ abnallstock1 <- lm(formula = SSB ~TSYEAR, data=subset(allstock, TSYEAR >= 1980))
 abnallstock <- lm(formula = SSB ~TSYEAR, data=allstock)
 summary(abnallstock)
 summary (abnallstock1)
+
+
+##all stocks SSB average 1980-most recent year
+
+allstock1980 <- subset(allstock, TSYEAR>=1980)
+
+SSB_mean <- allstock1980 %>%
+  group_by(STOCKID) %>%
+  summarise(mean=mean(SSB), sd=sd(SSB))
 
 
 #Abundance trend calculation for each stock
@@ -99,6 +107,13 @@ summary(abnallstock)
 
 
 #Abundance trend calculation for each stock
+
+#abundance average 1980 - present
+
+R_mean <- allstock1980 %>%
+  group_by(STOCKID) %>%
+  summarise(mean=mean(R), sd=sd(R))
+
 #1 R
 ggplot(data=HAKENRTN, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(ASSESSID))) +
   geom_line()+
@@ -120,6 +135,14 @@ ggplot(data=HAKESOTH, aes(x=TSYEAR, y=R, group=factor(ASSESSID), color=factor(AS
 
 abnHAKESOTH <- lm(formula = R ~TSYEAR, data=HAKESOTH)
 summary(abnHAKESOTH)
+
+
+#Fishing mortality figures
+#fishing mortality average 1980 - present
+
+F_mean <- allstock1980 %>%
+  group_by(STOCKID) %>%
+  summarise(mean=mean(F, na.rm = T), sd=sd(F, na.rm = T))
 
 #all stocks F
 allstock <- rbind(HAKENRTN, HAKESOTH) #sum all dataframe
