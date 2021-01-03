@@ -103,7 +103,7 @@ options(scipen=999)
 
 # Define which species are captured in each stock
 
-stock_by_species <- list(`Atlantic cod`=c("CODCOASTNOR","CODNEAR","CODCOASTNOR_CODNEAR","CODFAPL","CODICE","CODBA2532","CODKAT","CODIS","CODVIa","CODNS"),
+stock_by_species <- list(`Atlantic cod`=c("CODNEAR","CODNEARNCW","CODFAPL","CODICE","CODBA2532","CODKAT","CODIS","CODVIa","CODIIIaW"),
                          `European hake`=c("HAKENRTN","HAKESOTH")) 
 
 suppressWarnings(stock_by_species %<>% lapply(`length<-`, max(lengths(stock_by_species))) %>% data.frame(check.names = FALSE) %>% gather(SPECIES,STOCK) %>% filter(complete.cases(.)))
@@ -162,28 +162,30 @@ eco_indicators <- fread("data/ecological_indicators.csv",check.names = TRUE)
 
 ###### 2.1 AREA (E1) #####
 
-# See section "AREA (E1)" in 1.A in "SI 2. Indicators and Factors" for details.
+# See section "AREA (E1)" in 1.A in "SI 2. Indicators and Factors" for details. TO REVISE
 
 # Table 1
-
-area_2 <- 261895.6 # 2nd percentile of the distribution of area ranges in García-Molinos et al. (2015)
-area_98 <- 83378496 # 98th percentile of the distribution of area ranges in García-Molinos et al. (2015)
+#normalization is between -1 and 1 so we sum a 1 to the value of AreaChange and teh normaliztion range to do the normalization between 0 and 1
+area_min <- 0 # area in 2100 is the same or below the area projected in 2006  in García-Molinos et al. (2015)
+area_max <- 2 # area in 2100 is the same as the area projected in 2006  in García-Molinos et al. (2015)
 
 Table1 <- eco_indicators  %>% 
-  select(SPECIES,area2006,area2100) %>% 
+  select(SPECIES,AreaChange) %>% 
   distinct() %>%
-  mutate(area2006_norm=(area2006-area_2)/(area_98-area_2), # Normalization positive
-         area2100_norm=(area2100-area_2)/(area_98-area_2) # Normalization positive
-  ) %>% 
+  mutate(AreaChange_positive=(AreaChange+1),
+         AreaChange_norm=(AreaChange_positive-area_min)/(area_max-area_min)
+         # Normalization positive
+         # Normalization positive
+ )%>% 
   rowwise() %>%  # AREA factor is the mean of the normalized indicators above for each species (row)
-  mutate(AREA=mean(area2006_norm,area2100_norm),
-         area_2=area_2,
-         area_98=area_98)
+  mutate(AREA=AreaChange_norm,
+         area_min=area_min,
+         area_max=area_max)
 
 # Prepare for word
 to.plot <- Table1 %>% 
   data.frame %>% 
-  select(SPECIES,area2006,area2100,area_2,area_98,area2006_norm,area2100_norm,AREA)
+  select(SPECIES,AreaChange_positive,area_min,area_max,AreaChange_norm,AREA)
 
 
 to.plot[is.na(to.plot)] <- "-"
@@ -193,7 +195,7 @@ to.plot[is.na(to.plot)] <- "-"
 
 Ft<- format_table(to.plot)
 
-Ft %<>% set_header_labels(SPECIES="SPECIES",area2006="Area2006\n(km^2)",area2100="Area2100\n(km^2)",area_2="area 2%\n(km^2)",area_98="area 98%\n(km^2)",area2006_norm="Area06'\nNormalized",area2100_norm="Area100\nNormalized",AREA="AREA")
+Ft %<>% set_header_labels(SPECIES="SPECIES",AreaChange_positive="AreaChange", area_min="Min area change",area_max="Max area change",AreaChange_norm="Area Change\nNormalized",AREA="AREA")
 
 write_doc(Ft,
           "Table1. Area indicators and factor.",
@@ -222,7 +224,7 @@ to.plot <- Table2 %>%
 Ft<- format_table(to.plot)
 
 write_doc(Ft,
-          "Table 2. Value of the coefficients (ß) from the linear models of SSB historic (1950- 2010), SSB recent (1980-2010), R and F in ICES data series. Significance at the 0.001 (***), 0.01 (**) and 0.05 (*) levels.",
+          "Table 2. Value of the coefficients (ß) from the linear models of SSB historic (full time series), SSB recent (1980-2018), R and F in RAM legacy stocks. Significance at the 0.001 (***), 0.01 (**), 0.05 (*) and 0.1 levels.",
           "Tables/Table2SI.docx",landscape=TRUE)
 
 # Table 3
@@ -239,24 +241,22 @@ Table3 <- eco_indicators  %>%
          Rtrend_norm=normalize_positive(Rtrend) # Positive
   ) %>%
   rowwise %>% # ABUNDANCE factor is the mean of the normalized indicators above for each stock (row)
-  mutate(ABUNDANCE=mean(SSBhistoric_norm,SSBrecent_norm,Ftrend_norm,Rtrend_norm,na.rm=TRUE)) %>% 
+  mutate(ABUNDANCE=mean(SSBrecent_norm,Ftrend_norm,Rtrend_norm,na.rm=TRUE)) %>% #droping SSBhistoric due to correlation
   ungroup() %>% 
   select(-starts_with("B_"),-ends_with(".average")) # Remove slopes and averages from the table
 
 # Prepare for word
-
-to.plot <- Table3%>% 
-  select(-SPECIES) %>% 
+to.plot <- Table3 %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
 
 # Save to word
+
 Ft<- format_table(to.plot)
 
 write_doc(Ft,
-          "Table 3. Normalization of Abundance indicators and Abundance factor calculation.",
+          "Table 3. Value of the abundance indicators and overexploitation. Value of indicators normalized from Table SI2",
           "Tables/Table3SI.docx",landscape=TRUE)
-
 
 
 ###### 2.3 TEMPERATURE (E3) #####
@@ -267,8 +267,8 @@ write_doc(Ft,
 
 Trange_2 <- 0 # 2nd percentile of the distribution of temperature range. Cheung et al. (2010)
 Trange_98 <- 11 # 98th percentile of the distribution of temperature range. Cheung et al. (2010)
-T50_2 <- 0 # 2nd percentile of the distribution of temperature range. Cheung et al. (2010)
-T50_98 <- 28 # 98th percentile of the distribution of temperature range. Cheung et al. (2010)
+T50_2 <- 0 # 2nd percentile of the distribution of median temperature.  Cheung et al. (2010)
+T50_98 <- 28 # 98th percentile of the distribution of median temperature.  Cheung et al. (2010)
 
 Table4 <- eco_indicators  %>% 
   select(SPECIES,T50,Trange)%>% 
@@ -276,7 +276,7 @@ Table4 <- eco_indicators  %>%
   mutate(Trange_norm=(Trange-Trange_2)/(Trange_98-Trange_2), # Normalization
          T50_norm=(T50-T50_2)/(T50_98-T50_2) # Normalization
   ) %>% 
-  mutate(TEMPERATURE=T50_norm, # TEMPERATURE factor is normalized T50
+  mutate(TEMPERATURE=T50_norm, # TEMPERATURE factor is normalized T50, droping Trange due to correlation with T50 and AreaChange
          Trange_2=Trange_2,
          Trange_98=Trange_98,
          T50_2=T50_2,
@@ -289,9 +289,6 @@ to.plot <- Table4 %>%
   data.frame %>% 
   select(SPECIES,Trange,T50,Trange_2,Trange_98,T50_2,T50_98,Trange_norm,T50_norm,TEMPERATURE)
   
-
-
-
 # Save to word
 
 Ft<- format_table(to.plot)
@@ -380,7 +377,7 @@ write_doc(Ft,
 
 # Table 7
 
-# Merge all the factors in one table
+# Merge all the factors in one table except AREA due to correlation
 
 Table7 <- reduce(list(Table3 %>% select(SPECIES,STOCK,ABUNDANCE),
                       Table5 %>% select(SPECIES,STOCK,OVEREXPLOITATION),

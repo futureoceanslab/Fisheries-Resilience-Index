@@ -440,62 +440,70 @@ summary(abnCODIIIaW)
 
 
 
-
-##get the recovery time CODNEAR, CODNEAR CODFAPL, CODICE, CODBA2532, CODKAT, CODIS, CODNS
-
-#stock CODCOASTNOR
-#SSBlimit1 <- 100000
-
-#CODCOASTNOR$TSYEAR[which(CODCOASTNOR$SSB <  (SSBlimit1))]
-
-#CODCOASTNOR$TSYEAR[which(CODCOASTNOR$SSB >  (1.5*SSBlimit1))]
+##get the recovery time CODNEAR, CODNEARNCW CODFAPL, CODICE, CODBA2532, CODKAT, CODIS, CODIIIaW
 
 
 #stock CODNEAR
 SSBlimit2 <- 220000
 
 CODNEAR$TSYEAR[which(CODNEAR$SSB <  (SSBlimit2))]
-
 CODNEAR$TSYEAR[which(CODNEAR$SSB >  (1.5*SSBlimit2))]
+#11 years 1963-1972
+
+#stock CODNEARNCW *uses an estimate of SSb lim vased on the tration SSBmng for the rest of stocks
+SSBlimit1 <- 39408
+
+CODNEARNCW$TSYEAR[which(CODNEARNCW$SSB <  (SSBlimit1))]
+CODNEARNCW$TSYEAR[which(CODNEARNCW$SSB >  (1.5*SSBlimit1))]
+#18 2015-1997
 
 #stock CODFAPL
 SSBlimit3 <- 21000
 
 CODFAPL$TSYEAR[which(CODFAPL$SSB <  (SSBlimit3))]
-
 CODFAPL$TSYEAR[which(CODFAPL$SSB >  (1.5*SSBlimit3))]
+# 12 years from 2006-2018
 
 #stock CODICE
-#SSBlimit1 <- 100000
+SSBlimit1 <- 125000
 
-#CODICE$TSYEAR[which(CODICE$SSB <  (SSBlimit1))]
+CODICE$TSYEAR[which(CODICE$SSB <  (SSBlimit1))]
+CODICE$TSYEAR[which(CODICE$SSB >  (1.5*SSBlimit1))]
+#4 years, from 1993-1997
 
-#CODICE$TSYEAR[which(CODICE$SSB >  (1.5*SSBlimit1))]
 
 #stock CODBA2532
-SSBlimit5 <- 160000
+SSBlimit5 <- 63000
 
 CODBA2532$TSYEAR[which(CODBA2532$SSB <  (SSBlimit5))]
-
 CODBA2532$TSYEAR[which(CODBA2532$SSB >  (1.5*SSBlimit5))]
+# 3 years from 2005 to 2008
+
 
 #stock CODKAT
 SSBlimit6 <- 6400
 
 CODKAT$TSYEAR[which(CODKAT$SSB <  (SSBlimit6))]
+CODKAT$TSYEAR[which(CODKAT$SSB >  (1.5*SSBlimit6))]#21 from 1997 to 2018
 
-CODKAT$TSYEAR[which(CODKAT$SSB >  (1.5*SSBlimit6))]
 
 #stock CODIS
 SSBlimit7 <- 6000
 
 CODIS$TSYEAR[which(CODIS$SSB <  (SSBlimit7))]
-
 CODIS$TSYEAR[which(CODIS$SSB >  (1.5*SSBlimit7))]
+##24 from 1993 to 2017
 
-#stock CODNS
-SSBlimit8 <- 70000
+#stock CODVIa
+SSBlimit9 <- 14000
 
-CODNS$TSYEAR[which(CODNS$SSB <  (SSBlimit8))]
+CODVIa$TSYEAR[which(CODVIa$SSB <  (SSBlimit9))]
+CODVIa$TSYEAR[which(CODVIa$SSB >  (1.5*SSBlimit9))]
+#25 from 1992 until 2017 (not recovered) 
 
-CODNS$TSYEAR[which(CODNS$SSB >  (1.5*SSBlimit8))]
+#stock CODIIIaW
+SSBlimit8 <- 107000
+
+CODIIIaW$TSYEAR[which(CODIIIaW$SSB <  (SSBlimit8))]
+CODIIIaW$TSYEAR[which(CODIIIaW$SSB >  (1.5*SSBlimit8))]
+#25 from 1989 until today (not recovered) 

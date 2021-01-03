@@ -189,21 +189,21 @@ summary(abnHAKESOTH)
 ##get the recovery time
 
 #stock HAKENRTN
-SSBlimit1 <- 100000
+SSBlimit1 <- 32000
 
 HAKENRTN$TSYEAR[which(HAKENRTN$SSB <  (SSBlimit1))]
-
 HAKENRTN$TSYEAR[which(HAKENRTN$SSB >  (1.5*SSBlimit1))]
+#15 years from 1994 to 2009
 
 ##2007-1992= 15 years taking into consideration the first year that the biomass goes under SSB limit and the first year it goes over 1.5*SSB
 
 #stock HAKESOTH
-SSBlimit2 <- 25000
+SSBlimit2 <- 8000
 
 HAKESOTH$TSYEAR[which(HAKESOTH$SSB <  (SSBlimit2))]
-
 HAKESOTH$TSYEAR[which(HAKESOTH$SSB >  (1.5*SSBlimit2))]
 
+#12 years from 1995 to 2007
 
 
 
