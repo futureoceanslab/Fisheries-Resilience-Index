@@ -111,7 +111,7 @@ suppressWarnings(stock_by_species %<>% lapply(`length<-`, max(lengths(stock_by_s
 # Which countries fish  each stock
 countries_fishing <- list(HAKENRTN=c("BE","DK","DE","ES","FR","NL","PT","SE"),
                           HAKESOTH=c("ES","FR","PT"),
-                          CODCOASTNOR=c("DK","DE","EE","IE","ES","FR","PL","PT"),
+                          CODNEARNCW=c("DK","DE","EE","IE","ES","FR","PL","PT"),
                           CODNEAR=c("DK","DE","EE","IE","ES","FR","PL","PT"),
                           CODFAPL=c("DE"),
                           CODICE=c("DE"),
@@ -119,7 +119,7 @@ countries_fishing <- list(HAKENRTN=c("BE","DK","DE","ES","FR","NL","PT","SE"),
                           CODKAT=c("DK","DE","FR","NL","PT","SE"),
                           CODIS=c("BE","IE","FR"),
                           CODVIa=c("DE","IE","FR"),
-                          CODNS=c("FR"))
+                          CODIIIaW=c("FR"))
 
 # Define country dependence for each species
 
