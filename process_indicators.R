@@ -185,8 +185,9 @@ Table1 <- eco_indicators  %>%
 # Prepare for word
 to.plot <- Table1 %>% 
   data.frame %>% 
-  select(SPECIES,AreaChange_positive,area_min,area_max,AreaChange_norm,AREA)
-
+  select(SPECIES,AreaChange_positive,area_min,area_max,AreaChange_norm,AREA) %>% 
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
+  data.frame
 
 to.plot[is.na(to.plot)] <- "-"
 
@@ -388,7 +389,7 @@ Table7 <- reduce(list(Table3 %>% select(SPECIES,STOCK,ABUNDANCE),
 
 to.plot <- Table7 %>% 
   select(STOCK,ABUNDANCE,TEMPERATURE,OVEREXPLOITATION,RECOVERY) %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.4f",.)))) %>% # Numbers to string
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
 
 # Save to word
@@ -535,7 +536,7 @@ Table11 <- soc_indicators %>%
 # Prepare for word
 
 to.plot <- Table11 %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
 
 
@@ -570,14 +571,11 @@ Table12 <- soc_indicators %>%
   ungroup() %>% arrange_table()
 
 
-
-
-
 # Prepare for word
 
 to.plot <- Table12 %>% 
   select(-SPECIES) %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.4f",.)))) %>% # Numbers to string
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
 
 # Save to word
@@ -649,7 +647,7 @@ Table14 <- soc_indicators %>%
 
 # Prepare for word
 
-to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame %>%
+to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame %>%
   set_names(c("COUNTRIES","Research","Management","normalizedResearch","normalizedMng","ADAPTIVE.MNG"))
 
 to.plot[is.na(to.plot)] <- "-"
@@ -693,7 +691,7 @@ Table15 <- bind_cols(Table15,t10[rep(1,nrow(Table15)),])
 # Prepare for word
 to.plot <- Table15 %>% 
   mutate_at(vars(starts_with("CATCH")),funs(round(.,digits = 3))) %>%
-  mutate_at(vars(starts_with("ADAP"),starts_with("FLEET")),funs(round(.,digits = 2)))%>% 
+  mutate_at(vars(starts_with("ADAP"),starts_with("FLEET")),funs(round(.,digits = 3)))%>% 
   select(COUNTRIES,starts_with("GEAR"),FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% 
   data.frame
 
@@ -766,7 +764,7 @@ Table16 <-ins_indicators %>%
 # Prepare for word
 
 to.plot <- Table16 %>%
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame 
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
@@ -799,7 +797,7 @@ Table17 <- ins_indicators %>%
 # Prepare for word
 
 to.plot <- Table17 %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>% # Numbers to string
+  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
@@ -853,7 +851,7 @@ write_doc(Ft,
 
 # Prepare for word
 
-to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 2))) %>% data.frame %>%
+to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame %>%
   set_names(c("COUNTRIES","Research","Management","normalizedResearch","normalizedMng","ADAPTIVE.MNG"))
 
 to.plot[is.na(to.plot)] <- "-"
