@@ -57,11 +57,24 @@ packageVersion("tidyverse")
 
 eco_factors <- fread("data/ecological_factors_country.csv") %>% mutate(DIMENSION="ecological")
 
+eco_factors_stock <- fread("data/ecological_factors.csv") %>% mutate(DIMENSION="ecological")
+
 ins_factors <- fread("data/institutional_factors_country.csv")  %>% mutate(DIMENSION="institutional")
 
 soc_factors <- fread("data/socioeconomic_factors_country.csv")  %>% mutate(DIMENSION="socioeconomic")
 
 ##### 2. Compute Resilience Index #####
+
+##compute resilience index per stock, only ecological
+
+
+eco_res_stock <- bind_rows(eco_factors_stock) %>% 
+  gather(FACTOR,VALUE,-STOCK,-SPECIES,-DIMENSION,factor_key = TRUE) %>%
+  filter(complete.cases(.)) %>%
+  group_by(SPECIES,DIMENSION,STOCK) %>% 
+  summarise(Eco_Res_Index=mean(VALUE,na.rm=TRUE)) %>%
+  ungroup()
+
 
 # Compute resilience index. For that put together all the factors computed above and compute 
 # their mean by species, dimension and country
@@ -84,7 +97,7 @@ other_index <- fread("data/Other_index.csv",check.names = TRUE) %>% rename(OHI.f
 # merge with resilience index
 
 final_index <- other_index %>% 
-  left_join(resilience_index,by=c("COUNTRIES")) %<>% 
+  left_join(resilience_index,by=c("COUNTRIES")) %>% 
   mutate(SPECIES=c(`Atlantic cod`="Cod",`European hake`="Hake")[SPECIES]) %>% rename(SPECIE=SPECIES) %>% 
   arrange(SPECIE,COUNTRIES,DIMENSION) %>% select(SPECIE,COUNTRIES,DIMENSION,everything())
 

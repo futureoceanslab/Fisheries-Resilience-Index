@@ -407,7 +407,6 @@ Table7 %>%
 
 
 
-
 # Table 9
 
 # Compute mean factor for each country. 
