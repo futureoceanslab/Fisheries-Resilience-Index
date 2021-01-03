@@ -123,7 +123,7 @@ countries_fishing <- list(HAKENRTN=c("BE","DK","DE","ES","FR","NL","PT","SE"),
 
 # Define country dependence for each species
 
-countries_dependence <- suppressWarnings(c(countries_fishing,list(CODCOASTNOR_CODNEAR=countries_fishing$CODCOASTNOR)) %>%
+countries_dependence <- suppressWarnings(c(countries_fishing,list(CODNEARNCW_CODNEAR=countries_fishing$CODNEARNCW)) %>%
                                            lapply(`length<-`, max(lengths(countries_fishing))) %>% 
                                            as.data.frame() %>% 
                                            gather(STOCK,COUNTRIES) %>% 
