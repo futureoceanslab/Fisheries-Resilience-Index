@@ -879,7 +879,7 @@ Table19 <- Table19p %>%
          Above_advice_norm=normalize_negative(Above_advice) # Normalization negative
          ) %>% 
   rowwise() %>%
-  mutate(QUOTAS=mean(c(TAC_norm,Above_advice_norm),na.rm=TRUE))
+  mutate(QUOTAS=Above_advice_norm,na.rm=TRUE)
   
 
 # Prepare for word
