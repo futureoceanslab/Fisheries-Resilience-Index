@@ -91,3 +91,10 @@ Table_gear_cod <- gear_cod %>%
   ungroup() %>%
   select(fishing_entity, gear_num) %>%
   distinct ()
+
+
+Table_gear_hake [which(Table_gear_hake$gear_num == min(Table_gear_hake$gear_num)), ] ## 1
+Table_gear_hake [which(Table_gear_hake$gear_num == max(Table_gear_hake$gear_num)), ] ## 16 ireland
+
+Table_gear_cod [which(Table_gear_cod$gear_num == min(Table_gear_cod$gear_num)), ] ## 1
+Table_gear_cod [which(Table_gear_cod$gear_num == max(Table_gear_cod$gear_num)), ] ## 22 sweden
