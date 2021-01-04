@@ -831,52 +831,51 @@ write_doc(Ft,
 
 #Table 18
 
-Table18 <- ins_indicators  %>% 
-  select(COUNTRIES,STOCK,TAC) %>% 
-  spread(COUNTRIES,TAC)
+#Table18 <- ins_indicators  %>% 
+#  select(COUNTRIES,STOCK,TAC) %>% 
+#  spread(COUNTRIES,TAC)
 
 # Prepare for word
 
-to.plot <- Table18 %>% data.frame
+#to.plot <- Table18 %>% data.frame
 
-to.plot[is.na(to.plot)] <- "-"
+#to.plot[is.na(to.plot)] <- "-"
 
-to.plot <- to.plot[,match(c("STOCK",countries_order),names(to.plot))]
+#to.plot <- to.plot[,match(c("STOCK",countries_order),names(to.plot))]
 
-to.plot$STOCK <- gsub("_","/\n",to.plot$STOCK)
+#to.plot$STOCK <- gsub("_","/\n",to.plot$STOCK)
 
 # Save to word
 
-Ft<- format_table(to.plot)
+#Ft<- format_table(to.plot)
 
-Ft %<>% fontsize(j=1,size=10) %>% italic(j=1)
+#Ft %<>% fontsize(j=1,size=10) %>% italic(j=1)
 
 
-write_doc(Ft,
-          "Table 18. TAC (million tons) per stock and country (2015)",
+#write_doc(Ft,
+#          "Table 18. TAC (million tons) per stock and country (2015)",
           
-          "Tables/Table18SI.docx",landscape = TRUE)
+#         "Tables/Table18SI.docx",landscape = TRUE)
 
 # Prepare for word
 
-to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame %>%
-  set_names(c("COUNTRIES","Research","Management","normalizedResearch","normalizedMng","ADAPTIVE.MNG"))
+#to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame %>%
+#  set_names(c("COUNTRIES","Research","Management","normalizedResearch","normalizedMng","ADAPTIVE.MNG"))
 
-to.plot[is.na(to.plot)] <- "-"
+#to.plot[is.na(to.plot)] <- "-"
 
-to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
+#to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
 # Table 19
 
 Table19p <- ins_indicators %>% 
-  select(SPECIES,STOCK,COUNTRIES,TAC, Above_advice)
+  select(SPECIES,STOCK,COUNTRIES,Above_advice)
 
 Table19 <- Table19p %>%
   group_by(COUNTRIES,SPECIES) %>% 
-  summarise(TAC=sum(TAC,na.rm=TRUE), Above_advice=sum(Above_advice, na.rm = TRUE)) %>% # Sum stocks by country and species
+  summarise(Above_advice=sum(Above_advice, na.rm = TRUE)) %>% # Sum stocks by country and species
   ungroup()%>%
-  mutate(TAC_norm=normalize_positive(TAC), # Normalize positive
-         Above_advice_norm=normalize_negative(Above_advice) # Normalization negative
+  mutate(Above_advice_norm=normalize_negative(Above_advice) # Normalization negative
          ) %>% 
   rowwise() %>%
   mutate(QUOTAS=Above_advice_norm,na.rm=TRUE)
