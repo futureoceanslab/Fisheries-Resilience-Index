@@ -754,9 +754,9 @@ ins_indicators %<>%
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% 
   filter(dependence) %>% select(-dependence)
 
-##### 4.1 CO.MANAGEMENT (I1) #####
+##### 4.1 ORGANIZATION (I1) #####
 
-# See "CO.MANAGEMENT (I1)" in 3.A in "SI 2. Indicators and Factors" for details
+# See "ORGANIZATION (I1)" in 3.A in "SI 2. Indicators and Factors" for details
 
 # Table 16
 
@@ -766,7 +766,7 @@ Table16 <-ins_indicators %>%
   filter(!is.na(Norganizations)) %>%
   mutate(Norganizations_norm=normalize_positive(Norganizations)) %>% # Normalization positive
   rowwise() %>%
-  mutate(CO.MANAGEMENT=Norganizations_norm) %>% # CO.MANAGEMENT is Norganizations normalized
+  mutate(ORGANIZATION=Norganizations_norm) %>% # ORGANIZATION is Norganizations normalized
   ungroup()
 
 # Prepare for word
@@ -781,10 +781,10 @@ to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
 
 Ft<- format_table(to.plot)
 
-Ft %<>% set_header_labels(COUNTRIES="",Norganizations="Norganizations\n2017",Norganizations_norm="Norganizations'\n(normalized)",CO.MANAGEMENT="CO MANAGEMENT")
+Ft %<>% set_header_labels(COUNTRIES="",Norganizations="Norganizations\n2017",Norganizations_norm="Norganizations'\n(normalized)",ORGANIZATION="ORGANIZATION")
 
 write_doc(Ft,
-          "Table 16. Values, normalization and Co-Management factor.",
+          "Table 16. Values, normalization and ORGANIZATION factor.",
           "Tables/Table16SI.docx")
 
 ##### 4.2 PROPERTY.RIGHTS (I2) #####
@@ -948,7 +948,7 @@ write_doc(Ft,
 
 # Table 21. Merge tables 16, 17, 19 and 20
 
-Table21 <- reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
+Table21 <- reduce(list(Table16 %>% select(COUNTRIES,ORGANIZATION),
                        Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
                        Table19 %>% select(SPECIES,COUNTRIES,QUOTAS),
                        Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES")
@@ -975,22 +975,22 @@ write_doc(Ft,
 
 # Merge tables 16, 17, 19 not normalized and 20 to produce institutional factors per stock: institutional_factors.csv
 
-reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
+reduce(list(Table16 %>% select(COUNTRIES,ORGANIZATION),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
             Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
             Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,STOCK,STRENGTH,TAC,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+  select(SPECIES,COUNTRIES,STOCK,STRENGTH,TAC,PROPERTY.RIGHTS,ORGANIZATION) %>%
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/institutional_factors.csv")
 
 # Merge tables 16, 17, 19 and 20 to produce institutional factors per country: institutional_factors_country.csv
 
-reduce(list(Table16 %>% select(COUNTRIES,CO.MANAGEMENT),
+reduce(list(Table16 %>% select(COUNTRIES,ORGANIZATION),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
             Table19 %>% select(SPECIES, COUNTRIES,QUOTAS),
             Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,STRENGTH,QUOTAS,PROPERTY.RIGHTS,CO.MANAGEMENT) %>%
+  select(SPECIES,COUNTRIES,STRENGTH,QUOTAS,PROPERTY.RIGHTS,ORGANIZATION) %>%
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/institutional_factors_country.csv")
