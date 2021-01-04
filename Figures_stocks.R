@@ -28,9 +28,9 @@ ipak(packages)
 
 
 # Upload ICES rectangles and merge with stock database.
-#ICESmap <- sf::st_read("Data/ICES_rectangles/ICES_Statistical_Rectangles_Eco.dbf", quiet = TRUE)
-#ggplot() +
-  #geom_sf(data=ICESmap, (aes(fill = factor(Ecoregion), color=Ecoregion)))
+ICESmap <- sf::st_read("data/ICES_areas/ICES_Areas_20160601_cut_dense_3857.dbf", quiet = TRUE)
+ggplot() +
+  geom_sf(data=ICESmap, (aes(fill = factor(Area_27), color=Area_27)))
 
 library(rgdal)
 shp <- readOGR ("data/ICES_areas/ICES_Areas_20160601_cut_dense_3857.shp")
@@ -78,7 +78,7 @@ Res.hake<- Res%>%
 ###################################################
 
 
-matching.names <- match(stock$Stock_name, Res$Stock_name )
+matching.names <- match(stock$Stock_name, Res$Stock_name)
 matching.names [1] <- 9
 matching.names [2] <- 10
 
