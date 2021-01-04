@@ -977,9 +977,9 @@ write_doc(Ft,
 
 reduce(list(Table16 %>% select(COUNTRIES,ORGANIZATION),
             Table17 %>% select(COUNTRIES,PROPERTY.RIGHTS),
-            Table19p %>% select(SPECIES, STOCK,COUNTRIES,TAC),
+            Table19p %>% select(SPECIES, STOCK,COUNTRIES),
             Table20 %>% select(COUNTRIES,STRENGTH)),full_join,by="COUNTRIES") %>%
-  select(SPECIES,COUNTRIES,STOCK,STRENGTH,TAC,PROPERTY.RIGHTS,ORGANIZATION) %>%
+  select(SPECIES,COUNTRIES,STOCK,STRENGTH,PROPERTY.RIGHTS,ORGANIZATION) %>%
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   write_excel_csv("data/institutional_factors.csv")
