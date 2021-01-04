@@ -1,4 +1,5 @@
 ##gear diversity calculation per country
+##jan 2021 Elena Ojea and Juan Bueno
 
 ##load packages and libraries
 
@@ -72,6 +73,16 @@ countries_order <- c("BE","DK","DE","EE","IE","ES","FR","LV","LT","NL","PL","PT"
 ###number of gears per species and per country
 
 Table_gear_hake <- gear_hake %>% 
+  select(fishing_entity,catch_type, gear_type) %>%
+  filter(catch_type == "Landings") %>%
+  filter(!is.na(fishing_entity)) %>%
+  group_by(fishing_entity) %>% 
+  mutate(gear_num=(count = n_distinct(gear_type))) %>% # number of fishing gears per country
+  ungroup() %>%
+  select(fishing_entity, gear_num) %>%
+  distinct ()
+
+Table_gear_cod <- gear_cod %>% 
   select(fishing_entity,catch_type, gear_type) %>%
   filter(catch_type == "Landings") %>%
   filter(!is.na(fishing_entity)) %>%
