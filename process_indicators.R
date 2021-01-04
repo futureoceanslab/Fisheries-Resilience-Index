@@ -498,7 +498,7 @@ soc_indicators %<>%
 # Table 10
 
 Table10 <- soc_indicators %>% 
-  select(SPECIES,SPgear) %>% 
+  select(COUNTRIES,SPECIES,SPgear) %>% 
   distinct %>% 
   mutate(SPgear_norm=normalize_positive(SPgear), # Normalize positive
          GEAR.DIVERSITY=SPgear_norm) # GEAR.DIVERSITY factor is the SPgear normalized.
@@ -511,7 +511,7 @@ to.plot <- Table10 %>% mutate(SPECIES=tools::toTitleCase(species_sort_name(SPECI
 # Save to word
 
 Ft <- format_table(to.plot)
-Ft %<>% set_header_labels(SPECIES="",SPgear="Gear Diversity",SPgear_norm="NormalizedGearDiv",GEAR.DIVERSITY="GEAR DIVERSITY")
+Ft %<>% set_header_labels(COUNTRIES="Fishing Countries",SPgear="Gear Diversity",SPECIES="Species",SPgear="Gear Diversity",SPgear_norm="NormalizedGearDiv",GEAR.DIVERSITY="GEAR DIVERSITY")
 
 write_doc(Ft,
           "Table 10. Values and normalization of Gear Diversity.",
