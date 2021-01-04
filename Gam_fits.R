@@ -138,7 +138,6 @@ GCV = 0.025531  Scale est. = 0.01971   n = 22
 
 ### marginal model for cod 
 
-ge_cod=gam(Resilience_Index~s(LAT, bs="ts"), family="quasibinomial", data=SEdata[[1]])
 anova(ge_cod) # p-value = 0.113, non-significant effect fo latitude.
 
 
