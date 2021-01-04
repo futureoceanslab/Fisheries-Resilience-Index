@@ -75,6 +75,7 @@ eco_res_stock <- bind_rows(eco_factors_stock) %>%
   summarise(Eco_Res_Index=mean(VALUE,na.rm=TRUE)) %>%
   ungroup()
 
+write.csv(eco_res_stock,file="data/Eco_Res_Index.csv",row.names = FALSE)
 
 # Compute resilience index. For that put together all the factors computed above and compute 
 # their mean by species, dimension and country

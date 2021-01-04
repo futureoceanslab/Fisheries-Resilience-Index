@@ -131,12 +131,17 @@ graphs <- c("COD","HAKE") %>% lapply(function(specie_name){
              fill="gray50", color="black")+
     geom_map(data=map, map=map, color="black", size=0.15,
              aes(fill=Resilience_Index, group=id, map_id=id)) +
+    #scale_fill_viridis_c(option = "D")+
+    
     scale_colour_brewer() +
     coord_equal(xlim = c(-30,30), ylim = c(29,70),ratio=1.5) +
     scale_x_continuous(labels =longitude_formatter )+
     scale_y_continuous(labels =latitude_formatter )+
     labs(subtitle = specie_name)+
-    scale_fill_distiller(type = "seq", direction = 1,name="Resilence Index",limits=range(final_index$Resilience_Index))+
+    scale_fill_distiller(palette = "Spectral", 
+                         values = scales::rescale((1:10), c(0,1)),
+                         type = "seq", 
+                         direction = 1, name="Resilence Index", limits=range(final_index$Resilience_Index))+
     theme(plot.subtitle=element_text(size=15, hjust=0, face="italic", color="black"),
           panel.grid.major = element_line(color="white"),
           legend.text = element_text(size=12,color = "black"),

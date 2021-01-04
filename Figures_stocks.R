@@ -56,7 +56,7 @@ shp_tidy <- left_join(shp_tidy, shp@data)
 stock <- read.csv("Data/Stock-data.csv", sep = ";")
 colnames(stock) [which (colnames(stock) == "?..Species")] <- "Species"
 
-#shp_tidy <- merge(shp_tidy, stock , by="Area_27", all.x=TRUE)
+shp_tidy <- merge(shp_tidy, stock , by="Area_27", all.x=TRUE)
 
 
 ##################################################

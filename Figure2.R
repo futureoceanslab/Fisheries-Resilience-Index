@@ -89,8 +89,9 @@ europe <- spTransform(europe, CRS("+proj=longlat"))
 
 final_index <- read_csv("data/final_index.csv")
 
-
 ##### 4. PLOT #####
+
+dimensions.yaxis <- c("Institutional","Institutional","Socioeconomic","Socioeconomic","Ecological","Ecological")
 
 # Define which dimension and species will be shown in each panel
 plot_definition <- data.frame(DIMENSION=c("institutional","institutional","socioeconomic","socioeconomic","ecological","ecological"),
@@ -125,7 +126,10 @@ graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
   
   #Plot
   
-  ggplot() + 
+  ggplot() +
+    theme(plot.title=element_text(color="black", size=15, face="bold.italic", hjust = 0.5, margin=margin(0,0,-15,0)))+
+    ggtitle(specie)+
+    
     geom_map(data=map, map=map,
                       aes(x=long,y=lat, map_id=id, group=group),
                       fill="gray50", color="black")+
@@ -135,17 +139,14 @@ graphs <- 1:nrow(plot_definition) %>% lapply(function(i){
     coord_equal(xlim = c(-30,30), ylim = c(29,70),ratio=1.5) +
     scale_x_continuous(labels =longitude_formatter )+
     scale_y_continuous(labels =latitude_formatter )+
-    scale_fill_distiller(type = "seq", direction = 1,name="Resilence Index",limits=range(final_index$Resilience_Index))+
-    labs(subtitle = LETTERS[i])+
+    scale_fill_distiller(palette = "Spectral", type = "seq", direction = 1,name="Resilence Index",limits=range(final_index$Resilience_Index))+
+    labs(subtitle = LETTERS[i], y=dimensions.yaxis[i], x="", cex=5)+
     theme(plot.subtitle=element_text(size=15, hjust=0, face="italic", color="black"),
           panel.grid.major = element_line(color="white"),
           legend.text = element_text(size=12,color = "black"),
           legend.title = element_text(size=14,color="black"),
           legend.key.width=unit(2,"cm"),
-          legend.position = "bottom",
-          axis.title = element_blank())
-    
-
+          legend.position = "bottom")
   
     
 })
