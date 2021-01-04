@@ -513,6 +513,14 @@ to.plot <- Table10 %>% mutate(SPECIES=tools::toTitleCase(species_sort_name(SPECI
 Ft <- format_table(to.plot)
 Ft %<>% set_header_labels(COUNTRIES="Fishing Countries",SPgear="Gear Diversity",SPECIES="Species",SPgear="Gear Diversity",SPgear_norm="NormalizedGearDiv",GEAR.DIVERSITY="GEAR DIVERSITY")
 
+country_rows <- rle(to.plot$COUNTRIES)$lengths %>% cumsum()
+
+Ft %<>% merge_v(j = 1) %>% vline(j=2,border = fp_border()) %>% 
+  align(align = "left",j=2,part="body") %>% 
+  bg(bg="white",j=2) %>%
+  hline(country_rows,border=fp_border())
+
+
 write_doc(Ft,
           "Table 10. Values and normalization of Gear Diversity.",
           "Tables/Table10SI.docx")
@@ -738,7 +746,7 @@ reduce( # Merge tables 11, 13 and 14
 
 ##### 4 INSTITUTIONAL INDICATORS #####
 
-ins_indicators <- fread("data/institutional_indicators 2.csv")
+ins_indicators <- fread("data/institutional_indicators.csv")
 
 # Remove countries that do not depend on a given species.
 
