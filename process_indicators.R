@@ -685,25 +685,20 @@ write_doc(Ft,
 
 Table15 <- reduce(
   list(
+    Table10 %>% select(SPECIES,COUNTRIES, GEAR.DIVERSITY) %>% 
+      mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>% # One column for each species
+      spread(SPECIES,GEAR.DIVERSITY),
     Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
-    Table13 %>% select(SPECIES,COUNTRIES,CATCH.DEP) %>%
+    Table13 %>% select(COUNTRIES,SPECIES,CATCH.DEP) %>%
       mutate(SPECIES=paste0("CATCH.DEP\n",species_sort_name(SPECIES))) %>% # One column for each species
-      spread(SPECIES,CATCH.DEP) ,
+      spread(SPECIES,CATCH.DEP),
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES")
 
-
-# Merge table 10 with all the others
-t10 <- Table10 %>% select(SPECIES,GEAR.DIVERSITY) %>% 
-  mutate(SPECIES=paste0("GEAR.DIV\n",species_sort_name(SPECIES))) %>% # One column for each species
-  spread(SPECIES,GEAR.DIVERSITY)
-
-Table15 <- bind_cols(Table15,t10[rep(1,nrow(Table15)),])
-
 # Prepare for word
-to.plot <- Table15 %>% 
+to.plot <- Table15 %>%
   mutate_at(vars(starts_with("CATCH")),funs(round(.,digits = 3))) %>%
-  mutate_at(vars(starts_with("ADAP"),starts_with("FLEET")),funs(round(.,digits = 3)))%>% 
+  mutate_at(vars(starts_with("ADAP"),starts_with("GEAR"), starts_with("FLEET")),funs(round(.,digits = 3))) %>% 
   select(COUNTRIES,starts_with("GEAR"),FLEET.MOBILITY,starts_with("CATCH"),ADAPTIVE.MNG) %>% 
   data.frame
 
