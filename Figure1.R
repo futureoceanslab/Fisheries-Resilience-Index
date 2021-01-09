@@ -103,13 +103,12 @@ species_average <- final_index %>%
 
 graphs <- c("COD","HAKE") %>% lapply(function(specie_name){
   
-  
   # Filter to keep data for one specie, then merge with map data
   
   to.plot <- species_average %>% 
     filter(SPECIE==specie_name) %>% 
     select(-SPECIE)
-    
+  
   
   # Plot
   
