@@ -681,7 +681,7 @@ write_doc(Ft,
 
 # Table 15
 
-# Merge tables 11, 13 and 14.
+# Merge tables 10, 11, 13 and 14.
 
 Table15 <- reduce(
   list(
