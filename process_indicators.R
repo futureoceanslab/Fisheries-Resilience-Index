@@ -836,25 +836,24 @@ Table18 <- ins_indicators  %>%
 
 # Prepare for word
 
-#to.plot <- Table18 %>% data.frame
+to.plot <- Table18 %>% data.frame
 
-#to.plot[is.na(to.plot)] <- "-"
+to.plot[is.na(to.plot)] <- "-"
 
-#to.plot <- to.plot[,match(c("STOCK",countries_order),names(to.plot))]
+to.plot <- to.plot[,match(c("STOCK",countries_order),names(to.plot))]
 
-#to.plot$STOCK <- gsub("_","/\n",to.plot$STOCK)
+to.plot$STOCK <- gsub("_","/\n",to.plot$STOCK)
 
 # Save to word
 
-#Ft<- format_table(to.plot)
+Ft<- format_table(to.plot)
 
-#Ft %<>% fontsize(j=1,size=10) %>% italic(j=1)
+Ft %<>% fontsize(j=1,size=10) %>% italic(j=1)
 
 
-#write_doc(Ft,
-#          "Table 18. TAC (million tons) per stock and country (2015)",
-          
-#         "Tables/Table18SI.docx",landscape = TRUE)
+write_doc(Ft,
+          "Table 18. TAC (million tons) per stock and country (2015)",
+         "Tables/Table18SI.docx",landscape = TRUE)
 
 # Prepare for word
 
@@ -958,7 +957,7 @@ to.plot <- Table21 %>%
   mutate(SPECIES=paste0("QUOTAS\n",species_sort_name(SPECIES))) %>% 
   spread(SPECIES,QUOTAS) %>% 
   mutate_at(vars(starts_with("QUOTAS")),funs(ifelse(is.na(.),"0.000",sprintf("%0.3f",.)))) %>% # Numeric to string
-  mutate_at(vars(starts_with("CO.MANAG"),starts_with("PROPERTY")),funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>%  # Numeric to string
+  mutate_at(vars(starts_with("ORG"),starts_with("PROPERTY")),funs(ifelse(is.na(.),"-",sprintf("%0.2f",.)))) %>%  # Numeric to string
   mutate_at(vars(starts_with("STRENGTH")),funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% data.frame  # Numeric to string
 
 to.plot <- to.plot[match(countries_order,to.plot$COUNTRIES),]
