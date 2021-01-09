@@ -576,7 +576,8 @@ Table12 <- soc_indicators %>%
   ) %>%
   rowwise() %>% # CATCH.DEP factor is the mean of the normalized indicators above for each stock (row)
   mutate(CATCH.DEP=mean(c(Stockdep.sp_norm,Stockdep.total_norm),na.rm=TRUE)) %>% 
-  ungroup() %>% arrange_table()
+  ungroup() 
+#%>% arrange_table()
 
 
 # Prepare for word
