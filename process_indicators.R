@@ -830,9 +830,9 @@ write_doc(Ft,
 
 #Table 18
 
-#Table18 <- ins_indicators  %>% 
-#  select(COUNTRIES,STOCK,TAC) %>% 
-#  spread(COUNTRIES,TAC)
+Table18 <- ins_indicators  %>% 
+  select(COUNTRIES,STOCK,TAC) %>% 
+  spread(COUNTRIES,TAC)
 
 # Prepare for word
 
