@@ -1,49 +1,39 @@
 ﻿Species;Stock_name;Area_27
-Cod;CODNEAR;2.a.1
-Cod;CODNEAR;2.a.2
-Cod;CODICE;5.a.1
-Cod;CODICE;5.a.2
-Cod;CODFAPL;5.b.1.b
-Cod;CODFAPL;5.b.1.a
-Cod;CODFAPL;5.b.2
-Cod;CODFAPL;5.b.1.a
-Cod;CODBA2532;3.a.25
-Cod;CODBA2532;3.a.26
-Cod;CODBA2532;3.a.27
-Cod;CODBA2532;3.a.28.1
-Cod;CODBA2532;3.a.28.2
-Cod;CODBA2532;3.a.29
-Cod;CODBA2532;3.a.30
-Cod;CODBA2532;3.a.31
-Cod;CODBA2532;3.a.32
-Cod;CODIIIaW;4.a
-Cod;CODIIIaW;4.b
-Cod;CODIIIaW;4.c
-Cod;CODIIIaW;3.a.20
-Cod;CODKAT;3.a.21
-Cod;CODIIIaW;7.d
-Cod;CODVIa;6.a
-Cod;CODIS;7.a
-Hake;HAKESOTH;8.c
-Hake;HAKESOTH;9.a
-Hake;HAKENRTN;5.b.1.b
-Hake;HAKENRTN; 5.b.2
-Hake;HAKENRTN; 5.b.1.a
-Hake;HAKENRTN; 6.b.1
-Hake;HAKENRTN; 6.b.2
-Hake;HAKENRTN; 7.c.1
-Hake;HAKENRTN; 7.c.2
-Hake;HAKENRTN; 7.b
-Hake;HAKENRTN; 7.k.1
-Hake;HAKENRTN; 7.k.2
-Hake;HAKENRTN; 7.j.2
-Hake;HAKENRTN; 7.g
-Hake;HAKENRTN; 7.h
-Hake;HAKENRTN; 7.f
-Hake;HAKENRTN; 7.e
-Hake;HAKENRTN; 8.a
-Hake;HAKENRTN; 8.b
-Hake;HAKENRTN; 7.d
-Hake;HAKENRTN; 4.a
-Hake;HAKENRTN; 4.b
-Hake;HAKENRTN; 4.c
+Cod;Codnear&Codcoastnor;2.a.1
+Cod;Codnear&Codcoastnor;2.a.2
+Cod;Codice;5.a.1
+Cod;Codice;5.a.2
+Cod;Codfalp;5.b.1.b
+Cod;Codfalp;5.b.2
+Cod;Codfalp;5.b.1.a
+Cod;Codba-25-32;4.c
+Cod;Codba-25-32;3.a.20
+Cod;Codba-25-32;3.d.32
+Cod;Codns;4.a
+Cod;Codns;4.b
+Cod;CodVla;6.a
+Cod;Codis;7.a
+Cod;CodKat;27.3.21
+Hake;Hakesouth;8.c
+Hake;Hakesouth;9.a
+Hake;Hakertn;5.b.1.b
+Hake;Hakertn; 5.b.2
+Hake;Hakertn; 5.b.1.a
+Hake;Hakertn; 6.b.1
+Hake;Hakertn; 6.b.2
+Hake;Hakertn; 7.c.1
+Hake;Hakertn; 7.c.2
+Hake;Hakertn; 7.b
+Hake;Hakertn; 7.k.1
+Hake;Hakertn; 7.k.2
+Hake;Hakertn; 7.j.2
+Hake;Hakertn; 7.g
+Hake;Hakertn; 7.h
+Hake;Hakertn; 7.f
+Hake;Hakertn; 7.e
+Hake;Hakertn; 8.a
+Hake;Hakertn; 8.b
+Hake;Hakertn; 7.d
+Hake;Hakertn; 4.a
+Hake;Hakertn; 4.b
+Hake;Hakertn; 4.c
