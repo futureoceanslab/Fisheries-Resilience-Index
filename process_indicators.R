@@ -718,11 +718,11 @@ write_doc(Ft,
 
 reduce( # Merge tables 11, 12 and 14
   list(
+    Table10 %>% select(COUNTRIES,GEAR.DIVERSITY),
     Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
     Table12 %>% select(SPECIES,STOCK,COUNTRIES,CATCH.DEP),
     Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
   ),full_join,by="COUNTRIES") %>%
-  full_join(Table10 %>% select(SPECIES,GEAR.DIVERSITY), by="SPECIES") %>% # Merge table 10
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
   select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
