@@ -571,6 +571,9 @@ Table12 <- soc_indicators %>%
   complete(nesting(SPECIES,STOCK),COUNTRIES) %>%
   arrange(COUNTRIES,SPECIES,STOCK) %>% 
   select(SPECIES,COUNTRIES,STOCK,Stockdep.sp,Stockdep.total) %>%
+  mutate(Stockdep.sp = na_if(Stockdep.sp, 0),         #convert 0 dependence on a stock to NA, so that there is no catch dep calculated
+         Stockdep.total = na_if(Stockdep.total, 0)
+  ) %>%      
   mutate(Stockdep.sp_norm=normalize_negative(Stockdep.sp), # Normalization negative
          Stockdep.total_norm=normalize_negative(Stockdep.total) # Normalization negative
   ) %>%
