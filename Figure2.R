@@ -301,7 +301,7 @@ colnames(stock) [which (colnames(stock) == "?..Species")] <- "Species"
 ##################################################
 # Upload Resilience data
 
-Res <- read.csv("Data/Lat_RI_Stock.csv", sep = ";")
+Res <- read.csv("Data/Lat_RI_Stock2.csv", sep = ";")
 Res$FRI.x.Stock<- as.factor(Res$RI.x.Stock)
 
 colnames(Res) [which (colnames(Res) == "SPECIES")] <- "Species"
