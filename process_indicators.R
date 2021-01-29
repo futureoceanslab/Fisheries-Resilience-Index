@@ -659,6 +659,9 @@ Table14 <- soc_indicators %>%
   mutate(ADAPTIVE.MNG=mean(c(Research_norm,Management_norm),na.rm=TRUE)) %>% 
   ungroup()
 
+
+
+
 # Prepare for word
 
 to.plot <- Table14 %>% mutate_if(is.numeric,funs(round(.,digits = 3))) %>% data.frame %>%
