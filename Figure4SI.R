@@ -68,7 +68,7 @@ par(mfrow = c(1, 3))
 
 # socioeconomic correlations
 
-soc_to_correlate <- soc_indicators %>% select(-SPECIES,-COUNTRIES,-STOCK)
+soc_to_correlate <- soc_indicators %>% select(-SPECIES,-COUNTRIES,-STOCK, -V11, -V12, -V13)
 soc_correlations <- cor(soc_to_correlate, use="pairwise.complete.obs")
 p1 <- corrplot(soc_correlations, order ="AOE")
 
