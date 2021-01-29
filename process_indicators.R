@@ -92,9 +92,13 @@ if(!require(tidyverse)){
 require(tidyverse)
 packageVersion("tidyverse")
 
-## Viridis color palette 
-install.packages("viridis")
-library(viridis)
+if(!require(viridis)){
+  install.packages("viridis",dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+require(viridis)
+packageVersion("viridis")
+
+
 
 # [1] ‘1.2.1’
 
@@ -136,6 +140,55 @@ countries_dependence <- suppressWarnings(c(countries_fishing,list(CODNEARNCW_COD
                                            full_join(stock_by_species,by="STOCK") %>%
                                            select(-STOCK) %>% distinct %>%
                                            mutate(dependence=TRUE))
+
+### STOCK FRACTION BY COUNTRY  ###############
+
+country_areas=read.csv("data/country_areas.csv",sep=";", header=TRUE)
+country_areas$Chake=apply(country_areas[,3:4],1,sum)
+country_areas$Ccod=apply(country_areas[,5:12],1,sum)
+for (i in 3:4)
+{
+  x=country_areas[,i]
+  country_areas[x>0,i]=country_areas[x>0,i]/country_areas$Chake[x>0]
+}	
+for (i in 5:12)
+{
+  x=country_areas[,i]
+  country_areas[x>0,i]=country_areas[x>0,i]/country_areas$Ccod[x>0]
+}
+
+Careas=country_areas[,-1]
+tab=as.matrix(Careas[,-1])
+rownames(tab)=Careas[,1]
+#	ecoind=eco_indicators
+#	stocks=names(Careas[,-1])
+#	ecoind=ecoind[-4,]
+
+stock_areas=read.csv("data/stock_areas.csv",sep=";", header=TRUE)
+SCareas=stock_areas[1:14,]							   
+hake.area=as.matrix(SCareas[,3:4])
+cod.area=SCareas[,5:12]
+rownames(hake.area)=country_areas$country_code[-15]
+rownames(cod.area)=country_areas$country_code[-15]
+
+
+
+#png("Figures/Figure_Careas.png", width = 16, height = 12, units = "cm",pointsize=8,
+   # bg = "white", res = 450, family = "", restoreConsole = TRUE)
+
+png("Figures/Figure Areas.png",width=9,height=7,units="in",res=300)
+
+par(mfrow=c(2,1))
+par(mar=c(3,4.5,3,12))
+hcol=c("blue","cyan")
+ccol=viridis(9)
+barplot(as.matrix(t(hake.area)), col=hcol,ylab="Stock area",xlab=" ",main="Hake",
+        legend.text=colnames(hake.area), args.legend = list(x = "topright", cex=.8, bty="n", inset=c(-1,-0.2), xpd = TRUE))
+
+barplot(as.matrix(t(cod.area)), col=ccol,ylab="Stock area",xlab=" ",main="Cod",
+        legend.text=colnames(cod.area),args.legend = list(x = "topright",cex=.8, bty="n", inset=c(-2.1,-0.3), xpd = TRUE))
+
+dev.off()	
 
 
 # Table 8
