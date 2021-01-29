@@ -242,7 +242,7 @@ Table3 <- eco_indicators  %>%
          Rtrend_norm=normalize_positive(Rtrend) # Positive
   ) %>%
   rowwise %>% # ABUNDANCE factor is the mean of the normalized indicators above for each stock (row)
-  mutate(ABUNDANCE=mean(c(SSBrecent_norm,Ftrend_norm,Rtrend_norm),na.rm=TRUE)) %>% #droping SSBhistoric due to correlation
+  mutate(ABUNDANCE=mean(c(SSBrecent_norm,Ftrend_norm),na.rm=TRUE)) %>% #droping SSBhistoric and R_trenddue to correlation
   ungroup() %>% 
   select(-starts_with("B_"),-ends_with(".average")) # Remove slopes and averages from the table
 
