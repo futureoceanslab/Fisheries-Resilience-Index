@@ -56,7 +56,7 @@ packageVersion("tidyverse")
 
 eco_indicators <- fread("data/ecological_indicators.csv")
                             
-ins_indicators <- fread("data/institutional_indicators 2.csv")
+ins_indicators <- fread("data/institutional_indicators.csv")
                             
 soc_indicators <- fread("data/socioeconomic_indicators.csv")
 
