@@ -91,6 +91,11 @@ if(!require(tidyverse)){
 }
 require(tidyverse)
 packageVersion("tidyverse")
+
+## Viridis color palette 
+install.packages("viridis")
+library(viridis)
+
 # [1] ‘1.2.1’
 
 source("aux_functions.R")
