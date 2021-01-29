@@ -247,6 +247,8 @@ to.plot <- Table1 %>%
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
 
+Tab_species=to.plot ## New
+
 to.plot[is.na(to.plot)] <- "-"
 
 
@@ -285,6 +287,75 @@ Ft<- format_table(to.plot)
 write_doc(Ft,
           "Table 2. Value of the coefficients (ß) from the linear models of SSB historic (full time series), SSB recent (1980-2018), R and F in RAM legacy stocks. Significance at the 0.001 (***), 0.01 (**), 0.05 (*) and 0.1 levels.",
           "Tables/Table2SI.docx",landscape=TRUE)
+
+
+##################################################################		  
+#########		 eco_indicators by country 					######
+##################################################################	
+CAmat=as.matrix(Careas[,-1])
+
+EcoArray=array(NA, dim=c(14,ncol(eco_indicators)-1,2))
+rownames(EcoArray)=country_areas$country_code[1:14]
+colnames(EcoArray)=names(eco_indicators)[-1]	  
+colnames(EcoArray)[1]="country"	  
+ecomat=data.frame(eco_indicators)
+
+
+EcoCod=as.data.frame(EcoArray[,,2])
+EcoCod$country=rownames(EcoArray)
+EcoCod$area2006=ecomat$area2006[3]
+EcoCod$area2100=ecomat$area2100[3]
+EcoCod$Trange=ecomat$Trange[3]
+EcoCod$T50=ecomat$T50[3]
+
+for (i in 1:14)
+{
+  x=as.numeric(CAmat[i,3:10])
+  for (j in 6:ncol(EcoArray))
+  {
+    k=j+1
+    y=ecomat[3:11,k]	
+    y=y[-2]
+    aux=x*y
+    EcoCod[i,j]=sum(aux)
+    #	
+    EcoCod[i,j]=sum(na.omit(aux))
+  }
+}
+
+
+
+EcoHake=EcoHake[-15,]
+species=c(rep("Hake",14),rep("Cod",14))
+
+Ecoind_country=rbind(EcoHake,EcoCod)
+Ecoind_country$species=species
+Ecoind_country$country=as.factor(Ecoind_country$country)
+Ecoind_country$species=as.factor(Ecoind_country$species)
+
+X=Ecoind_country
+X$SSBrecent=X$B_SSBrecent/X$SSB.average
+X$SSBhistoric=X$B_SSBhistoric/X$SSB.average
+X$Ftrend=X$B_Ftrend/X$F.average
+X$Rtrend=X$B_Rtrend/X$R.average
+
+X$SSBrecent_norm=normalize_positive(X$SSBrecent)
+X$SSBhistoric_norm=normalize_positive(X$SSBhistoric)
+X$Ftrend_norm=normalize_negative(X$Ftrend)
+X$Rtrend_norm=normalize_positive(X$Rtrend)
+
+X$ABUNDANCE=apply(X[,21:24],1,mean)
+Ecoind_country=X
+
+Chake=apply(CAmat[,1:2],1,sum)
+Ccod=apply(CAmat[,3:10],1,sum)
+
+
+
+
+
+
+
 
 # Table 3
 
