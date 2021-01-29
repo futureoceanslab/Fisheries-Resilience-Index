@@ -914,7 +914,7 @@ write_doc(Ft,
 Table20 <-ins_indicators %>% 
   select(COUNTRIES,Compliance) %>%
   distinct %>%
-  mutate(Compliance_norm=normalize_positive(Compliance)) %>% # Normalization positive
+  mutate(Compliance_norm=normalize_negative(Compliance)) %>% # Normalization negative
   rowwise() %>%
   mutate(STRENGTH=Compliance_norm) %>% # DEVELOPMENT factos is HDI normalized
   ungroup()
