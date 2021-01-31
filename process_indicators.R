@@ -560,10 +560,10 @@ Ecoind_country$RI=apply(Emat,1,mean, na.rm=TRUE)
 Ecoind_country$RIdef= Ecoind_country$RI
 Ecoind_country$RIdef[rid==0]=NA #not working
 summary(Ecoind_country)
-#Ecoind_country$species=species
+Ecoind_country$species=species
 
 
-write.table(Ecoind_country,"Data/EcologicalRI_country.csv",sep=";") 
+write.table(Ecoind_country,"Data/EcologicalRI_country.csv",sep=";", row.names = FALSE) 
 
 
 ##### 3. SOCIOECONOMIC INDICATORS #####
