@@ -495,7 +495,7 @@ for (i in 1:14)
     EcoCod[i,j]=sum(na.omit(aux))
   }
 }
-species=c(rep("Hake",14),rep("Cod",14))
+species=c(rep("European hake",14),rep("Atlantic cod",14))
 
 Ecoind_country=rbind(EcoHake,EcoCod)
 Ecoind_country$species=species
