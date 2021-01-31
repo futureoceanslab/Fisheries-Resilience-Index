@@ -561,7 +561,7 @@ summary(Ecoind_country)
 #Ecoind_country$species=species
 
 
-write.table(Ecoind_country,"EcologicalRI_country.csv",sep=";") 
+write.table(Ecoind_country,"Data/EcologicalRI_country.csv",sep=";") 
 
 
 ##### 3. SOCIOECONOMIC INDICATORS #####
