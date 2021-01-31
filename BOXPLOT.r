@@ -79,7 +79,7 @@ a<-filter(world_area, grepl('EG|AL|AD|AT|BY|BE|BA|BG|HR|CY|CZ|DK|EE|FO|FI|FR|DE|
 
 ##### 3. READ DATA #####
 
-final_index <- read.csv("data/final_index_rev.csv",sep=";", header=TRUE)
+final_index <- read.csv("data/final_index.csv",sep=",", header=TRUE)  ## ";" in PC?
 
 joined <- merge(a, final_index, by="COUNTRIES", all.x=T)
 
