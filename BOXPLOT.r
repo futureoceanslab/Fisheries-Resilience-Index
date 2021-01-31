@@ -79,7 +79,7 @@ a<-filter(world_area, grepl('EG|AL|AD|AT|BY|BE|BA|BG|HR|CY|CZ|DK|EE|FO|FI|FR|DE|
 
 ##### 3. READ DATA #####
 
-final_index <- read.csv("data/final_index.csv",sep=",", header=TRUE)  ## ";" in PC?
+final_index <- read.csv("data/final_index.csv",sep=",", header=TRUE)  ## "; in PC?
 
 joined <- merge(a, final_index, by="COUNTRIES", all.x=T)
 
@@ -97,23 +97,23 @@ species_average <- final_index %>%
   arrange(COUNTRIES,DIMENSION)  %>% 
   mutate(SPECIE=toupper(SPECIE))  %>%  
   group_by(COUNTRIES,SPECIE) %>%
-  summarise(Resilience_Index=mean(RI,na.rm = TRUE)) %>%
+  summarise(Resilience_Index=mean(Resilience_Index,na.rm = TRUE)) %>%
   ungroup()
 	
 Fdata=species_average
 
 png(filename = "Figures/Boxplots_RI.png",
     width = 20, height =8, units = "cm", pointsize = 8,
-    bg = "white", res = 450, family = "", restoreConsole = TRUE)
+    bg = "white", res = 450, family = "")
 
 
 	par(mfrow=c(1,4))
 	ylim=c(0,1)
 	ldim=levels(joined$dim)
-	boxplot(Resilience_Index~SPECIE, ylim=ylim, ylab="Resilience Index", main="Overal", data=Fdata)
+	boxplot(Resilience_Index~SPECIE, ylim=ylim, ylab="Resilience Index", main="Overall", data=Fdata)
 	for(i in 1:3)
 	{
-		boxplot(RI~sp, ylim=ylim, ylab="Resilience Index", main=ldim[i], data=Data[[i]])
+		boxplot(Resilience_Index~SPECIE, ylim=ylim, ylab="Resilience Index", main=ldim[i], data=Data[[i]])
 	}
 
 dev.off()
