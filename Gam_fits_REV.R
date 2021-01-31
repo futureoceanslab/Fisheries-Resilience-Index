@@ -79,7 +79,8 @@ a<-filter(world_area, grepl('EG|AL|AD|AT|BY|BE|BA|BG|HR|CY|CZ|DK|EE|FO|FI|FR|DE|
 
 ##### 3. READ DATA #####
 
-final_index <- read.csv("data/final_index_rev.csv",sep=";", header=TRUE)
+final_index <- read.csv("data/final_index.csv",sep=",", header=TRUE)
+final_index <- final_index %>% mutate(RI = Resilience_Index) 
 
 joined <- merge(a, final_index, by="COUNTRIES", all.x=T)
 
@@ -166,11 +167,11 @@ GCV = 0.025531  Scale est. = 0.01971   n = 22
 ###################################################################################		
 
 ## Fit marginal models to plot	
-gi_cod=gam(Resilience_Index~s(LAT, bs="ts"), family="quasibinomial", data=SIdata[[1]])
-gi_hake=gam(Resilience_Index~s(LAT, bs="ts"), family="quasibinomial", data=SIdata[[2]])
+gi_cod=gam(Resilience_Index~s(LAT, bs="ts"), family="quasibinomial", data=Data[[1]])
+gi_hake=gam(Resilience_Index~s(LAT, bs="ts"), family="quasibinomial", data=Data[[2]])
 
 ## create predictions 	
-data=SIdata[[1]]
+data=Data[[1]]
 rlat=range(data$LAT)
 ncod=data.frame(LAT=seq(rlat[1], rlat[2], length=100))
 p=predict(gi_cod,newdata=ncod, type="response",se=TRUE)
@@ -179,7 +180,7 @@ se=p$se.fit
 up=pred+1.96*se
 low=pred-1.96*se
 
-data=SIdata[[2]]
+data=Data[[2]]
 rlat=range(data$LAT)
 nhake=data.frame(LAT=seq(rlat[1], rlat[2], length=100))
 p=predict(gi_hake,newdata=nhake, type="response",se=TRUE)
@@ -191,13 +192,13 @@ low2=pred2-1.96*se
 
 png(filename = "Figures/INSTITUTIONALgam.png",
     width = 20, height =8, units = "cm", pointsize = 8,
-    bg = "white", res = 450, family = "", restoreConsole = TRUE)
+    bg = "white", res = 450, family = "")
 
 par(mfrow=c(1,2))
 par(mar=c(4,4.5, 4, 2))
 
 
-plot(ncod$LAT, pred,ylim=c(0,1), type="l",col=1, lty=2,xlab="LAT", ylab="Institutional R.I", main="COD")
+plot(ncod$LAT, pred,ylim=c(0,1), type="l",col=1, lty=2,xlab="LAT", ylab="Institutional RI", main="COD")
 x=ncod$LAT
 polygon(x=c(x,rev(x)),y=c(up,rev(low)), col="grey75")
 lines(x,pred, col=1, lwd=2)
@@ -205,7 +206,7 @@ abline(h=mean(data$Resilience_Index), col=2, lty=2)
 
 x=nhake$LAT
 
-plot(nhake$LAT, pred2,ylim=c(0,1), type="l",col=1, lty=2,xlab="LAT", ylab="Institutional R.I", main="HAKE")
+plot(nhake$LAT, pred2,ylim=c(0,1), type="l",col=1, lty=2,xlab="LAT", ylab="Institutional RI", main="HAKE")
 x=nhake$LAT
 polygon(x=c(x,rev(x)),y=c(up2,rev(low2)), col="grey75")
 lines(x,pred2, col=1, lwd=2)
