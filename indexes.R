@@ -56,6 +56,8 @@ packageVersion("tidyverse")
 
 
 eco_factors <- fread("data/ecological_factors_country.csv") %>% mutate(DIMENSION="ecological")
+colnames(eco_factors)[1] = "COUNTRIES"
+colnames(eco_factors)[2] = "SPECIES"
 
 eco_factors_stock <- fread("data/ecological_factors.csv") %>% mutate(DIMENSION="ecological")
 
