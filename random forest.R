@@ -27,6 +27,7 @@ library(ggplot2)
 library(gbm)
 library(tree)
 library(tidyverse)
+library(data.table)
 
 
 ##### 1. Read factors #####
@@ -78,23 +79,41 @@ TableFactors <- TableFactors[ ,c(-1, -2, -15)]  #droping dim species and country
 #[1] 66 12
 set.seed(1)
 train=sample(1:nrow(TableFactors),20) #training Sample with 20 observations
-index.rf=randomForest(Resilience_Index ~ . , data = TableFactors , subset = train, na.action=na.roughfix, calibrate = TRUE)
+index.rf=randomForest(Resilience_Index ~ . , data = TableFactors , subset = train, importance=TRUE, na.action=na.roughfix, calibrate = TRUE)
+
+importance(index.rf)
+importanceSD(index.rf)
 
 
-
-gg_dta <- gg_vimp(index.rf)
-a <- plot(gg_dta)
 
 
 plot(gg_vimp(index.rf))
 
 
-tree.rf=tree(Resilience_Index~.,TableFactors,subset=train, na.action=na.roughfix)
+
+#'Mean Decrease Accuracy (%IncMSE) - 
+#'This shows how much our model accuracy decreases if we leave out that variable
+
+png(file="Figures/RandomForest.png",
+    width=600, height=350)
+varImpPlot(index.rf,type=1, main="country resilience index") # let's save the varImp object
+dev.off()
 
 
-summary(tree.rf)
-plot(tree.rf)
-text(tree.rf,pretty=0)
-yh=predict(tree.rf,newdata=TableFactors[-train,])
 
+
+########extra code############
+# this part just creates the data.frame for the plot part
+library(dplyr)
+imp <- as.data.frame(imp)
+imp$varnames <- rownames(imp) # row names to column
+rownames(imp) <- NULL  
+imp$var_categ <- rep(1:2, 5) # random var category
+ggplot(imp, aes(x=reorder(varnames, IncNodePurity), y=IncNodePurity, color=as.factor(var_categ))) + 
+  geom_point() +
+  geom_segment(aes(x=varnames,xend=varnames,y=0,yend=IncNodePurity)) +
+  scale_color_discrete(name="Variable Group") +
+  ylab("IncNodePurity") +
+  xlab("Variable Name") +
+  coord_flip()
 
