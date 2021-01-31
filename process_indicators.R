@@ -143,6 +143,8 @@ countries_dependence <- suppressWarnings(c(countries_fishing,list(CODNEARNCW_COD
                                            select(-STOCK) %>% distinct %>%
                                            mutate(dependence=TRUE))
 
+countries_dependence <- countries_dependence[-(23:30),]
+
 
 ### STOCK FRACTION BY COUNTRY  ###############
 
@@ -803,15 +805,26 @@ write_doc(Ft,
 
 # Merge tables 11, 12, 10 and 14 to produce socioeconomic factors per stock: socioeconomic_factors.csv
 
+#Adding the SPECIES column to tables 11 and 14 to be able to properly join
+Table14 <- as.data.frame(lapply(Table14, rep,2))
+SPECIES_col <- c(rep("European hake",14),  rep("Atlantic cod",14))
+Table14$SPECIES <- SPECIES_col
+
+Table11 <- as.data.frame(lapply(Table11, rep,2))
+SPECIES_col <- c(rep("European hake",14),  rep("Atlantic cod",14))
+Table11$SPECIES <- SPECIES_col
+
+
 reduce( # Merge tables 11, 12 and 14
   list(
-    Table10 %>% select(COUNTRIES,GEAR.DIVERSITY),
-    Table11 %>% select(COUNTRIES,FLEET.MOBILITY),
+    Table10 %>% select(SPECIES,COUNTRIES,GEAR.DIVERSITY),
+    Table11 %>% select(SPECIES,COUNTRIES,FLEET.MOBILITY),
     Table12 %>% select(SPECIES,STOCK,COUNTRIES,CATCH.DEP),
-    Table14 %>% select(COUNTRIES,ADAPTIVE.MNG)
-  ),full_join,by="COUNTRIES") %>%
+    Table14 %>% select(SPECIES,COUNTRIES,ADAPTIVE.MNG)
+  ),full_join,by = c("COUNTRIES", "SPECIES")) %>%
   left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on each species
   filter(dependence) %>% select(-dependence) %>%
+  distinct()  %>%
   select("SPECIES","COUNTRIES","STOCK","ADAPTIVE.MNG","CATCH.DEP","FLEET.MOBILITY","GEAR.DIVERSITY") %>% # Organize columns
   write_excel_csv("data/socioeconomic_factors.csv") # Save to csv
 
