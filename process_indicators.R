@@ -460,9 +460,9 @@ ecomat=data.frame(eco_indicators)
 
 EcoHake=as.data.frame(EcoArray[,,1])
 EcoHake$country=rownames(EcoArray)
-EcoHake$AreaChange=ecomat$AreaChange[1]
-EcoHake$Trange=ecomat$Trange[1]
-EcoHake$T50=ecomat$T50[1]
+EcoHake$AreaChange=ecomat$AreaChange[10]
+EcoHake$Trange=ecomat$Trange[10]
+EcoHake$T50=ecomat$T50[10]
 
 for (i in 1:14)
 {
@@ -479,8 +479,8 @@ for (i in 1:14)
 EcoCod=as.data.frame(EcoArray[,,2])
 EcoCod$country=rownames(EcoArray)
 EcoCod$AreaChange=ecomat$AreaChange[1]	
-EcoCod$Trange=ecomat$Trange[3]
-EcoCod$T50=ecomat$T50[3]
+EcoCod$Trange=ecomat$Trange[1]
+EcoCod$T50=ecomat$T50[1]
 
 for (i in 1:14)
 {
