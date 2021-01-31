@@ -10,20 +10,23 @@
 #' 
 #' and produces
 #' 
+#' data/ecological_indicators_country.csv
+#' data/ecological_factors.csv
 #' data/socioeconomic_factors.csv
 #' data/institutional_factors.csv
-#' data/ecological_factors.csv
+#' data/ecological_factors_country.csv
 #' data/socioeconomic_factors_country.csv
 #' data/institutional_factors_country.csv
-#' data/ecological_factors_country.csv
+#' data/ecologicalRI_country.csv
 #' 
+#' Tables/Table1SI.docx
 #' Tables/Table2SI.docx
 #' Tables/Table3SI.docx
 #' Tables/Table4SI.docx
 #' Tables/Table5SI.docx
 #' Tables/Table6SI.docx
 #' Tables/Table8SI.docx
-#' Tables/Table9SI.docx
+#' Tables/Table9SI.docx dropped
 #' Tables/Table10SI.docx
 #' Tables/Table11SI.docx
 #' Tables/Table12SI.docx
@@ -91,6 +94,7 @@ if(!require(tidyverse)){
 }
 require(tidyverse)
 packageVersion("tidyverse")
+# [1] ‘1.2.1’
 
 if(!require(viridis)){
   install.packages("viridis",dependencies = TRUE,repos='http://cran.us.r-project.org')
@@ -98,15 +102,13 @@ if(!require(viridis)){
 require(viridis)
 packageVersion("viridis")
 
-
-
-# [1] ‘1.2.1’
-
 source("aux_functions.R")
 
 # Disable scientific notation
 scipen <- getOption("scipen")
 options(scipen=999)
+
+
 
 ##### 1.1 DEFINE COUNTRY DEPENDENCY #####
 
@@ -141,6 +143,7 @@ countries_dependence <- suppressWarnings(c(countries_fishing,list(CODNEARNCW_COD
                                            select(-STOCK) %>% distinct %>%
                                            mutate(dependence=TRUE))
 
+
 ### STOCK FRACTION BY COUNTRY  ###############
 
 country_areas=read.csv("data/country_areas.csv",sep=";", header=TRUE)
@@ -160,9 +163,6 @@ for (i in 5:12)
 Careas=country_areas[,-1]
 tab=as.matrix(Careas[,-1])
 rownames(tab)=Careas[,1]
-#	ecoind=eco_indicators
-#	stocks=names(Careas[,-1])
-#	ecoind=ecoind[-4,]
 
 stock_areas=read.csv("data/stock_areas.csv",sep=";", header=TRUE)
 SCareas=stock_areas[1:14,]							   
@@ -171,24 +171,8 @@ cod.area=SCareas[,5:12]
 rownames(hake.area)=country_areas$country_code[-15]
 rownames(cod.area)=country_areas$country_code[-15]
 
+###################################################################
 
-
-#png("Figures/Figure_Careas.png", width = 16, height = 12, units = "cm",pointsize=8,
-   # bg = "white", res = 450, family = "", restoreConsole = TRUE)
-
-png("Figures/Figure Areas.png",width=9,height=7,units="in",res=300)
-
-par(mfrow=c(2,1))
-par(mar=c(3,4.5,3,12))
-hcol=c("blue","cyan")
-ccol=viridis(9)
-barplot(as.matrix(t(hake.area)), col=hcol,ylab="Stock area",xlab=" ",main="Hake",
-        legend.text=colnames(hake.area), args.legend = list(x = "topright", cex=.8, bty="n", inset=c(-1,-0.2), xpd = TRUE))
-
-barplot(as.matrix(t(cod.area)), col=ccol,ylab="Stock area",xlab=" ",main="Cod",
-        legend.text=colnames(cod.area),args.legend = list(x = "topright",cex=.8, bty="n", inset=c(-2.1,-0.3), xpd = TRUE))
-
-dev.off()	
 
 
 # Table 8
@@ -213,7 +197,7 @@ write_doc(Ft,
           "Tables/Table8SI.docx")
 
 
-##### 2. ECOLOGICAL INDICATORS #####
+##### 2. ECOLOGICAL INDICATORS PROCESSING #####
 
 eco_indicators <- fread("data/ecological_indicators.csv",check.names = TRUE)
 
@@ -234,7 +218,7 @@ Table1 <- eco_indicators  %>%
          AreaChange_norm=(AreaChange_positive-area_min)/(area_max-area_min)
          # Normalization positive
          # Normalization positive
- )%>% 
+  )%>% 
   rowwise() %>%  # AREA factor is the mean of the normalized indicators above for each species (row)
   mutate(AREA=AreaChange_norm,
          area_min=area_min,
@@ -246,8 +230,6 @@ to.plot <- Table1 %>%
   select(SPECIES,AreaChange_positive,area_min,area_max,AreaChange_norm,AREA) %>% 
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   data.frame
-
-Tab_species=to.plot ## New
 
 to.plot[is.na(to.plot)] <- "-"
 
@@ -288,75 +270,6 @@ write_doc(Ft,
           "Table 2. Value of the coefficients (ß) from the linear models of SSB historic (full time series), SSB recent (1980-2018), R and F in RAM legacy stocks. Significance at the 0.001 (***), 0.01 (**), 0.05 (*) and 0.1 levels.",
           "Tables/Table2SI.docx",landscape=TRUE)
 
-
-##################################################################		  
-#########		 eco_indicators by country 					######
-##################################################################	
-CAmat=as.matrix(Careas[,-1])
-
-EcoArray=array(NA, dim=c(14,ncol(eco_indicators)-1,2))
-rownames(EcoArray)=country_areas$country_code[1:14]
-colnames(EcoArray)=names(eco_indicators)[-1]	  
-colnames(EcoArray)[1]="country"	  
-ecomat=data.frame(eco_indicators)
-
-
-EcoCod=as.data.frame(EcoArray[,,2])
-EcoCod$country=rownames(EcoArray)
-EcoCod$area2006=ecomat$area2006[3]
-EcoCod$area2100=ecomat$area2100[3]
-EcoCod$Trange=ecomat$Trange[3]
-EcoCod$T50=ecomat$T50[3]
-
-for (i in 1:14)
-{
-  x=as.numeric(CAmat[i,3:10])
-  for (j in 6:ncol(EcoArray))
-  {
-    k=j+1
-    y=ecomat[3:11,k]	
-    y=y[-2]
-    aux=x*y
-    EcoCod[i,j]=sum(aux)
-    #	
-    EcoCod[i,j]=sum(na.omit(aux))
-  }
-}
-
-
-
-EcoHake=EcoHake[-15,]
-species=c(rep("Hake",14),rep("Cod",14))
-
-Ecoind_country=rbind(EcoHake,EcoCod)
-Ecoind_country$species=species
-Ecoind_country$country=as.factor(Ecoind_country$country)
-Ecoind_country$species=as.factor(Ecoind_country$species)
-
-X=Ecoind_country
-X$SSBrecent=X$B_SSBrecent/X$SSB.average
-X$SSBhistoric=X$B_SSBhistoric/X$SSB.average
-X$Ftrend=X$B_Ftrend/X$F.average
-X$Rtrend=X$B_Rtrend/X$R.average
-
-X$SSBrecent_norm=normalize_positive(X$SSBrecent)
-X$SSBhistoric_norm=normalize_positive(X$SSBhistoric)
-X$Ftrend_norm=normalize_negative(X$Ftrend)
-X$Rtrend_norm=normalize_positive(X$Rtrend)
-
-X$ABUNDANCE=apply(X[,21:24],1,mean)
-Ecoind_country=X
-
-Chake=apply(CAmat[,1:2],1,sum)
-Ccod=apply(CAmat[,3:10],1,sum)
-
-
-
-
-
-
-
-
 # Table 3
 
 Table3 <- eco_indicators  %>% 
@@ -371,7 +284,7 @@ Table3 <- eco_indicators  %>%
          Rtrend_norm=normalize_positive(Rtrend) # Positive
   ) %>%
   rowwise %>% # ABUNDANCE factor is the mean of the normalized indicators above for each stock (row)
-  mutate(ABUNDANCE=mean(c(SSBrecent_norm,Ftrend_norm),na.rm=TRUE)) %>% #droping SSBhistoric and R_trenddue to correlation
+  mutate(ABUNDANCE=mean(c(SSBrecent_norm,Ftrend_norm),na.rm=TRUE)) %>% #droping SSBhistoric and Rtrend due to correlation
   ungroup() %>% 
   select(-starts_with("B_"),-ends_with(".average")) # Remove slopes and averages from the table
 
@@ -420,7 +333,7 @@ to.plot <- Table4 %>%
   mutate_at(vars(c("T50","Trange","Trange_2","Trange_98","T50_2","T50_98")),funs(ifelse(is.na(.),"-",sprintf("%d",as.integer(.))))) %>% # Numbers to string
   data.frame %>% 
   select(SPECIES,Trange,T50,Trange_2,Trange_98,T50_2,T50_98,Trange_norm,T50_norm,TEMPERATURE)
-  
+
 # Save to word
 
 Ft<- format_table(to.plot)
@@ -454,7 +367,7 @@ to.plot <- Table5 %>%
   mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) %>% # Numbers to string
   select(STOCK,OverMSY,Status,OverMSY_norm,Status_norm,OVEREXPLOITATION) %>%
   data.frame
-  
+
 
 
 
@@ -502,12 +415,7 @@ write_doc(Ft,
           "Table 6. Recovery indicator, normalization and factor.",
           "Tables/Table6SI.docx")
 
-
-##### 2.6 ECOLOGICAL FACTORS #####
-
-# See section 1.B in "SI 2. Indicators and Factors" for details
-
-# Table 7
+# Table 7 - ECOLOGICAL FACTORS PER STOCK
 
 # Merge all the factors in one table except AREA due to correlation
 
@@ -538,78 +446,123 @@ Table7 %>%
 
 
 
+##################################################################		  
+#########		 eco_indicators by country 					######
+##################################################################	
+CAmat=as.matrix(Careas[,-1])
+EcoArray=array(NA, dim=c(14,ncol(eco_indicators)-1,2))
+rownames(EcoArray)=country_areas$country_code[1:14]
+colnames(EcoArray)=names(eco_indicators)[-1]	  
+colnames(EcoArray)[1]="country"	  
+ecomat=data.frame(eco_indicators)
 
-# Table 9
+EcoHake=as.data.frame(EcoArray[,,1])
+EcoHake$country=rownames(EcoArray)
+EcoHake$AreaChange=ecomat$AreaChange[1]
+EcoHake$Trange=ecomat$Trange[1]
+EcoHake$T50=ecomat$T50[1]
 
-# Compute mean factor for each country. 
+for (i in 1:14)
+{
+  x=CAmat[i,1:2]
+  for (j in 5:ncol(EcoArray))
+  {
+    k=j+1
+    y=ecomat[10:11,k]	
+    aux=x*y
+    EcoHake[i,j]=sum(aux)
+  }
+}
 
-eco_countries <- lapply(countries_order, function(country){ # For each country
-  
-  
-  stocks_fished %>% 
-    filter_at(vars(one_of(country)),all_vars(.)) %>% # Keep the data for that country 
-    select(STOCK) %>% 
-    left_join(Table7,by="STOCK") %>% # Merge with data by stock
-    select(-STOCK) %>% 
-    group_by(SPECIES) %>% # For each species
-    summarise_all(funs(mean(.,na.rm=TRUE))) %>% # Compute the mean of each factor
-    ungroup() %>% 
-    mutate(COUNTRIES=country)
-  
-  
-}) %>% bind_rows() %>% # put all countries together
-  arrange(SPECIES,COUNTRIES) %>% # ORder by species and countries
-  select(COUNTRIES,SPECIES,everything()) # Reorder columns
+EcoCod=as.data.frame(EcoArray[,,2])
+EcoCod$country=rownames(EcoArray)
+EcoCod$AreaChange=ecomat$AreaChange[1]	
+EcoCod$Trange=ecomat$Trange[3]
+EcoCod$T50=ecomat$T50[3]
 
-# Prepare for word
+for (i in 1:14)
+{
+  x=as.numeric(CAmat[i,3:10])
+  for (j in 5:ncol(EcoArray))
+  {
+    k=j+1
+    y=ecomat[1:9,k]	
+    y=y[-2]
+    aux=x*y
+    EcoCod[i,j]=sum(aux)
+    EcoCod[i,j]=sum(na.omit(aux))
+  }
+}
+species=c(rep("Hake",14),rep("Cod",14))
 
-Table9 <- eco_countries %>% 
-  gather(FACTOR,VALUE,-SPECIES,-COUNTRIES) %>% 
-  unite(SP_FACTOR,SPECIES,FACTOR) %>% 
-  spread(SP_FACTOR,VALUE) %>% 
-  mutate_if(is.numeric,funs(ifelse(is.na(.),"-",sprintf("%0.3f",.)))) # Numbers to string
-  
+Ecoind_country=rbind(EcoHake,EcoCod)
+Ecoind_country$species=species
+Ecoind_country$country=as.factor(Ecoind_country$country)
+Ecoind_country$species=as.factor(Ecoind_country$species)
+Ecoind_country <- Ecoind_country[-c(4:5, 8:9, 11,13), ] #to drop countries with no catches for hake
+Ecoind_country[Ecoind_country == 0] <- NA
 
+##correcting abundance indicators by average values
 
-to.plot <- Table9[match(countries_order,Table9$COUNTRIES),]
-
-names(to.plot) <- make.names(names(to.plot))
-
-
-# Save to word
-
-Ft<- format_table(to.plot)
-
-header_labels <- names(to.plot) %>% gsub("Atlantic.cod_|European.hake_","",.) %>% as.list()
-
-names(header_labels)<- names(to.plot)
-
-Ft <- do.call(set_header_labels,c(list(x=Ft),header_labels))
-
-
-
-# Extra header
-
-extra_header <- c("",rep(c("COD","HAKE"),each=4)) %>% as.list
-
-names(extra_header)<- names(to.plot)
-
-Ft <- do.call(add_header,c(list(x=Ft,top=TRUE),extra_header)) %>% merge_h(part="header") %>% vline(i=1:2,j=1:ncol(to.plot),fp_border(width=0),part="header")
+X=Ecoind_country
+X$SSBrecent=X$B_SSBrecent/X$SSB.average
+X$SSBhistoric=X$B_SSBhistoric/X$SSB.average
+X$Ftrend=X$B_Ftrend/X$F.average
+X$Rtrend=X$B_Rtrend/X$R.average
 
 
+X %>% 
+  select(-B_SSBrecent,-B_SSBhistoric,-B_Ftrend,-B_Rtrend,-SSB.average,-F.average, -R.average) %>%
+  write_excel_csv("data/ecological_indicators_country.csv")
 
-write_doc(Ft,
-          "Table 9. Ecological Factors per fishing country and species.",
-          "Tables/Table9SI.docx",landscape = TRUE)
+
+##Normalization and calculation of Ecological Factors by country
 
 
-# Save factors by county to ecological_factors_country.csv
+#ABUNDANCE FACTOR
+X$SSBrecent_norm=normalize_positive(X$SSBrecent)
+X$SSBhistoric_norm=normalize_positive(X$SSBhistoric)
+X$Ftrend_norm=normalize_negative(X$Ftrend)
+X$Rtrend_norm=normalize_positive(X$Rtrend)
 
-eco_countries %>%  mutate_if(is.numeric,funs(round(.,digits = 9))) %>% 
-  select(SPECIES,COUNTRIES,"ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY") %>%
-  left_join(countries_dependence,by = c("COUNTRIES", "SPECIES")) %>% # Keep only countries that depend on this catch
-  filter(dependence) %>% select(-dependence) %>%
+X$ABUNDANCE=(X$SSBrecent_norm+X$Ftrend_norm)/2
+
+
+##TEMPERATURE FACTOR
+X$Trange_norm=(X$Trange-Trange_2)/(Trange_98-Trange_2)
+X$T50_norm=(X$T50-T50_2)/(T50_98-T50_2)
+X$TEMPERATURE=X$T50_norm
+
+
+#OVEREXPLOITATION FACTOR
+X$OverMSY_norm=normalize_negative(X$OverMSY)
+X$Status_norm=normalize_positive(X$Status)
+X$OVEREXPLOITATION=apply(X[,20:21],1,mean, na.rm=TRUE)
+
+#RECOVERY FACTOR
+X$Recovery_norm=(recovery_98-X$Recovery)/(recovery_98-recovery_2) # Normalization
+X$RECOVERY=X$Recovery_norm
+
+##saving Ecological factors by country
+
+
+eco_countries <-   X    %>% 
+  select("country","species","ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY") %>%
   write_excel_csv("data/ecological_factors_country.csv")
+
+
+
+##saving ecological RI by country
+Emat=cbind(X$ABUNDANCE,	X$TEMPERATURE,X$OVEREXPLOITATION,X$RECOVERY) 
+Ecoind_country$RI=apply(Emat,1,mean, na.rm=TRUE)
+Ecoind_country$RIdef= Ecoind_country$RI
+Ecoind_country$RIdef[rid==0]=NA #not working
+summary(Ecoind_country)
+#Ecoind_country$species=species
+
+
+write.table(Ecoind_country,"EcologicalRI_country.csv",sep=";") 
+
 
 ##### 3. SOCIOECONOMIC INDICATORS #####
 
@@ -987,7 +940,7 @@ Ft %<>% fontsize(j=1,size=10) %>% italic(j=1)
 
 write_doc(Ft,
           "Table 18. TAC (million tons) per stock and country (2015)",
-         "Tables/Table18SI.docx",landscape = TRUE)
+          "Tables/Table18SI.docx",landscape = TRUE)
 
 # Prepare for word
 
@@ -1008,10 +961,10 @@ Table19 <- Table19p %>%
   summarise(Above_advice=sum(Above_advice, na.rm = TRUE)) %>% # Sum stocks by country and species
   ungroup()%>%
   mutate(Above_advice_norm=normalize_negative(Above_advice) # Normalization negative
-         ) %>% 
+  ) %>% 
   rowwise() %>%
   mutate(QUOTAS=Above_advice_norm,na.rm=TRUE)
-  
+
 
 # Prepare for word
 
@@ -1132,4 +1085,6 @@ reduce(list(Table16 %>% select(COUNTRIES,ORGANIZATION),
 # Enable scientific notation again
 
 options(scipen=scipen)
+
+
 
