@@ -26,7 +26,14 @@ require(tidyverse)
 packageVersion("tidyverse")
 # [1] ‘1.2.1’
 
+
+if(!require(data.table)){
+  install.packages("data.table",dependencies = TRUE,repos='http://cran.us.r-project.org')
+}
+
+
 source("aux_functions.R")
+
 
 ##### 2. READ DATA #####
 
