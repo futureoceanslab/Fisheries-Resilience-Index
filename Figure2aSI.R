@@ -72,19 +72,32 @@ source("aux_functions.R")
 # 
 # ins_factors %<>% gather(FACTOR, VALUE, DEVELOPMENT:CO.MANAGEMENT, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR))) %>% mutate(FACTOR=factor(FACTOR,levels = c("DEVELOPMENT","QUOTAS","PROPERTY RIGHTS","CO MANAGEMENT")))
 
-eco_factors <- fread("data/ecological_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY")))
 
-soc_factors <- fread("data/socioeconomic_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("ADAPTIVE MNG","CATCH DEP","FLEET MOBILITY")))
+eco_factors <- fread("data/ecological_factors_country.csv")
+colnames(eco_factors)[1] = "COUNTRIES"
+colnames(eco_factors)[2] = "SPECIES"
+eco_factors <- eco_factors %>%  
+  gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% 
+  mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% 
+  mutate(FACTOR=factor(FACTOR,levels = c("ABUNDANCE","TEMPERATURE","OVEREXPLOITATION","RECOVERY")))
 
-ins_factors <- fread("data/institutional_factors_country.csv") %>% gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% mutate(FACTOR=factor(FACTOR,levels = c("STRENGTH","QUOTAS","PROPERTY RIGHTS","CO MANAGEMENT")))
+soc_factors <- fread("data/socioeconomic_factors_country.csv") %>% 
+  gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% 
+  mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% 
+  mutate(FACTOR=factor(FACTOR,levels = c("ADAPTIVE MNG","CATCH DEP","FLEET MOBILITY", "GEAR DiVERSITY")))
+
+ins_factors <- fread("data/institutional_factors_country.csv") %>% 
+  gather(FACTOR, VALUE, -SPECIES,-COUNTRIES, factor_key=TRUE)  %>% 
+  mutate(FACTOR=gsub("\\."," ",as.character(FACTOR)))  %>% 
+  mutate(FACTOR=factor(FACTOR,levels = c("STRENGTH","QUOTAS","PROPERTY RIGHTS","ORGANIZATION")))
 
 ##### 3. PLOT #####
 
 dimensions <- c("eco_factors","soc_factors","ins_factors")
   
 dimension_colors <- list(eco_factors=c("seagreen3","seagreen4"),
-                         soc_factors=c("yellow3","yellow4"),
-                         ins_factors=c("cornsilk3","cornsilk4"))
+                         soc_factors=c("sienna1","sienna3"),
+                         ins_factors=c("royalblue1","royalblue3"))
                          
 graphs <- dimensions  %>% lapply(function(dimension){
   # dimension <- "soc_factors"
@@ -116,7 +129,7 @@ graphs <- dimensions  %>% lapply(function(dimension){
 })
 
 
-png("Figures/Fig 2 SIa.png",width=25,height=12,units="in",res=300)
+png("Figures/Fig 2 SIa.png",width=25,height=12,units="in",res=600)
 
 do.call(grid_arrange_shared_legend,c(graphs, list(nrow = 1, ncol = 3)))
 
