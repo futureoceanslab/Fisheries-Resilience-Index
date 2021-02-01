@@ -94,7 +94,7 @@ species_average <- final_index %>%
   arrange(COUNTRIES,DIMENSION)  %>% 
   mutate(SPECIE=toupper(SPECIE))  %>%  
   group_by(COUNTRIES,SPECIE) %>%
-  summarise(Resilience_Index=mean(Resilience_Index,na.rm = TRUE)) %>%
+  #summarise(Resilience_Index=mean(Resilience_Index,na.rm = TRUE)) %>%
   ungroup()
 
 ##### 4. PLOT #####
