@@ -66,7 +66,7 @@ p1 <- ggplot(data=HAKENRTN, aes(x=SSB.SSBLIM, y=F.FLIM, color=TSYEAR)) +
   theme(axis.text.x = element_text(angle = 90, size = 8))
 p1
 
-p2 <- ggplot(data=HAKESOTH, aes(x=HAKESOTH$SSB.SSBLIM, y=HAKESOTH$F.FLIM, color=TSYEAR)) +
+p2 <- ggplot(data=HAKESOTH, aes(x=SSB.SSBLIM, y=F.FLIM, color=TSYEAR)) +
   geom_point(size=5)+
   geom_vline(xintercept = 1)+
   geom_hline(yintercept = 1)+
@@ -80,4 +80,13 @@ p2 <- ggplot(data=HAKESOTH, aes(x=HAKESOTH$SSB.SSBLIM, y=HAKESOTH$F.FLIM, color=
   theme(axis.text.x = element_text(angle = 90, size = 8))
 p2
 
-grid.arrange(p1, p2)
+graphs <- grid.arrange(p1, p2)
+
+
+# Save
+
+png("Figures/Fig 6a SI.png",width=9,height=7,units="in",res=600)
+
+do.call(grid.arrange,c(graphs))
+
+dev.off()
