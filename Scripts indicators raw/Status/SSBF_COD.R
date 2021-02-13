@@ -57,7 +57,6 @@ ggplot(data=SSBFCOD, aes(x=SSB.SSBLIM, y=F.FLIM, group=factor(STOCKID), color=fa
   ggtitle("SSBFCOD")
   #theme(axis.text.x = element_text(angle = 90, size = 8))
 
-##no sufficient data for CODBA2532
 p1 <- ggplot(data=CODBA2532, aes(x=SSB.SSBLIM, y=F.FLIM, color=TSYEAR)) +
   geom_point(size=5)+
   geom_vline(xintercept = 1)+
@@ -112,7 +111,7 @@ p4 <- ggplot(data=CODKAT, aes(x=SSB.SSBLIM, y=F.FLIM, color=TSYEAR)) +
   ylim(0.25, 1.8) +
   ggtitle("CODKAT")
   #theme(axis.text.x = element_text(angle = 90, size = 8))
-p4 #no data for kobe
+p4 
 
 p5 <- ggplot(data=CODNEAR, aes(x=CODNEAR$SSB.SSBLIM, y=CODNEAR$F.FLIM, color=TSYEAR)) +
   geom_point(size=5)+
@@ -141,7 +140,7 @@ p6 <- ggplot(data=CODNEARNCW, aes(x=SSB.SSBLIM, y=F.FLIM, color=TSYEAR)) +
   ylim(0.25, 1.8) +
   ggtitle("CODNEARNCW")
   #theme(axis.text.x = element_text(angle = 90, size = 8))
-p6 #no data for kobe
+p6 
 
 p7 <- ggplot(data=CODVIa, aes(x=SSB.SSBLIM, y=F.FLIM, color=TSYEAR)) +
   geom_point(size=5)+
@@ -185,4 +184,16 @@ p9 <- ggplot(data=CODIIIaW, aes(x=SSB.SSBLIM, y=F.FLIM, color=TSYEAR)) +
 #theme(axis.text.x = element_text(angle = 90, size = 8))
 p9
 
-grid.arrange(p2, p3, p5, p7, p8, p9)
+
+graphs <- grid.arrange(p2, p3, p5, p7, p8, p9)
+
+
+# Save
+
+png("Figures/Fig 6b SI.png",width=9,height=7,units="in",res=600)
+
+do.call(grid.arrange,c(graphs))
+
+dev.off()
+
+
