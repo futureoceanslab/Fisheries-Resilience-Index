@@ -300,16 +300,17 @@ colnames(stock) [which (colnames(stock) == "?..Species")] <- "Species"
 
 ##################################################
 # Upload Resilience data
+library(tidyverse)
 
 Res <- read.csv("Data/Lat_RI_Stock2.csv", sep = ";")
-Res$FRI.x.Stock<- as.factor(Res$RI.x.Stock)
+Res$RI_Stock<- as.factor(Res$RI_Stock)
 
 colnames(Res) [which (colnames(Res) == "SPECIES")] <- "Species"
 
-Res.cod<- Res%>% 
+Res.cod <- Res %>% 
   filter(Species == "Atlantic cod")
 
-Res.hake<- Res%>% 
+Res.hake <- Res %>% 
   filter(Species == "European hake")
 
 
@@ -321,7 +322,7 @@ matching.names <- match(stock$Stock_name, Res$Stock_name )
 #matching.names [1] <- 9
 #matching.names [2] <- 10
 
-stock_res <- Res$FRI.x.Stock [matching.names]
+stock_res <- Res$RI_Stock [matching.names]
 stock.res <- data.frame (stock, Res=stock_res)
 
 stock.res$Area_27 <- gsub(" ", "", stock.res$Area_27)

@@ -50,7 +50,7 @@ aggdata <- to.plot %>% group_by(COUNTRIES,SPECIE) %>% summarise(Resilience_Index
 
 ggplot(to.plot, aes(x=COUNTRIES, y=Resilience_Index))+
   geom_bar(aes(fill = DIMENSION), stat="identity",col=NA)+
-  scale_fill_manual(values=c("seagreen4","cornsilk3","yellow3"))+
+  scale_fill_manual(values=c("seagreen3","royalblue1","sienna1"))+
   geom_point(data= aggdata, aes(x=COUNTRIES, y= Resilience_Index,group=SPECIE),col="black",size=3)+
   coord_flip()+
   facet_wrap(~ SPECIE,ncol=2,scales="free_y")+
