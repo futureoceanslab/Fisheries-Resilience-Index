@@ -137,25 +137,49 @@ plot_p_values <- function(g,data,p_values,column_name){
   
 }
 
-# By dimension
+# By dimension and species
+##hake
 
-LatDim <- ggplot (na.omit(to.plot), aes(LAT,Resilience_Index, col = DIMENSION)) +
+to.plot.hake <- subset(to.plot, SPECIE=="Hake")
+
+LatDim1 <- ggplot (na.omit(to.plot.hake), aes(LAT,Resilience_Index, col = DIMENSION)) +
   geom_point(aes(shape=DIMENSION)) +
   geom_smooth(se = TRUE, method = "lm", size= 1,alpha=0.2)+
-  scale_color_manual(values=c("seagreen4","cornsilk3","yellow3"))+
+  scale_color_manual(values=c("seagreen3","royalblue1","sienna1"))+
   xlab("Latitude (º)")+
   ylab("R.I") +
+  scale_y_continuous(limit = c(0, 1))+
+    theme_classic() + 
+  theme(axis.text = element_text(size=16, color="black"),
+        axis.title = element_text(size=20, color="black"),
+        legend.text = element_text(size=12,color = "black"),
+        legend.title = element_text(size=14,color="black")) +
+  ggtitle("hake")
+
+LatDim1 <- plot_p_values(LatDim1, na.omit(to.plot.hake),p_values_dimensions,"DIMENSION") # plot p-values
+LatDim1
+
+
+##cod
+
+to.plot.cod <- subset(to.plot, SPECIE=="Cod")
+
+LatDim2 <- ggplot (na.omit(to.plot.cod), aes(LAT,Resilience_Index, col = DIMENSION)) +
+  geom_point(aes(shape=DIMENSION)) +
+  geom_smooth(se = TRUE, method = "lm", size= 1,alpha=0.2)+
+  scale_color_manual(values=c("seagreen3","royalblue1","sienna1"))+
+  xlab("Latitude (º)")+
+  ylab("R.I") +
+  scale_y_continuous(limit = c(0, 1))+
   theme_classic() + 
   theme(axis.text = element_text(size=16, color="black"),
         axis.title = element_text(size=20, color="black"),
         legend.text = element_text(size=12,color = "black"),
-        legend.title = element_text(size=14,color="black")) 
+        legend.title = element_text(size=14,color="black")) +
+  ggtitle("cod")
 
-LatDim <- plot_p_values(LatDim, na.omit(to.plot),p_values_dimensions,"DIMENSION") # plot p-values
-LatDim
-
-
-
+LatDim2 <- plot_p_values(LatDim2, na.omit(to.plot.cod),p_values_dimensions,"DIMENSION") # plot p-values
+LatDim2
 
 
 
@@ -181,11 +205,13 @@ LatSp
 
 # Arrange both panels in one graph and save
 
-png("Figures/Fig 5 SI.png",width=9,height=9,units="in",res=300)
+png("Figures/Fig 5 SI.png",width=9,height=7,units="in",res=600)
 
-grid.arrange(ggplotGrob(LatDim), ggplotGrob(LatSp), layout_matrix = cbind(c(1,2)))
+grid.arrange(ggplotGrob(LatDim1), ggplotGrob(LatDim2), ggplotGrob(LatSp))
 
 dev.off()
+
+
 
 
 ##### 6. TABLES #####
